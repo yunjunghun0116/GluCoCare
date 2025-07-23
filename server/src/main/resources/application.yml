@@ -1,0 +1,17 @@
+jwt:
+  expired-time: 86400000
+  secret-key: GLUCOCARE-SERVER-SECURITY-SECRET-KEY
+
+spring:
+  application:
+    name: server
+  datasource:
+    url: jdbc:mysql://localhost:3306/glucocare?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: glucocare
+    password: a1041714
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+

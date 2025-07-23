@@ -9,9 +9,11 @@ import com.glucocare.server.feature.member.dto.LoginRequest;
 import com.glucocare.server.security.JwtProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LoginUseCase {
@@ -21,24 +23,16 @@ public class LoginUseCase {
 
     @Transactional
     public AuthResponse execute(LoginRequest request) {
-        var member = saveMemberWithMemberRequest(request);
-        return createAuthResponseWithMember(member);
-    }
-
-    private AuthResponse createAuthResponseWithMember(Member member) {
+        var member = readMemberWithLoginRequest(request);
         return AuthResponse.of(jwtProvider.generateToken(member));
     }
 
-    private void validatePassword(LoginRequest request) {
-        var encodedPassword = passwordEncoder.encode(request.password());
-        if (memberRepository.existsByEmailAndPassword(request.email(), encodedPassword)) {
+    private Member readMemberWithLoginRequest(LoginRequest request) {
+        var member = memberRepository.findByEmail(request.email())
+                                     .orElseThrow(() -> new ApplicationException(ErrorMessage.INVALID_LOGIN_REQUEST_MATCHES));
+        if (!passwordEncoder.matches(request.password(), member.getPassword())) {
             throw new ApplicationException(ErrorMessage.INVALID_LOGIN_REQUEST_MATCHES);
         }
-    }
-
-    private Member saveMemberWithMemberRequest(LoginRequest loginRequest) {
-        validatePassword(loginRequest);
-        return memberRepository.findByEmailAndPassword(loginRequest.email(), loginRequest.password())
-                               .orElseThrow(() -> new ApplicationException(ErrorMessage.INVALID_LOGIN_REQUEST_MATCHES));
+        return member;
     }
 }

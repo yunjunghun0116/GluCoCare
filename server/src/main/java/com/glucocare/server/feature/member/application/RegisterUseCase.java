@@ -22,10 +22,6 @@ public class RegisterUseCase {
     @Transactional
     public AuthResponse execute(RegisterRequest request) {
         var member = saveMemberWithMemberRequest(request);
-        return createAuthResponseWithMember(member);
-    }
-
-    private AuthResponse createAuthResponseWithMember(Member member) {
         return AuthResponse.of(jwtProvider.generateToken(member));
     }
 
@@ -35,10 +31,10 @@ public class RegisterUseCase {
         }
     }
 
-    private Member saveMemberWithMemberRequest(RegisterRequest registerRequest) {
-        validateEmail(registerRequest.email());
-        var encodedPassword = passwordEncoder.encode(registerRequest.password());
-        var member = new Member(registerRequest.name(), registerRequest.email(), encodedPassword);
+    private Member saveMemberWithMemberRequest(RegisterRequest request) {
+        validateEmail(request.email());
+        var encodedPassword = passwordEncoder.encode(request.password());
+        var member = new Member(request.name(), request.email(), encodedPassword);
         return memberRepository.save(member);
     }
 }

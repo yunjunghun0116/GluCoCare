@@ -4,10 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class ApplicationException extends RuntimeException {
-
-    public ErrorMessage message;
+    public ErrorMessage errorMessage;
 
     public ApplicationException(ErrorMessage message) {
-        this.message = message;
+        this.errorMessage = message;
     }
 }

@@ -21,7 +21,7 @@ public class RegisterUseCase {
 
     @Transactional
     public AuthResponse execute(RegisterRequest request) {
-        var member = saveMemberWithMemberRequest(request);
+        var member = saveMemberWithRequest(request);
         return AuthResponse.of(jwtProvider.generateToken(member));
     }
 
@@ -31,7 +31,7 @@ public class RegisterUseCase {
         }
     }
 
-    private Member saveMemberWithMemberRequest(RegisterRequest request) {
+    private Member saveMemberWithRequest(RegisterRequest request) {
         validateEmail(request.email());
         var encodedPassword = passwordEncoder.encode(request.password());
         var member = new Member(request.name(), request.email(), encodedPassword);

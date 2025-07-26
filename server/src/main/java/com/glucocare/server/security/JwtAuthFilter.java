@@ -38,12 +38,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * 모든 HTTP 요청에 대해 JWT 토큰 검증을 수행
-     * 
-     * @param request HTTP 요청 객체
-     * @param response HTTP 응답 객체
+     *
+     * @param request     HTTP 요청 객체
+     * @param response    HTTP 응답 객체
      * @param filterChain 필터 체인
      * @throws ServletException 서블릿 예외
-     * @throws IOException IO 예외
+     * @throws IOException      IO 예외
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -69,8 +69,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * 멤버 인증 토큰을 SecurityContext에 설정
-     * 
-     * @param request HTTP 요청 객체
+     *
+     * @param request  HTTP 요청 객체
      * @param memberId 멤버 ID
      */
     private void setMemberAuthToken(HttpServletRequest request, Long memberId) {
@@ -86,15 +86,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext()
                                  .setAuthentication(authToken);
         } catch (Exception exception) {
-            request.setAttribute("exception", "토큰이 만료되었습니다..");
+            request.setAttribute("exception", "토큰이 만료되었습니다.");
         }
     }
 
     /**
      * JWT 토큰에서 멤버 ID를 추출
-     * 
+     *
      * @param request HTTP 요청 객체
-     * @param token JWT 토큰
+     * @param token   JWT 토큰
      * @return 멤버 ID (토큰이 유효하지 않으면 null)
      */
     private Long getMemberIdWithToken(HttpServletRequest request, String token) {
@@ -108,7 +108,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * Authorization 헤더에서 JWT 토큰을 추출
-     * 
+     *
      * @param request HTTP 요청 객체
      * @return JWT 토큰 (헤더가 유효하지 않으면 null)
      */
@@ -128,7 +128,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * 인증을 건너뛸 수 있는 요청인지 확인
-     * 
+     *
      * @param request HTTP 요청 객체
      * @return 인증을 건너뛸 수 있으면 true
      */
@@ -148,9 +148,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * 토큰 관련 예외 발생 시 401 응답을 즉시 반환
-     * 
+     *
      * @param response HTTP 응답 객체
-     * @param message 에러 메시지
+     * @param message  에러 메시지
      * @throws IOException IO 예외
      */
     private void handleTokenException(HttpServletResponse response, String message) throws IOException {

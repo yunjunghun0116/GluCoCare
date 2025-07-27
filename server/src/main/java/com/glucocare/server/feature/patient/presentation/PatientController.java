@@ -25,7 +25,7 @@ public class PatientController {
     }
 
     @PostMapping("/{patientId}")
-    public ResponseEntity<CreatePatientResponse> updateCgmServerUrl(@PathVariable Long patientId, @Valid @RequestBody UpdateCgmServerUrlRequest updateCgmServerUrlRequest) {
+    public ResponseEntity<Void> updateCgmServerUrl(@PathVariable Long patientId, @Valid @RequestBody UpdateCgmServerUrlRequest updateCgmServerUrlRequest) {
         updateCgmServerUrlUseCase.execute(patientId, updateCgmServerUrlRequest);
         return ResponseEntity.ok()
                              .build();

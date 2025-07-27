@@ -27,9 +27,9 @@ public class InvalidAuthEntryPoint implements AuthenticationEntryPoint {
     /**
      * 인증 실패 시 호출되는 메서드
      * 401 Unauthorized 상태코드와 에러 메시지를 JSON 형태로 반환
-     * 
-     * @param request HTTP 요청 객체
-     * @param response HTTP 응답 객체
+     *
+     * @param request       HTTP 요청 객체
+     * @param response      HTTP 응답 객체
      * @param authException 인증 예외
      * @throws IOException IO 예외
      */

@@ -1,10 +1,13 @@
-package com.glucocare.server.feature.caregiver.domain;
+package com.glucocare.server.feature.glucosehistory.domain;
 
-import com.glucocare.server.feature.member.domain.Member;
+import com.glucocare.server.feature.patient.domain.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
-    List<CareGiver> findAllByMember(Member member);
+public interface GlucoseHistoryRepository extends JpaRepository<GlucoseHistory, Long> {
+    List<GlucoseHistory> findAllByPatientOrderByDateDesc(Patient patient);
+
+    Optional<GlucoseHistory> findFirstByPatientOrderByDateDesc(Patient patient);
 }

@@ -1,5 +1,7 @@
-package com.glucocare.server.security;
+package com.glucocare.server.config;
 
+import com.glucocare.server.security.InvalidAuthEntryPoint;
+import com.glucocare.server.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +44,7 @@ public class SecurityConfig {
                                                                                    .permitAll()
                                                                                    .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
                                                                                    .permitAll()
-                                                                                   .requestMatchers("/api/members/login", "/api/members/register")
+                                                                                   .requestMatchers("/api/members/login", "/api/members/register", "/api/members/exists-email")
                                                                                    .permitAll()
                                                                                    .anyRequest()
                                                                                    .authenticated())

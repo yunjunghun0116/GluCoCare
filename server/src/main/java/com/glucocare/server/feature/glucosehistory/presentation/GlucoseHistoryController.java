@@ -1,46 +1,27 @@
-package com.glucocare.server.feature.member.persentation;
+package com.glucocare.server.feature.glucosehistory.presentation;
 
-import com.glucocare.server.feature.member.application.LoginUseCase;
-import com.glucocare.server.feature.member.application.RegisterUseCase;
-import com.glucocare.server.feature.member.application.UpdateNameUseCase;
-import com.glucocare.server.feature.member.dto.AuthResponse;
-import com.glucocare.server.feature.member.dto.LoginRequest;
-import com.glucocare.server.feature.member.dto.RegisterRequest;
-import com.glucocare.server.feature.member.dto.UpdateNameRequest;
-import jakarta.validation.Valid;
+import com.glucocare.server.feature.glucosehistory.application.ReadAllGlucoseHistoryUseCase;
+import com.glucocare.server.feature.glucosehistory.dto.ReadGlucoseHistoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/members")
-public class MemberController {
+@RequestMapping("/api/patients/{patientId}/glucose-histories")
+public class GlucoseHistoryController {
 
-    private final LoginUseCase loginUseCase;
-    private final RegisterUseCase registerUseCase;
-    private final UpdateNameUseCase updateNameUseCase;
+    private final ReadAllGlucoseHistoryUseCase readAllGlucoseHistoryUseCase;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        var auth = registerUseCase.execute(registerRequest);
-        return ResponseEntity.ok(auth);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        var auth = loginUseCase.execute(loginRequest);
-        return ResponseEntity.ok(auth);
-    }
-
-    @PostMapping("/update-name")
-    public ResponseEntity<AuthResponse> updateName(@AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateNameRequest updateNameRequest) {
-        updateNameUseCase.execute(memberId, updateNameRequest);
-        return ResponseEntity.ok()
-                             .build();
+    @GetMapping
+    public ResponseEntity<List<ReadGlucoseHistoryResponse>> readGlucoseHistories(@AuthenticationPrincipal Long memberId, @PathVariable Long patientId) {
+        var response = readAllGlucoseHistoryUseCase.execute(memberId, patientId);
+        return ResponseEntity.ok(response);
     }
 }

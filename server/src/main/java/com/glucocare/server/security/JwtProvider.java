@@ -1,5 +1,6 @@
 package com.glucocare.server.security;
 
+import com.glucocare.server.config.properties.JwtProperties;
 import com.glucocare.server.feature.member.domain.Member;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

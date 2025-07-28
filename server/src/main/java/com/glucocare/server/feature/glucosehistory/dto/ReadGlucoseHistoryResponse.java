@@ -1,12 +1,11 @@
-package com.glucocare.server.feature.caregiver.dto;
+package com.glucocare.server.feature.glucosehistory.dto;
 
-public record ReadCareGiverResponse(
+public record ReadGlucoseHistoryResponse(
         Long id,
-        Long patientId,
-        String name,
-        String cgmServerUrl
+        Long date,
+        Integer sgv
 ) {
-    public static ReadCareGiverResponse of(Long id, Long patientId, String name, String cgmServerUrl) {
-        return new ReadCareGiverResponse(id, patientId, name, cgmServerUrl);
+    public static ReadGlucoseHistoryResponse of(Long id, Long date, Integer sgv) {
+        return new ReadGlucoseHistoryResponse(id, date, sgv);
     }
 }

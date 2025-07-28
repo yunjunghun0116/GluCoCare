@@ -30,7 +30,7 @@ public class CareGiverController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReadCareGiverResponse>> getCareGivers(@AuthenticationPrincipal Long memberId) {
+    public ResponseEntity<List<ReadCareGiverResponse>> readCareGivers(@AuthenticationPrincipal Long memberId) {
         var response = readAllCareGiverUseCase.execute(memberId);
         return ResponseEntity.ok(response);
     }

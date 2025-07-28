@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class FetchGlucoseHistory {
+public class FetchGlucoseHistoryUseCase {
 
     private final CgmServerClient cgmServerClient;
     private final PatientRepository patientRepository;

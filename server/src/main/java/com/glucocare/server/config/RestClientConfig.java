@@ -1,4 +1,4 @@
-package gift.config;
+package com.glucocare.server.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ public class RestClientConfig {
         factory.setConnectTimeout(5000);
         factory.setReadTimeout(5000);
         return RestClient.builder()
-                .requestFactory(factory)
-                .build();
+                         .requestFactory(factory)
+                         .build();
     }
 }

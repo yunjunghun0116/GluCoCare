@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ReadAllGlucoseHistory {
+public class ReadAllGlucoseHistoryUseCase {
     private final PatientRepository patientRepository;
     private final GlucoseHistoryRepository glucoseHistoryRepository;
     private final CareGiverRepository careGiverRepository;

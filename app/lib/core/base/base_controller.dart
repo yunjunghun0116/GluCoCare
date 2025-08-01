@@ -84,6 +84,10 @@ abstract class BaseController<S extends BaseState> extends StateNotifier<S> {
       state = state.copyWith(isLoading: false) as S;
     }
   }
+
+  String getBearerToken(String accessToken) {
+    return "Bearer $accessToken";
+  }
 }
 
 class BaseState {

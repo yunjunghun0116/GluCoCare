@@ -1,9 +1,21 @@
+import 'dart:async';
+
 import 'package:app/features/main/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/exceptions/exception_handler.dart';
+
+final rootStateKey = GlobalKey<NavigatorState>();
+
 void main() {
-  runApp(ProviderScope(child: const MainApp()));
+  FlutterError.onError = (FlutterErrorDetails details) {
+    ExceptionHandler().handleException(details.exception, details.stack, rootStateKey.currentContext);
+  };
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    runApp(ProviderScope(child: const MainApp()));
+  }, (error, stackTrace) => ExceptionHandler().handleException(error, stackTrace, rootStateKey.currentContext));
 }
 
 class MainApp extends StatelessWidget {
@@ -14,6 +26,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: "글루코케어",
       debugShowCheckedModeBanner: false,
+      navigatorKey: rootStateKey,
       builder: (context, child) {
         if (child == null) return Container();
         return MediaQuery(

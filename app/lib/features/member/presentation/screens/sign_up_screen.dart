@@ -5,7 +5,7 @@ import '../../../../core/exceptions/custom_exception.dart';
 import '../../../../core/exceptions/exception_message.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/utils/sign_util.dart';
-import '../../data/models/register_dto.dart';
+import '../../../auth/data/models/register_dto.dart';
 import '../providers.dart';
 import 'email_password_screen.dart';
 import 'member_information_screen.dart';

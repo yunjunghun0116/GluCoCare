@@ -19,6 +19,18 @@ class AuthController extends BaseController<BaseState> {
     return null;
   }
 
+  Future<String?> autoLogin(String accessToken) async {
+    var response = await postRequest(
+      "${AppValues.serverBaseUrl}/api/members/auto-login",
+      headers: {"Authorization": getBearerToken(accessToken)},
+    );
+
+    if (response.statusCode == 200) {
+      return response.data["token"];
+    }
+    return null;
+  }
+
   Future<String?> register(RegisterDto registerDto) async {
     var response = await postRequest(
       "${AppValues.serverBaseUrl}/api/members/register",
@@ -30,11 +42,11 @@ class AuthController extends BaseController<BaseState> {
     return null;
   }
 
-  Future<bool> autoLogin() async {
-    return true;
-  }
-
   Future<bool> validateUniqueEmail(String email) async {
-    return true;
+    var response = await postRequest("${AppValues.serverBaseUrl}/api/members/exists-email", data: {"email": email});
+    if (response.statusCode == 200) {
+      return response.data;
+    }
+    return false;
   }
 }

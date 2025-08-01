@@ -4,37 +4,18 @@ import 'package:app/shared/constants/app_values.dart';
 
 import '../../../../core/base/base_controller.dart';
 
-class AuthController extends BaseController<BaseState> {
-  AuthController(super.state, super.dio);
+class MemberController extends BaseController<BaseState> {
+  MemberController(super.state, super.dio);
 
-  Future<String?> login(LoginDto loginDto) async {
-    var response = await postRequest(
-      "${AppValues.serverBaseUrl}/api/members/login",
-      data: {"email": loginDto.email, "password": loginDto.password},
+  Future<String?> getName(String accessToken) async {
+    var authorization = getBearerToken(accessToken);
+    var response = await getRequest(
+      "${AppValues.serverBaseUrl}/api/members/name",
+      headers: {"Authorization": authorization},
     );
-
-    if (response.statusCode == 200) {
-      return response.data["token"];
-    }
-    return null;
-  }
-
-  Future<String?> register(RegisterDto registerDto) async {
-    var response = await postRequest(
-      "${AppValues.serverBaseUrl}/api/members/register",
-      data: {"email": registerDto.email, "password": registerDto.password, "name": registerDto.name},
-    );
-    if (response.statusCode == 200) {
-      return response.data["token"];
-    }
-    return null;
-  }
-
-  Future<bool> validateUniqueEmail(String email) async {
-    var response = await postRequest("${AppValues.serverBaseUrl}/api/members/exists-email", data: {"email": email});
     if (response.statusCode == 200) {
       return response.data;
     }
-    return false;
+    return null;
   }
 }

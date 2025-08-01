@@ -37,7 +37,7 @@ public class MemberController {
     }
 
     @PostMapping("/update-name")
-    public ResponseEntity<AuthResponse> updateName(@AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateNameRequest updateNameRequest) {
+    public ResponseEntity<Void> updateName(@AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateNameRequest updateNameRequest) {
         updateNameUseCase.execute(memberId, updateNameRequest);
         return ResponseEntity.ok()
                              .build();

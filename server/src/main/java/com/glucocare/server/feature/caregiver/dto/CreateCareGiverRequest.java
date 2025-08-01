@@ -1,9 +1,10 @@
 package com.glucocare.server.feature.caregiver.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateCareGiverRequest(
         @NotBlank(message = "이름의 길이는 최소 1자 이상이어야 합니다.") String name,
-        @NotBlank(message = "CGM 서버는 반드시 입력되어야 합니다.") String cgmServerUrl
+        @NotNull(message = "환자의 ID는 반드시 입력되어야 합니다.") Long patientId
 ) {
 }

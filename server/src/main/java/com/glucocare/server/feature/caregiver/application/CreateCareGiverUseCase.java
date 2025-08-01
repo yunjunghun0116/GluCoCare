@@ -58,6 +58,9 @@ public class CreateCareGiverUseCase {
                                      .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
         var patient = patientRepository.findByNameAndId(request.name(), request.patientId())
                                        .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+        if (careGiverRepository.existsByMemberAndPatient(member, patient)) {
+            throw new ApplicationException(ErrorMessage.ALREADY_EXISTS);
+        }
         var careGiver = new CareGiver(member, patient);
         return careGiverRepository.save(careGiver);
     }

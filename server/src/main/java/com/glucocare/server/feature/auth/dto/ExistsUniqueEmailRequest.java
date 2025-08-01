@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.member.dto;
+package com.glucocare.server.feature.auth.dto;
 
 import jakarta.validation.constraints.Email;
 

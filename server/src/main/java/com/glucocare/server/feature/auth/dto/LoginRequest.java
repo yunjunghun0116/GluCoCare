@@ -1,11 +1,9 @@
-package com.glucocare.server.feature.member.dto;
+package com.glucocare.server.feature.auth.dto;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record RegisterRequest(
-        @NotBlank(message = "이름의 길이는 최소 1자 이상이어야 합니다.") String name,
+public record LoginRequest(
         @Email(message = "허용되지 않은 형식의 이메일입니다.") String email,
         @Size(
                 min = 8,

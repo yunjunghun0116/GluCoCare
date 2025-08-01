@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.member.dto;
+package com.glucocare.server.feature.auth.dto;
 
 public record AuthResponse(
         String token

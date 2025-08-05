@@ -1,7 +1,3 @@
-import 'package:app/features/auth/data/models/login_dto.dart';
-import 'package:app/features/auth/data/models/register_dto.dart';
-import 'package:app/shared/constants/app_values.dart';
-
 import '../../../../core/base/base_controller.dart';
 
 class MemberController extends BaseController<BaseState> {

@@ -1,5 +1,4 @@
 import 'package:app/core/data/repositories/local_repository.dart';
-import 'package:app/core/providers.dart';
 import 'package:app/features/auth/presentation/providers.dart';
 import 'package:app/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
@@ -7,8 +6,6 @@ import 'package:app/shared/utils/sign_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/exceptions/custom_exception.dart';
-import '../../../core/exceptions/exception_message.dart';
 import '../../../shared/constants/app_colors.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {

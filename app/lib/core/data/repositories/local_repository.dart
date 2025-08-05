@@ -5,6 +5,7 @@ import '../../exceptions/exception_message.dart';
 
 class LocalRepository {
   static final LocalRepository _instance = LocalRepository._internal();
+
   factory LocalRepository() => _instance;
 
   late final SharedPreferences _preferences;

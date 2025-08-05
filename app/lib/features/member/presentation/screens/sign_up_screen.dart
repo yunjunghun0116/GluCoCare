@@ -7,7 +7,6 @@ import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/utils/sign_util.dart';
 import '../../../auth/data/models/register_dto.dart';
 import '../../../auth/presentation/providers.dart';
-import '../providers.dart';
 import 'email_password_screen.dart';
 import 'member_information_screen.dart';
 import 'signing_screen.dart';

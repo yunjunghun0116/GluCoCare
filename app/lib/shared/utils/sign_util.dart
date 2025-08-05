@@ -1,4 +1,3 @@
-import 'package:app/core/providers.dart';
 import 'package:app/features/main/screens/main_screen.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:flutter/material.dart';

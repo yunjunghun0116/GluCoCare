@@ -1,30 +1,25 @@
-import 'package:app/core/domain/repositories/local_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../exceptions/custom_exception.dart';
 import '../../exceptions/exception_message.dart';
 
-class LocalRepositoryImpl implements LocalRepository {
-  static final LocalRepositoryImpl _instance = LocalRepositoryImpl._internal();
-
-  factory LocalRepositoryImpl() => _instance;
-
-  LocalRepositoryImpl._internal();
+class LocalRepository {
+  static final LocalRepository _instance = LocalRepository._internal();
+  factory LocalRepository() => _instance;
 
   late final SharedPreferences _preferences;
 
-  @override
+  LocalRepository._internal();
+
   Future<void> initialize() async {
     _preferences = await SharedPreferences.getInstance();
   }
 
-  @override
   void delete(String key) {
     if (!_preferences.containsKey(key)) return;
     _preferences.remove(key);
   }
 
-  @override
   T read<T>(String key) {
     if (!_preferences.containsKey(key)) throw CustomException(ExceptionMessage.badRequest);
     dynamic value = _preferences.get(key);
@@ -34,7 +29,6 @@ class LocalRepositoryImpl implements LocalRepository {
     throw CustomException(ExceptionMessage.invalidType);
   }
 
-  @override
   Future<void> save<T>(String key, value) async {
     if (value is String) {
       await _preferences.setString(key, value);

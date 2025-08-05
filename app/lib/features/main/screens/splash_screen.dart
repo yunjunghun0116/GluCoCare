@@ -1,3 +1,4 @@
+import 'package:app/core/data/repositories/local_repository.dart';
 import 'package:app/core/providers.dart';
 import 'package:app/features/auth/presentation/providers.dart';
 import 'package:app/features/auth/presentation/screens/sign_in_screen.dart';
@@ -22,29 +23,24 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(Duration(seconds: 1), () => _initializeProvider());
-      var token = await _validateSavedAccessToken();
+      await Future.delayed(Duration(seconds: 1), () async => await LocalRepository().initialize());
+      var accessToken = LocalRepository().read<String>(LocalRepositoryKey.accessToken);
+      var success = await _validateSavedAccessToken(accessToken);
       if (!mounted) return;
-      if (token != null) {
-        SignUtil.login(context, ref: ref, token: token);
+      if (success) {
+        SignUtil.login(context, ref: ref, token: accessToken);
         return;
       }
       Navigator.push(context, MaterialPageRoute(builder: (_) => SignInScreen()));
     });
   }
 
-  Future<void> _initializeProvider() async {
-    await ref.read(localRepositoryProvider).initialize();
-  }
-
-  Future<String?> _validateSavedAccessToken() async {
+  Future<bool> _validateSavedAccessToken(String accessToken) async {
     try {
-      var savedToken = ref.read(localRepositoryProvider).read<String>(LocalRepositoryKey.accessToken);
-      var token = await ref.read(authControllerProvider.notifier).autoLogin(savedToken);
-      if (token == null) throw CustomException(ExceptionMessage.badRequest);
-      return token;
-    } on CustomException catch (e) {
-      return null;
+      var success = await ref.read(authControllerProvider.notifier).autoLogin(accessToken);
+      return success;
+    } catch (e) {
+      return false;
     }
   }
 

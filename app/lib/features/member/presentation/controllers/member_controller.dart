@@ -8,11 +8,7 @@ class MemberController extends BaseController<BaseState> {
   MemberController(super.state, super.dio);
 
   Future<String?> getName(String accessToken) async {
-    var authorization = getBearerToken(accessToken);
-    var response = await getRequest(
-      "${AppValues.serverBaseUrl}/api/members/name",
-      headers: {"Authorization": authorization},
-    );
+    var response = await getRequest("/api/members/name");
     if (response.statusCode == 200) {
       return response.data;
     }

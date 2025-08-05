@@ -1,6 +1,7 @@
 package com.glucocare.server.security;
 
 import com.glucocare.server.config.properties.JwtProperties;
+import com.glucocare.server.feature.auth.dto.AuthResponse;
 import com.glucocare.server.feature.member.domain.Member;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,18 +21,43 @@ public class JwtProvider {
 
     private final JwtProperties jwtProperties;
 
+    public AuthResponse generateToken(Member member) {
+        var accessToken = generateAccessToken(member);
+        var refreshToken = generateRefreshToken(member);
+        return AuthResponse.of(accessToken, refreshToken);
+
+    }
+
     /**
-     * 멤버 정보를 바탕으로 JWT 토큰을 생성
+     * 멤버 정보를 바탕으로 AccessToken 을 생성
      *
      * @param member 대상 멤버
-     * @return 생성된 JWT 토큰 문자열
+     * @return 생성된 AccessToken 토큰 문자열
      */
-    public String generateToken(Member member) {
+    private String generateAccessToken(Member member) {
         return Jwts.builder()
                    .subject(member.getId()
                                   .toString())
                    .issuedAt(new Date())
-                   .expiration(new Date(System.currentTimeMillis() + jwtProperties.expiredTime()))
+                   .expiration(new Date(System.currentTimeMillis() + jwtProperties.accessTokenExpiredTime()))
+                   .signWith(Keys.hmacShaKeyFor(jwtProperties.secretKey()
+                                                             .getBytes()))
+                   .compact();
+
+    }
+
+    /**
+     * 멤버 정보를 바탕으로 RefreshToken 을 생성
+     *
+     * @param member 대상 멤버
+     * @return 생성된 RefreshToken 토큰 문자열
+     */
+    private String generateRefreshToken(Member member) {
+        return Jwts.builder()
+                   .subject(member.getId()
+                                  .toString())
+                   .issuedAt(new Date())
+                   .expiration(new Date(System.currentTimeMillis() + jwtProperties.refreshTokenExpiredTime()))
                    .signWith(Keys.hmacShaKeyFor(jwtProperties.secretKey()
                                                              .getBytes()))
                    .compact();

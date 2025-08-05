@@ -2,6 +2,8 @@ package com.glucocare.server.feature.auth.application;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
+import com.glucocare.server.feature.auth.domain.AuthToken;
+import com.glucocare.server.feature.auth.domain.AuthTokenRepository;
 import com.glucocare.server.feature.auth.dto.AuthResponse;
 import com.glucocare.server.feature.auth.dto.LoginRequest;
 import com.glucocare.server.feature.member.domain.Member;
@@ -25,6 +27,7 @@ public class LoginUseCase {
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+    private final AuthTokenRepository authTokenRepository;
 
     /**
      * 회원 로그인을 처리하는 메인 메서드
@@ -40,7 +43,7 @@ public class LoginUseCase {
      */
     public AuthResponse execute(LoginRequest request) {
         var member = readMemberWithLoginRequest(request);
-        return AuthResponse.of(jwtProvider.generateToken(member));
+        return saveRefreshToken(member);
     }
 
     /**
@@ -62,5 +65,19 @@ public class LoginUseCase {
             throw new ApplicationException(ErrorMessage.INVALID_LOGIN_REQUEST_MATCHES);
         }
         return member;
+    }
+
+    private AuthResponse saveRefreshToken(Member member) {
+        var tokenResponse = jwtProvider.generateToken(member);
+        if (!authTokenRepository.existsByMember(member)) {
+            var authToken = new AuthToken(member, tokenResponse.refreshToken());
+            authTokenRepository.save(authToken);
+            return tokenResponse;
+        }
+        var authToken = authTokenRepository.findByMember(member)
+                                           .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+        authToken.updateRefreshToken(tokenResponse.refreshToken());
+        authTokenRepository.save(authToken);
+        return tokenResponse;
     }
 }

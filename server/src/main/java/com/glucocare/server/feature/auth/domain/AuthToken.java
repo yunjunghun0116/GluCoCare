@@ -1,34 +1,33 @@
-package com.glucocare.server.feature.caregiver.domain;
+package com.glucocare.server.feature.auth.domain;
 
 import com.glucocare.server.feature.member.domain.Member;
-import com.glucocare.server.feature.patient.domain.Patient;
 import com.glucocare.server.shared.domain.BaseEntity;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import static jakarta.persistence.FetchType.LAZY;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Entity
-@Table(name = "care_giver")
+@Table(name = "auth_token")
 @Getter
-public class CareGiver extends BaseEntity {
+public class AuthToken extends BaseEntity {
     @NotNull
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
     @NotNull
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
+    @Column(name = "refresh_token")
+    private String refreshToken;
 
-    protected CareGiver() {
+    protected AuthToken() {
     }
 
-    public CareGiver(Member member, Patient patient) {
+    public AuthToken(Member member, String refreshToken) {
         this.member = member;
-        this.patient = patient;
+        this.refreshToken = refreshToken;
+    }
+
+    public void updateRefreshToken(String newRefreshToken) {
+        this.refreshToken = newRefreshToken;
     }
 }

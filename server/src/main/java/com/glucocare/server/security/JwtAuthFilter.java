@@ -5,11 +5,13 @@ import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
 import com.glucocare.server.exception.ExceptionResponse;
 import com.glucocare.server.feature.member.domain.MemberRepository;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +32,7 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
@@ -54,11 +57,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         var token = getTokenWithAuthorizationHeader(request);
         if (token == null) {
             handleTokenException(response, "잘못된 토큰 정보입니다.");
+            log.info("토큰의 형식이 잘못되었습니다.");
             return;
         }
         var memberId = getMemberIdWithToken(request, token);
         if (memberId == null) {
             handleTokenException(response, "토큰이 만료되었습니다.");
+            log.info("토큰[{}]의 유효기간이 만료되었습니다.", token);
             return;
         }
 
@@ -74,20 +79,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * @param memberId 멤버 ID
      */
     private void setMemberAuthToken(HttpServletRequest request, Long memberId) {
-        try {
-            var member = memberRepository.findById(memberId)
-                                         .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
-            var authorities = List.of(new SimpleGrantedAuthority(member.getMemberRole()
-                                                                       .name()));
-            var authToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getEmail(), authorities);
-            var authDetails = new WebAuthenticationDetailsSource().buildDetails(request);
-            authToken.setDetails(authDetails);
+        var member = memberRepository.findById(memberId)
+                                     .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+        var authorities = List.of(new SimpleGrantedAuthority(member.getMemberRole()
+                                                                   .name()));
+        var authToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getEmail(), authorities);
+        var authDetails = new WebAuthenticationDetailsSource().buildDetails(request);
+        authToken.setDetails(authDetails);
 
-            SecurityContextHolder.getContext()
-                                 .setAuthentication(authToken);
-        } catch (Exception exception) {
-            request.setAttribute("exception", "토큰이 만료되었습니다.");
-        }
+        SecurityContextHolder.getContext()
+                             .setAuthentication(authToken);
     }
 
     /**
@@ -100,7 +101,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private Long getMemberIdWithToken(HttpServletRequest request, String token) {
         try {
             return jwtProvider.getMemberIdWithToken(token);
-        } catch (Exception exception) {
+        } catch (JwtException jwtException) {
             request.setAttribute("exception", "토큰이 만료되었습니다.");
             return null;
         }

@@ -1,21 +1,12 @@
 package com.glucocare.server.feature.auth.persentation;
 
-import com.glucocare.server.feature.auth.application.AutoLoginUseCase;
-import com.glucocare.server.feature.auth.application.ExistsUniqueEmailUseCase;
-import com.glucocare.server.feature.auth.application.LoginUseCase;
-import com.glucocare.server.feature.auth.application.RegisterUseCase;
-import com.glucocare.server.feature.auth.dto.AuthResponse;
-import com.glucocare.server.feature.auth.dto.ExistsUniqueEmailRequest;
-import com.glucocare.server.feature.auth.dto.LoginRequest;
-import com.glucocare.server.feature.auth.dto.RegisterRequest;
+import com.glucocare.server.feature.auth.application.*;
+import com.glucocare.server.feature.auth.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,6 +17,7 @@ public class AuthController {
     private final RegisterUseCase registerUseCase;
     private final ExistsUniqueEmailUseCase existsUniqueEmailUseCase;
     private final AutoLoginUseCase autoLoginUseCase;
+    private final RefreshTokenUseCase refreshTokenUseCase;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
@@ -39,10 +31,18 @@ public class AuthController {
         return ResponseEntity.ok(auth);
     }
 
-    @PostMapping("/auto-login")
-    public ResponseEntity<AuthResponse> login(@AuthenticationPrincipal Long memberId) {
-        var auth = autoLoginUseCase.execute(memberId);
-        return ResponseEntity.ok(auth);
+    @GetMapping("/auto-login")
+    public ResponseEntity<Boolean> autoLogin(@AuthenticationPrincipal Long memberId) {
+        autoLoginUseCase.execute(memberId);
+        return ResponseEntity.ok()
+                             .build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<Boolean> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        refreshTokenUseCase.execute(refreshTokenRequest);
+        return ResponseEntity.ok()
+                             .build();
     }
 
     @PostMapping("/exists-email")

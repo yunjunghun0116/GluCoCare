@@ -4,7 +4,6 @@ import 'package:app/features/care_giver/data/models/care_giver_response_dto.dart
 import 'package:app/features/care_giver/presentation/providers.dart';
 import 'package:app/features/care_giver/presentation/screens/create_care_giver_screen.dart';
 import 'package:app/features/glucose_history/presentation/widgets/glucose_chart.dart';
-import 'package:app/features/member/presentation/providers.dart';
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:flutter/material.dart';

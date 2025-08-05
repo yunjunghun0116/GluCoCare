@@ -1,17 +1,14 @@
 import 'package:app/features/glucose_history/data/models/glucose_history_response_dto.dart';
 import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/shared/constants/app_colors.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../../../../core/exceptions/custom_exception.dart';
-import '../../../../core/exceptions/exception_message.dart';
-
 class GlucoseChart extends ConsumerStatefulWidget {
   final int patientId;
+
   const GlucoseChart({super.key, required this.patientId});
 
   @override

@@ -1,5 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
 class GlucoseHistoryResponseDto {
   final int id;
   final DateTime dateTime;

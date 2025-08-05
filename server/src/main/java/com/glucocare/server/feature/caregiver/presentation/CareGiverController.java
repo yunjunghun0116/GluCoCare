@@ -3,6 +3,7 @@ package com.glucocare.server.feature.caregiver.presentation;
 import com.glucocare.server.feature.caregiver.application.CreateCareGiverUseCase;
 import com.glucocare.server.feature.caregiver.application.DeleteCareGiverUseCase;
 import com.glucocare.server.feature.caregiver.application.ReadAllCareGiverUseCase;
+import com.glucocare.server.feature.caregiver.application.ReadCareGiverUseCase;
 import com.glucocare.server.feature.caregiver.dto.CreateCareGiverRequest;
 import com.glucocare.server.feature.caregiver.dto.CreateCareGiverResponse;
 import com.glucocare.server.feature.caregiver.dto.ReadCareGiverResponse;
@@ -20,12 +21,19 @@ import java.util.List;
 public class CareGiverController {
 
     private final CreateCareGiverUseCase createCareGiverUseCase;
+    private final ReadCareGiverUseCase readCareGiverUseCase;
     private final ReadAllCareGiverUseCase readAllCareGiverUseCase;
     private final DeleteCareGiverUseCase deleteCareGiverUseCase;
 
     @PostMapping
     public ResponseEntity<CreateCareGiverResponse> createCareGiver(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateCareGiverRequest createCareGiverRequest) {
         var response = createCareGiverUseCase.execute(memberId, createCareGiverRequest);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReadCareGiverResponse> readCareGiver(@PathVariable Long id) {
+        var response = readCareGiverUseCase.execute(id);
         return ResponseEntity.ok(response);
     }
 
@@ -36,8 +44,8 @@ public class CareGiverController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCareGiver(@AuthenticationPrincipal Long memberId, @PathVariable Long id) {
-        deleteCareGiverUseCase.execute(memberId, id);
+    public ResponseEntity<Void> deleteCareGiver(@PathVariable Long id) {
+        deleteCareGiverUseCase.execute(id);
         return ResponseEntity.ok()
                              .build();
     }

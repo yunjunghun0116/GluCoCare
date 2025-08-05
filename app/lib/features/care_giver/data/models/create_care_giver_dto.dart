@@ -1,5 +1,3 @@
-import 'package:json_annotation/json_annotation.dart';
-
 class CreateCareGiverDto {
   final int patientId;
   final String patientName;

@@ -1,7 +1,6 @@
 jwt:
-  # 86400000 : 24시간
-  access-token-expired-time: 86400000
-  refresh-token-expired-time: 8640000000
+  access-token-expired-time: 7200000     # 2시간
+  refresh-token-expired-time: 2592000000 # 30일
   secret-key: GLUCOCARE-SERVER-SECURITY-SECRET-KEY
 cgm:
   api-secret: 6657e0a81db2984bcc01291d854c9af3be759471

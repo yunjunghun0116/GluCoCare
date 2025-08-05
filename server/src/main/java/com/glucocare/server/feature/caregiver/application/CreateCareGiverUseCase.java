@@ -72,11 +72,10 @@ public class CreateCareGiverUseCase {
      * 클라이언트에게 반환할 응답 객체를 생성합니다.
      *
      * @param careGiver 변환할 간병인 관계 엔티티
-     * @return 간병인 ID, 회원 ID, 환자 ID, 환자 이름을 포함한 응답 객체
+     * @return 간병인 ID, 환자 ID, 환자 이름을 포함한 응답 객체
      */
     private CreateCareGiverResponse createCareGiverResponse(CareGiver careGiver) {
-        var member = careGiver.getMember();
         var patient = careGiver.getPatient();
-        return CreateCareGiverResponse.of(careGiver.getId(), member.getId(), patient.getId(), patient.getName());
+        return CreateCareGiverResponse.of(careGiver.getId(), patient.getId(), patient.getName());
     }
 }

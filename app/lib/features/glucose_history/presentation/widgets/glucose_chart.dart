@@ -1,6 +1,7 @@
 import 'package:app/features/glucose_history/data/models/glucose_history_response_dto.dart';
 import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/shared/constants/app_colors.dart';
+import 'package:app/shared/utils/glucose_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -47,10 +48,22 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (records.isEmpty) return Text('데이터가 없습니다.');
+    if (records.isEmpty) {
+      return Column(
+        children: [
+          SizedBox(height: 20),
+          Center(
+            child: Text(
+              "해당 Care Receiver의 \n혈당 정보가 존재하지 않습니다.\n혈당 정보를 업로드해주세요.",
+              style: TextStyle(fontSize: 16, height: 20 / 16, color: AppColors.mainColor),
+            ),
+          ),
+        ],
+      );
+    }
     labelShowSet.clear();
-    var maxDate = records.last.dateTime.add(Duration(hours: 12)).difference(DateTime.now()).isNegative
-        ? records.last.dateTime.add(Duration(hours: 12))
+    var maxDate = records.last.dateTime.add(Duration(hours: 3)).difference(DateTime.now()).isNegative
+        ? records.last.dateTime.add(Duration(hours: 3))
         : DateTime.now();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -82,7 +95,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
               height: 300,
               child: SfCartesianChart(
                 primaryXAxis: DateTimeAxis(
-                  minimum: records.first.dateTime.subtract(Duration(hours: 12)),
+                  minimum: records.first.dateTime.subtract(Duration(hours: 3)),
                   maximum: maxDate,
                   interval: interval,
                   labelAlignment: LabelAlignment.center,
@@ -137,12 +150,42 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                     xValueMapper: (dto, _) => dto.dateTime,
                     yValueMapper: (dto, _) => dto.sgv,
                     width: 2,
-                    markerSettings: MarkerSettings(isVisible: true, width: 4, height: 4),
+                    markerSettings: MarkerSettings(isVisible: false, width: 3, height: 3),
                   ),
                 ],
               ),
             ),
           ),
+        ),
+        SizedBox(height: 20),
+        Builder(
+          builder: (_) {
+            var todayGlucose = GlucoseUtil.getLastDateGlucoseData(records);
+            if (todayGlucose == null) return Container();
+            var lastDate = records.last.dateTime;
+            var lastDateString = DateFormat("MM월 dd일").format(lastDate);
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "통계 정보($lastDateString)",
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 20 / 16,
+                      color: AppColors.mainColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text("최고 혈당 수치 : ${todayGlucose.max}"),
+                  Text("최저 혈당 수치 : ${todayGlucose.min}"),
+                  Text("평균 혈당 수치 : ${todayGlucose.avg.toStringAsFixed(2)}"),
+                ],
+              ),
+            );
+          },
         ),
       ],
     );

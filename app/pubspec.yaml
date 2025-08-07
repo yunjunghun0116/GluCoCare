@@ -27,6 +27,13 @@ dependencies:
   fl_chart: ^1.0.0
   syncfusion_flutter_charts: ^30.1.42
   intl: ^0.20.2
+  # 파이어베이스
+  firebase_core: ^4.0.0
+  firebase_messaging: ^16.0.0
+  # 알림 
+  flutter_local_notifications: ^19.4.0
+  # 권한 관리
+  permission_handler: ^12.0.1
 
 dev_dependencies:
   flutter_test:

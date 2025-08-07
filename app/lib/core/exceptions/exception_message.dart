@@ -20,7 +20,9 @@ enum ExceptionMessage {
   /* 닉네임 관련 메시지 */
   wrongNameRegExp(400, "잘못된 형식의 닉네임입니다."),
   /* 나이 관련 메시지 */
-  wrongAgeRegExp(400, "올바른 형식의 나이를 입력해 주세요.");
+  wrongAgeRegExp(400, "올바른 형식의 나이를 입력해 주세요."),
+  /* Care Giver 관련 메시지*/
+  invalidPatientInformation(400, "유효하지 않은 Care Receiver 정보입니다. 확인 후 다시 요청해 주세요.");
 
   final int statusCode;
   final String description;

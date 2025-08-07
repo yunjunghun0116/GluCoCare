@@ -8,7 +8,9 @@ class GlucoseHistoryController extends BaseController<BaseState> {
   Future<List<GlucoseHistoryResponseDto>?> getAllGlucoseHistories(int patientId) async {
     var response = await getRequest("/api/patients/$patientId/glucose-histories");
     if (response.statusCode == 200) {
-      return (response.data as List).map((data) => GlucoseHistoryResponseDto.fromJson(data)).toList();
+      var result = (response.data as List).map((data) => GlucoseHistoryResponseDto.fromJson(data)).toList();
+      result.sort((a, b) => a.dateTime.difference(b.dateTime).inMinutes);
+      return result;
     }
     return null;
   }

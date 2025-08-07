@@ -1,11 +1,14 @@
-import 'package:app/core/data/repositories/local_repository.dart';
-import 'package:app/features/care_giver/data/models/care_giver_response_dto.dart';
+import 'package:app/core/exceptions/custom_exception.dart';
+import 'package:app/core/exceptions/exception_message.dart';
+import 'package:app/features/care_giver/data/models/create_care_giver_dto.dart';
 import 'package:app/features/care_giver/presentation/providers.dart';
 import 'package:app/shared/constants/app_colors.dart';
-import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
+import 'package:app/shared/widgets/common_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../shared/widgets/common_text_field.dart';
 
 class CreateCareGiverScreen extends ConsumerStatefulWidget {
   const CreateCareGiverScreen({super.key});
@@ -15,71 +18,72 @@ class CreateCareGiverScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateCareGiverScreenState extends ConsumerState<CreateCareGiverScreen> {
-  var _careGivers = <CareGiverResponseDto>[];
+  final _idController = TextEditingController();
+  final _nameController = TextEditingController();
 
-  void selectCareReceiver(CareGiverResponseDto careGiver) async {
-    await LocalRepository().save<int>(LocalRepositoryKey.lateCareGiverId, careGiver.id);
-    if (!mounted) return;
-    Navigator.pop(context);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      careGiversInitialize();
-    });
-  }
-
-  Future<void> careGiversInitialize() async {
-    var result = await ref.read(careGiverControllerProvider.notifier).getAllCareGiver();
-    if (result == null) return;
-    setState(() => _careGivers = result);
+  void createCareGiver() async {
+    try {
+      var createCareGiverDto = CreateCareGiverDto(
+        patientId: int.parse(_idController.text),
+        patientName: _nameController.text,
+      );
+      await ref.read(careGiverControllerProvider.notifier).createCareGiver(createCareGiverDto);
+      if (!mounted) return;
+      Navigator.pop(context, true);
+    } catch (e) {
+      throw CustomException(ExceptionMessage.invalidPatientInformation);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: "Care Receiver 등록"),
       backgroundColor: AppColors.backgroundColor,
-      body: Column(children: [..._careGivers.map((careGiver) => getCareGiverCard(careGiver))]),
-    );
-  }
-
-  Widget getCareGiverCard(CareGiverResponseDto careGiver) {
-    return GestureDetector(
-      onTap: () => selectCareReceiver(careGiver),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: AppColors.mainColor)),
-          color: AppColors.backgroundColor,
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Care Receiver 정보",
-                    style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray800Color),
-                  ),
-                  Text(
-                    "ID : ${careGiver.patientId}, 이름 : ${careGiver.patientName}",
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 20 / 16,
-                      color: AppColors.fontGray800Color,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+      appBar: CommonAppBar(title: "Care Receiver 등록"),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              "Care Receiver의 정보를 입력해 주세요.",
+              style: TextStyle(
+                fontSize: 16,
+                height: 20 / 16,
+                color: AppColors.fontGray800Color,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.mainColor),
-          ],
-        ),
+          ),
+          SizedBox(height: 20),
+          Row(
+            children: [
+              SizedBox(width: 80, child: Text("이름", textAlign: TextAlign.center)),
+              Expanded(
+                child: CommonTextField(
+                  controller: _nameController,
+                  hintText: "이름을 입력해 주세요.",
+                  onChanged: (String str) => setState(() {}),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          Row(
+            children: [
+              SizedBox(width: 80, child: Text("고유 ID", textAlign: TextAlign.center)),
+              Expanded(
+                child: CommonTextField(
+                  controller: _idController,
+                  hintText: "고유 ID를 입력해 주세요.",
+                  onChanged: (String str) => setState(() {}),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          CommonButton(value: true, onTap: () => createCareGiver(), title: "입력하기"),
+        ],
       ),
     );
   }

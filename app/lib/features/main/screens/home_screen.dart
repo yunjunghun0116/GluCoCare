@@ -2,7 +2,6 @@ import 'package:app/core/exceptions/custom_exception.dart';
 import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/features/care_giver/data/models/care_giver_response_dto.dart';
 import 'package:app/features/care_giver/presentation/providers.dart';
-import 'package:app/features/care_giver/presentation/screens/create_care_giver_screen.dart';
 import 'package:app/features/glucose_history/presentation/widgets/glucose_chart.dart';
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/data/repositories/local_repository.dart';
+import '../../care_giver/presentation/screens/care_giver_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -49,7 +49,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CreateCareGiverScreen())),
+          onTap: () async {
+            var result = await Navigator.push<int?>(context, MaterialPageRoute(builder: (_) => CareGiverScreen()));
+            if (result == null) return;
+            if (careGiver?.id == result) return;
+            await careGiversInitialize();
+            setState(() {});
+          },
           child: Container(
             color: AppColors.mainColor,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -70,7 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ),
-        if (careGiver != null) GlucoseChart(patientId: careGiver!.patientId),
+        if (careGiver != null) GlucoseChart(key: ValueKey(careGiver!.patientId), patientId: careGiver!.patientId),
       ],
     );
   }

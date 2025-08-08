@@ -1,9 +1,10 @@
+import 'dart:io';
+
 import 'package:app/shared/widgets/common_app_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/data/repositories/local_repository.dart';
 import '../../../shared/constants/app_colors.dart';
-import '../../../shared/constants/local_repository_key.dart';
 import 'home_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -15,6 +16,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   var _currentIndex = 0;
+
+  Future<void> updateFCMToken() async {}
 
   Widget _getScreen() {
     Widget screen;

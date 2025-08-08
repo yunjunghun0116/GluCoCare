@@ -9,8 +9,6 @@ import 'package:app/shared/widgets/common_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../shared/widgets/input_screen.dart';
-
 class CareGiverScreen extends ConsumerStatefulWidget {
   const CareGiverScreen({super.key});
 

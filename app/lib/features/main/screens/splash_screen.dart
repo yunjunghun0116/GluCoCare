@@ -1,4 +1,6 @@
 import 'package:app/core/data/repositories/local_repository.dart';
+import 'package:app/core/exceptions/custom_exception.dart';
+import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/features/auth/presentation/providers.dart';
 import 'package:app/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
@@ -19,21 +21,26 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(Duration(seconds: 1), () async => await LocalRepository().initialize());
-      var accessToken = LocalRepository().read<String>(LocalRepositoryKey.accessToken);
-      var success = await _validateSavedAccessToken(accessToken);
-      if (!mounted) return;
-      if (success) {
-        SignUtil.login(context, ref: ref, token: accessToken);
-        return;
-      }
-      Navigator.push(context, MaterialPageRoute(builder: (_) => SignInScreen()));
-    });
+    initialize();
   }
 
-  Future<bool> _validateSavedAccessToken(String accessToken) async {
+  void initialize() async {
     try {
+      await Future.delayed(Duration(seconds: 1), () async => await LocalRepository().initialize());
+      var success = await _validateSavedAccessToken();
+      if (!mounted) return;
+      if (!success) throw CustomException(ExceptionMessage.invalidAuthentication);
+      var accessToken = LocalRepository().read<String>(LocalRepositoryKey.accessToken);
+      SignUtil.login(context, ref: ref, token: accessToken);
+      return;
+    } on CustomException catch (e) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => SignInScreen()));
+    }
+  }
+
+  Future<bool> _validateSavedAccessToken() async {
+    try {
+      var accessToken = LocalRepository().read<String>(LocalRepositoryKey.accessToken);
       var success = await ref.read(authControllerProvider.notifier).autoLogin(accessToken);
       return success;
     } catch (e) {

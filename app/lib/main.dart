@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:app/core/data/repositories/local_repository.dart';
 import 'package:app/features/main/screens/splash_screen.dart';
+import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

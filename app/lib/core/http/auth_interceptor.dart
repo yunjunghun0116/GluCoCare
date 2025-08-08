@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:app/core/data/repositories/local_repository.dart';
@@ -25,20 +26,18 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    log("onError 호출 : $err");
     if (err.response?.statusCode == 401) {
       log("[Interceptor] 401 → accessToken 재발급 시도");
 
       var refreshToken = await SecureRepository().readRefreshToken();
-
       if (refreshToken == null) {
         log("[Interceptor] refreshToken 없음 → 로그아웃 필요");
         return handler.next(err);
       }
-      log(refreshToken);
       var success = await _refreshToken(refreshToken);
 
       if (success) {
+        log("[Interceptor] 토큰 재발급 성공");
         var accessToken = LocalRepository().read<String>(LocalRepositoryKey.accessToken);
 
         var retryRequest = err.requestOptions;
@@ -61,17 +60,11 @@ class AuthInterceptor extends Interceptor {
 
   Future<bool> _refreshToken(String refreshToken) async {
     try {
-      var accessToken = LocalRepository().read<String>(LocalRepositoryKey.accessToken);
-      var response = await _dio.post(
-        '/api/members/refresh-token',
-        data: {'token': refreshToken},
-        options: Options(headers: {"Authorization": 'Bearer $accessToken'}),
-      );
+      var response = await _dio.post('/api/members/refresh-token', data: {'token': refreshToken});
 
       var tokenResponse = TokenResponseDto.fromJson(response.data);
       await LocalRepository().save<String>(LocalRepositoryKey.accessToken, tokenResponse.accessToken);
       await SecureRepository().writeRefreshToken(tokenResponse.refreshToken);
-
       return true;
     } catch (e) {
       log("[Interceptor] 토큰 재발급 실패: $e");

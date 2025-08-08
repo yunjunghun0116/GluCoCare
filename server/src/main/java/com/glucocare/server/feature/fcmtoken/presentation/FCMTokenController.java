@@ -1,52 +1,27 @@
-package com.glucocare.server.feature.caregiver.presentation;
+package com.glucocare.server.feature.fcmtoken.presentation;
 
-import com.glucocare.server.feature.caregiver.application.CreateCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.application.DeleteCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.application.ReadAllCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.application.ReadCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverRequest;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverResponse;
-import com.glucocare.server.feature.caregiver.dto.ReadCareGiverResponse;
+import com.glucocare.server.feature.fcmtoken.application.CreateFCMTokenUseCase;
+import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenRequest;
+import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/care-givers")
-public class CareGiverController {
+@RequestMapping("/api/fcm-tokens")
+public class FCMTokenController {
 
-    private final CreateCareGiverUseCase createCareGiverUseCase;
-    private final ReadCareGiverUseCase readCareGiverUseCase;
-    private final ReadAllCareGiverUseCase readAllCareGiverUseCase;
-    private final DeleteCareGiverUseCase deleteCareGiverUseCase;
+    private final CreateFCMTokenUseCase createFCMTokenUseCase;
 
     @PostMapping
-    public ResponseEntity<CreateCareGiverResponse> createCareGiver(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateCareGiverRequest createCareGiverRequest) {
-        var response = createCareGiverUseCase.execute(memberId, createCareGiverRequest);
+    public ResponseEntity<CreateFCMTokenResponse> createFCMToken(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateFCMTokenRequest createFCMTokenRequest) {
+        var response = createFCMTokenUseCase.execute(memberId, createFCMTokenRequest);
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ReadCareGiverResponse> readCareGiver(@PathVariable Long id) {
-        var response = readCareGiverUseCase.execute(id);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<ReadCareGiverResponse>> readCareGivers(@AuthenticationPrincipal Long memberId) {
-        var response = readAllCareGiverUseCase.execute(memberId);
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCareGiver(@PathVariable Long id) {
-        deleteCareGiverUseCase.execute(id);
-        return ResponseEntity.ok()
-                             .build();
     }
 }

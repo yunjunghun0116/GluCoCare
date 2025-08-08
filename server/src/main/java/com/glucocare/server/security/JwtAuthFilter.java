@@ -137,7 +137,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
-        var skipUris = List.of("/swagger-ui", "/swagger-resources", "/v3/api-docs", "/api/members/login", "/api/members/register", "/api/members/exists-email");
+        var skipUris = List.of("/swagger-ui", "/swagger-resources", "/v3/api-docs", "/api/members/login", "/api/members/register", "/api/members/exists-email", "/api/members/refresh-token");
         var uri = request.getRequestURI();
         for (var skipUri : skipUris) {
             if (uri.startsWith(skipUri)) {

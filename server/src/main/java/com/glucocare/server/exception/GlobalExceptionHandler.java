@@ -1,5 +1,6 @@
 package com.glucocare.server.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = ApplicationException.class)
@@ -35,6 +37,7 @@ public class GlobalExceptionHandler {
 
     private ResponseEntity<ExceptionResponse> getExceptionResponse(String message, HttpStatus status) {
         var response = new ExceptionResponse(status.value(), message);
+        log.error(response.message());
         return ResponseEntity.status(status)
                              .body(response);
     }

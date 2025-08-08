@@ -1,81 +1,88 @@
-package com.glucocare.server.feature.caregiver.application;
+package com.glucocare.server.feature.fcmtoken.application;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
-import com.glucocare.server.feature.caregiver.domain.CareGiver;
-import com.glucocare.server.feature.caregiver.domain.CareGiverRepository;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverRequest;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverResponse;
+import com.glucocare.server.feature.fcmtoken.domain.FCMToken;
+import com.glucocare.server.feature.fcmtoken.domain.FCMTokenRepository;
+import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenRequest;
+import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenResponse;
 import com.glucocare.server.feature.member.domain.MemberRepository;
-import com.glucocare.server.feature.patient.domain.PatientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * 간병인(CareGiver) 생성을 담당하는 Use Case 클래스
+ * FCM 토큰 생성 및 업데이트 기능을 담당하는 Use Case 클래스
  * <p>
- * 이 클래스는 새로운 간병인 관계를 생성하는 비즈니스 로직을 처리합니다.
- * 간병인 관계는 회원(Member)과 환자(Patient) 간의 연결을 나타냅니다.
+ * 이 클래스는 Firebase Cloud Messaging(FCM) 토큰을 생성하거나 업데이트하는
+ * 비즈니스 로직을 처리합니다. FCM 토큰은 푸시 알림 전송을 위해 필요한
+ * 기기별 고유 식별자입니다.
  */
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CreateCareGiverUseCase {
+public class CreateFCMTokenUseCase {
     private final MemberRepository memberRepository;
-    private final PatientRepository patientRepository;
-    private final CareGiverRepository careGiverRepository;
+    private final FCMTokenRepository fcmTokenRepository;
 
     /**
-     * 간병인 관계를 생성하는 메인 메서드
+     * FCM 토큰을 생성하거나 업데이트하는 메인 메서드
+     * <p>
+     * 이 메서드는 다음과 같은 과정을 수행합니다:
+     * 1. 회원에게 기존 FCM 토큰이 있는지 확인
+     * 2. 기존 토큰이 있으면 업데이트, 없으면 새로 생성
+     * 3. 생성 또는 업데이트된 FCM 토큰 정보를 응답 객체로 변환
      *
-     * @param memberId 간병인 역할을 할 회원의 ID
-     * @param request  간병인 생성 요청 데이터 (환자 이름, CGM 서버 URL 포함)
-     * @return 생성된 간병인 관계의 상세 정보를 담은 응답 객체
-     * @throws ApplicationException 회원 또는 환자를 찾을 수 없는 경우
+     * @param memberId FCM 토큰을 생성/업데이트할 회원의 ID
+     * @param request  FCM 토큰 생성 요청 정보 (FCM 토큰 값 포함)
+     * @return 생성되거나 업데이트된 FCM 토큰 정보를 담은 응답 객체
+     * @throws ApplicationException 회원을 찾을 수 없는 경우
      */
-    public CreateCareGiverResponse execute(Long memberId, CreateCareGiverRequest request) {
-        var careGiver = saveCareGiverWithRequest(memberId, request);
-        return createCareGiverResponse(careGiver);
+    public CreateFCMTokenResponse execute(Long memberId, CreateFCMTokenRequest request) {
+        var token = createFCMTokenWithRequest(memberId, request);
+        return createFCMTokenResponse(token);
     }
 
     /**
-     * 간병인 관계를 생성하고 저장하는 메서드
+     * FCM 토큰을 생성하거나 업데이트하는 내부 메서드
      * <p>
      * 이 메서드는 다음과 같은 과정을 수행합니다:
      * 1. 주어진 memberId로 회원 존재 여부 확인
-     * 2. 요청에 포함된 이름과 환자 ID로 환자 존재 여부 확인
-     * 3. 회원과 환자 간의 간병인 관계 엔티티 생성
-     * 4. 생성된 간병인 관계를 데이터베이스에 저장
+     * 2. 해당 회원의 기존 FCM 토큰 존재 여부 확인
+     * 3. 기존 토큰이 있으면 토큰 값 업데이트
+     * 4. 기존 토큰이 없으면 새로운 FCM 토큰 엔티티 생성
+     * 5. 변경사항을 데이터베이스에 저장
      *
-     * @param memberId 간병인 역할을 할 회원의 ID
-     * @param request  환자 정보가 담긴 생성 요청 객체
-     * @return 저장된 간병인 관계 엔티티
-     * @throws ApplicationException 회원이나 환자를 찾을 수 없는 경우
+     * @param memberId FCM 토큰을 생성/업데이트할 회원의 ID
+     * @param request  FCM 토큰 생성 요청 정보
+     * @return 생성되거나 업데이트된 FCM 토큰 엔티티
+     * @throws ApplicationException 회원을 찾을 수 없는 경우
      */
-    private CareGiver saveCareGiverWithRequest(Long memberId, CreateCareGiverRequest request) {
+    private FCMToken createFCMTokenWithRequest(Long memberId, CreateFCMTokenRequest request) {
         var member = memberRepository.findById(memberId)
                                      .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
-        var patient = patientRepository.findByNameAndId(request.name(), request.patientId())
-                                       .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
-        if (careGiverRepository.existsByMemberAndPatient(member, patient)) {
-            throw new ApplicationException(ErrorMessage.ALREADY_EXISTS);
+        if (fcmTokenRepository.existsByMember(member)) {
+            var fcmToken = fcmTokenRepository.findByMember(member)
+                                             .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+            fcmToken.updateFCMToken(request.fcmToken());
+            fcmTokenRepository.save(fcmToken);
+            return fcmToken;
         }
-        var careGiver = new CareGiver(member, patient);
-        return careGiverRepository.save(careGiver);
+        var fcmToken = new FCMToken(member, request.fcmToken());
+        fcmTokenRepository.save(fcmToken);
+        return fcmToken;
     }
 
     /**
-     * 간병인 엔티티를 응답 객체로 변환하는 메서드
+     * FCM 토큰 엔티티를 응답 객체로 변환하는 메서드
      * <p>
-     * 이 메서드는 생성된 간병인 관계 엔티티에서 필요한 정보를 추출하여
+     * FCM 토큰 엔티티에서 필요한 정보(토큰 ID, FCM 토큰 값)를 추출하여
      * 클라이언트에게 반환할 응답 객체를 생성합니다.
      *
-     * @param careGiver 변환할 간병인 관계 엔티티
-     * @return 간병인 ID, 환자 ID, 환자 이름을 포함한 응답 객체
+     * @param fcmToken 변환할 FCM 토큰 엔티티
+     * @return FCM 토큰 ID와 토큰 값을 포함한 응답 객체
      */
-    private CreateCareGiverResponse createCareGiverResponse(CareGiver careGiver) {
-        var patient = careGiver.getPatient();
-        return CreateCareGiverResponse.of(careGiver.getId(), patient.getId(), patient.getName());
+    private CreateFCMTokenResponse createFCMTokenResponse(FCMToken fcmToken) {
+        return CreateFCMTokenResponse.of(fcmToken.getId(), fcmToken.getFcmToken());
     }
 }

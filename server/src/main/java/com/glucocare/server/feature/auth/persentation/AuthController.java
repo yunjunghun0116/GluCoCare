@@ -39,10 +39,9 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<Boolean> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        refreshTokenUseCase.execute(refreshTokenRequest);
-        return ResponseEntity.ok()
-                             .build();
+    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        var auth = refreshTokenUseCase.execute(refreshTokenRequest);
+        return ResponseEntity.ok(auth);
     }
 
     @PostMapping("/exists-email")

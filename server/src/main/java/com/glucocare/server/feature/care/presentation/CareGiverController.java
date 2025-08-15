@@ -1,12 +1,12 @@
-package com.glucocare.server.feature.caregiver.presentation;
+package com.glucocare.server.feature.care.presentation;
 
-import com.glucocare.server.feature.caregiver.application.CreateCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.application.DeleteCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.application.ReadAllCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.application.ReadCareGiverUseCase;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverRequest;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverResponse;
-import com.glucocare.server.feature.caregiver.dto.ReadCareGiverResponse;
+import com.glucocare.server.feature.care.application.CreateCareGiverUseCase;
+import com.glucocare.server.feature.care.application.DeleteCareGiverUseCase;
+import com.glucocare.server.feature.care.application.ReadAllCareGiverUseCase;
+import com.glucocare.server.feature.care.application.ReadCareGiverUseCase;
+import com.glucocare.server.feature.care.dto.CreateCareGiverRequest;
+import com.glucocare.server.feature.care.dto.CreateCareGiverResponse;
+import com.glucocare.server.feature.care.dto.ReadCareGiverResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

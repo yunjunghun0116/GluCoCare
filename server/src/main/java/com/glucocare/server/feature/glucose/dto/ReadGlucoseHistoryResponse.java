@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.glucosehistory.dto;
+package com.glucocare.server.feature.glucose.dto;
 
 public record ReadGlucoseHistoryResponse(
         Long id,

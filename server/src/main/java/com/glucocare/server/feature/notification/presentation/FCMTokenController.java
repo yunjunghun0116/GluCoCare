@@ -1,8 +1,8 @@
-package com.glucocare.server.feature.fcmtoken.presentation;
+package com.glucocare.server.feature.notification.presentation;
 
-import com.glucocare.server.feature.fcmtoken.application.CreateFCMTokenUseCase;
-import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenRequest;
-import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenResponse;
+import com.glucocare.server.feature.notification.application.CreateFCMTokenUseCase;
+import com.glucocare.server.feature.notification.dto.CreateFCMTokenRequest;
+import com.glucocare.server.feature.notification.dto.CreateFCMTokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
-package com.glucocare.server.feature.glucosehistory.presentation;
+package com.glucocare.server.feature.glucose.presentation;
 
-import com.glucocare.server.feature.glucosehistory.application.ReadAllGlucoseHistoryUseCase;
-import com.glucocare.server.feature.glucosehistory.dto.ReadGlucoseHistoryResponse;
+import com.glucocare.server.feature.glucose.application.ReadAllGlucoseHistoryUseCase;
+import com.glucocare.server.feature.glucose.dto.ReadGlucoseHistoryResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

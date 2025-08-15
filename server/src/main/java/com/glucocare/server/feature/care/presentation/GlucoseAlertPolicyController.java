@@ -1,52 +1,43 @@
 package com.glucocare.server.feature.care.presentation;
 
-import com.glucocare.server.feature.care.application.CreateCareGiverUseCase;
-import com.glucocare.server.feature.care.application.DeleteCareGiverUseCase;
-import com.glucocare.server.feature.care.application.ReadAllCareGiverUseCase;
-import com.glucocare.server.feature.care.application.ReadCareGiverUseCase;
-import com.glucocare.server.feature.care.dto.CreateCareGiverRequest;
-import com.glucocare.server.feature.care.dto.CreateCareGiverResponse;
-import com.glucocare.server.feature.care.dto.ReadCareGiverResponse;
+import com.glucocare.server.feature.care.application.ReadGlucoseAlertPolicyUseCase;
+import com.glucocare.server.feature.care.application.UpdateGlucoseAlertPolicyHighRiskUseCase;
+import com.glucocare.server.feature.care.application.UpdateGlucoseAlertPolicyVeryHighRiskUseCase;
+import com.glucocare.server.feature.care.dto.ReadGlucoseAlertPolicyResponse;
+import com.glucocare.server.feature.care.dto.UpdateGlucoseAlertPolicyHighRiskRequest;
+import com.glucocare.server.feature.care.dto.UpdateGlucoseAlertPolicyVeryHighRiskRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/care-givers")
-public class CareGiverController {
+@RequestMapping("/api/glucose-alert-policies")
+public class GlucoseAlertPolicyController {
 
-    private final CreateCareGiverUseCase createCareGiverUseCase;
-    private final ReadCareGiverUseCase readCareGiverUseCase;
-    private final ReadAllCareGiverUseCase readAllCareGiverUseCase;
-    private final DeleteCareGiverUseCase deleteCareGiverUseCase;
+    private final UpdateGlucoseAlertPolicyVeryHighRiskUseCase updateGlucoseAlertPolicyVeryHighRiskUseCase;
+    private final UpdateGlucoseAlertPolicyHighRiskUseCase updateGlucoseAlertPolicyHighRiskUseCase;
+    private final ReadGlucoseAlertPolicyUseCase readGlucoseAlertPolicyUseCase;
 
-    @PostMapping
-    public ResponseEntity<CreateCareGiverResponse> createCareGiver(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateCareGiverRequest createCareGiverRequest) {
-        var response = createCareGiverUseCase.execute(memberId, createCareGiverRequest);
-        return ResponseEntity.ok(response);
+    @PostMapping("/{id}/high-risk")
+    public ResponseEntity<Void> updateGlucoseAlertPolicyHighRisk(@PathVariable Long id, @Valid @RequestBody UpdateGlucoseAlertPolicyHighRiskRequest updateGlucoseAlertPolicyRequest) {
+        updateGlucoseAlertPolicyHighRiskUseCase.execute(id, updateGlucoseAlertPolicyRequest);
+        return ResponseEntity.ok()
+                             .build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReadCareGiverResponse> readCareGiver(@PathVariable Long id) {
-        var response = readCareGiverUseCase.execute(id);
-        return ResponseEntity.ok(response);
+    @PostMapping("/{id}/very-high-risk")
+    public ResponseEntity<Void> updateGlucoseAlertPolicyVeryHighRisk(@PathVariable Long id, @Valid @RequestBody UpdateGlucoseAlertPolicyVeryHighRiskRequest updateGlucoseAlertPolicyRequest) {
+        updateGlucoseAlertPolicyVeryHighRiskUseCase.execute(id, updateGlucoseAlertPolicyRequest);
+        return ResponseEntity.ok()
+                             .build();
     }
 
     @GetMapping
-    public ResponseEntity<List<ReadCareGiverResponse>> readCareGivers(@AuthenticationPrincipal Long memberId) {
-        var response = readAllCareGiverUseCase.execute(memberId);
+    public ResponseEntity<ReadGlucoseAlertPolicyResponse> readGlucoseAlertPolicy(@AuthenticationPrincipal Long memberId, @RequestParam Long careGiverId) {
+        var response = readGlucoseAlertPolicyUseCase.execute(memberId, careGiverId);
         return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCareGiver(@PathVariable Long id) {
-        deleteCareGiverUseCase.execute(id);
-        return ResponseEntity.ok()
-                             .build();
     }
 }

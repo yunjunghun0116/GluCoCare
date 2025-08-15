@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.fcmtoken.domain;
+package com.glucocare.server.feature.notification.domain;
 
 import com.glucocare.server.feature.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;

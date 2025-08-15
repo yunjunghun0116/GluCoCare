@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import static jakarta.persistence.FetchType.LAZY;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "auth_token")
@@ -14,6 +16,7 @@ public class AuthToken extends BaseEntity {
     @NotNull
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
     @NotNull
     @Column(name = "refresh_token")

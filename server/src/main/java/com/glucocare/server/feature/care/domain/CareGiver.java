@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.caregiver.domain;
+package com.glucocare.server.feature.care.domain;
 
 import com.glucocare.server.feature.member.domain.Member;
 import com.glucocare.server.feature.patient.domain.Patient;

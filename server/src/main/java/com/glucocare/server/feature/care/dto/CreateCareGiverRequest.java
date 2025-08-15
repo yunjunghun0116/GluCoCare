@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.caregiver.dto;
+package com.glucocare.server.feature.care.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

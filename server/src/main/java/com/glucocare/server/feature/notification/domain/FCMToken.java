@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.fcmtoken.domain;
+package com.glucocare.server.feature.notification.domain;
 
 import com.glucocare.server.feature.member.domain.Member;
 import com.glucocare.server.shared.domain.BaseEntity;
@@ -14,7 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 public class FCMToken extends BaseEntity {
     @NotNull
-    @ManyToOne(fetch = LAZY)
+    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;

@@ -11,18 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class UpdateGlucoseAlertPolicyVeryHighUseCase {
+public class UpdateGlucoseAlertPolicyVeryHighRiskUseCase {
     private final GlucoseAlertPolicyRepository glucoseAlertPolicyRepository;
 
-    public void execute(Long id, Long memberId, UpdateGlucoseAlertPolicyVeryHighRiskRequest request) {
+    public void execute(Long id, UpdateGlucoseAlertPolicyVeryHighRiskRequest request) {
         var glucoseAlertPolicy = glucoseAlertPolicyRepository.findById(id)
                                                              .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
-        if (!glucoseAlertPolicy.getCareGiver()
-                               .getMember()
-                               .getId()
-                               .equals(memberId)) {
-            throw new ApplicationException(ErrorMessage.INVALID_ACCESS);
-        }
         glucoseAlertPolicy.updateVeryHighRiskValue(request.veryHighRiskValue());
         glucoseAlertPolicyRepository.save(glucoseAlertPolicy);
     }

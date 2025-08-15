@@ -1,12 +1,12 @@
-package com.glucocare.server.feature.fcmtoken.application;
+package com.glucocare.server.feature.notification.application;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
-import com.glucocare.server.feature.fcmtoken.domain.FCMToken;
-import com.glucocare.server.feature.fcmtoken.domain.FCMTokenRepository;
-import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenRequest;
-import com.glucocare.server.feature.fcmtoken.dto.CreateFCMTokenResponse;
 import com.glucocare.server.feature.member.domain.MemberRepository;
+import com.glucocare.server.feature.notification.domain.FCMToken;
+import com.glucocare.server.feature.notification.domain.FCMTokenRepository;
+import com.glucocare.server.feature.notification.dto.CreateFCMTokenRequest;
+import com.glucocare.server.feature.notification.dto.CreateFCMTokenResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

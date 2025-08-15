@@ -1,9 +1,9 @@
-package com.glucocare.server.feature.glucosehistory.application;
+package com.glucocare.server.feature.glucose.application;
 
 import com.glucocare.server.client.CgmServerClient;
 import com.glucocare.server.client.dto.CgmEntry;
-import com.glucocare.server.feature.glucosehistory.domain.GlucoseHistory;
-import com.glucocare.server.feature.glucosehistory.domain.GlucoseHistoryRepository;
+import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
+import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
 import com.glucocare.server.feature.patient.domain.Patient;
 import com.glucocare.server.feature.patient.domain.PatientRepository;
 import jakarta.transaction.Transactional;

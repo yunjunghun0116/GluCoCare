@@ -1,8 +1,8 @@
-package com.glucocare.server.feature.caregiver.application;
+package com.glucocare.server.feature.care.application;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
-import com.glucocare.server.feature.caregiver.domain.CareGiverRepository;
+import com.glucocare.server.feature.care.domain.CareGiverRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

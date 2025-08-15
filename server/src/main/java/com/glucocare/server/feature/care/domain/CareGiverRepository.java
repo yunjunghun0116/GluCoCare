@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.caregiver.domain;
+package com.glucocare.server.feature.care.domain;
 
 import com.glucocare.server.feature.member.domain.Member;
 import com.glucocare.server.feature.patient.domain.Patient;
@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
     List<CareGiver> findAllByMember(Member member);
+
+    List<CareGiver> findAllByPatient(Patient patient);
 
     Boolean existsByMemberAndPatient(Member member, Patient patient);
 }

@@ -1,6 +1,7 @@
-package com.glucocare.server.feature.member.domain;
+package com.glucocare.server.feature.notification.domain;
 
-public enum MemberRole {
-    MEMBER,
-    ADMIN
+public enum GlucoseWarningType {
+    HIGH_RISK,
+    VERY_HIGH_RISK,
+    NORMAL
 }

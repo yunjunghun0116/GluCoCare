@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.glucosehistory.domain;
+package com.glucocare.server.feature.glucose.domain;
 
 import com.glucocare.server.feature.patient.domain.Patient;
 import com.glucocare.server.shared.domain.BaseEntity;

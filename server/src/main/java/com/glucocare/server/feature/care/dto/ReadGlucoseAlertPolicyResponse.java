@@ -1,11 +1,12 @@
 package com.glucocare.server.feature.care.dto;
 
-public record ReadCareGiverResponse(
+public record ReadGlucoseAlertPolicyResponse(
         Long id,
-        Long patientId,
-        String patientName
+        Long careGiverId,
+        Integer highRiskValue,
+        Integer veryHighRiskValue
 ) {
-    public static ReadCareGiverResponse of(Long id, Long patientId, String patientName) {
-        return new ReadCareGiverResponse(id, patientId, patientName);
+    public static ReadGlucoseAlertPolicyResponse of(Long id, Long careGiverId, Integer highRiskValue, Integer veryHighRiskValue) {
+        return new ReadGlucoseAlertPolicyResponse(id, careGiverId, highRiskValue, veryHighRiskValue);
     }
 }

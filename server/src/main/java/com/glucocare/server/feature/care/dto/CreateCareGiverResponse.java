@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.caregiver.dto;
+package com.glucocare.server.feature.care.dto;
 
 public record CreateCareGiverResponse(
         Long id,

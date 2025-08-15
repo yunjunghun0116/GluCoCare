@@ -1,11 +1,11 @@
-package com.glucocare.server.feature.glucosehistory.application;
+package com.glucocare.server.feature.glucose.application;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
-import com.glucocare.server.feature.caregiver.domain.CareGiverRepository;
-import com.glucocare.server.feature.glucosehistory.domain.GlucoseHistory;
-import com.glucocare.server.feature.glucosehistory.domain.GlucoseHistoryRepository;
-import com.glucocare.server.feature.glucosehistory.dto.ReadGlucoseHistoryResponse;
+import com.glucocare.server.feature.care.domain.CareGiverRepository;
+import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
+import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
+import com.glucocare.server.feature.glucose.dto.ReadGlucoseHistoryResponse;
 import com.glucocare.server.feature.member.domain.MemberRepository;
 import com.glucocare.server.feature.patient.domain.PatientRepository;
 import jakarta.transaction.Transactional;

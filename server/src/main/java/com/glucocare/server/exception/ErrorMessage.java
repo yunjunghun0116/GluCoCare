@@ -12,7 +12,8 @@ public enum ErrorMessage {
     DUPLICATED_EMAIL(409, "이미 존재하는 이메일입니다."),
     INVALID_CONVERT_REQUEST(400, "잘못된 타입으로의 변환 요청입니다."),
     ALREADY_EXISTS(409, "이미 존재하는 객체입니다."),
-    BAD_REQUEST(400, "잘못된 요청입니다.");
+    BAD_REQUEST(400, "잘못된 요청입니다."),
+    INTERNAL_SERVER_ERROR(500, "서버 내부의 문제로 인해 요청을 처리할 수 없습니다.");
 
     private final int code;
     private final String message;

@@ -1,5 +1,6 @@
 package com.glucocare.server.feature.member.persentation;
 
+import com.glucocare.server.feature.member.application.DeleteMemberUseCase;
 import com.glucocare.server.feature.member.application.ReadMemberNameUseCase;
 import com.glucocare.server.feature.member.application.UpdateNameUseCase;
 import com.glucocare.server.feature.member.dto.UpdateNameRequest;
@@ -16,6 +17,7 @@ public class MemberController {
 
     private final UpdateNameUseCase updateNameUseCase;
     private final ReadMemberNameUseCase readMemberNameUseCase;
+    private final DeleteMemberUseCase deleteMemberUseCase;
 
     @GetMapping("/name")
     public ResponseEntity<String> readName(@AuthenticationPrincipal Long memberId) {
@@ -26,6 +28,13 @@ public class MemberController {
     @PostMapping("/update-name")
     public ResponseEntity<Void> updateName(@AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateNameRequest updateNameRequest) {
         updateNameUseCase.execute(memberId, updateNameRequest);
+        return ResponseEntity.ok()
+                             .build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal Long memberId) {
+        deleteMemberUseCase.execute(memberId);
         return ResponseEntity.ok()
                              .build();
     }

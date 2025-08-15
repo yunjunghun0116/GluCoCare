@@ -1,11 +1,13 @@
-package com.glucocare.server.feature.caregiver.application;
+package com.glucocare.server.feature.care.application;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
-import com.glucocare.server.feature.caregiver.domain.CareGiver;
-import com.glucocare.server.feature.caregiver.domain.CareGiverRepository;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverRequest;
-import com.glucocare.server.feature.caregiver.dto.CreateCareGiverResponse;
+import com.glucocare.server.feature.care.domain.CareGiver;
+import com.glucocare.server.feature.care.domain.CareGiverRepository;
+import com.glucocare.server.feature.care.domain.GlucoseAlertPolicy;
+import com.glucocare.server.feature.care.domain.GlucoseAlertPolicyRepository;
+import com.glucocare.server.feature.care.dto.CreateCareGiverRequest;
+import com.glucocare.server.feature.care.dto.CreateCareGiverResponse;
 import com.glucocare.server.feature.member.domain.MemberRepository;
 import com.glucocare.server.feature.patient.domain.PatientRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +27,7 @@ public class CreateCareGiverUseCase {
     private final MemberRepository memberRepository;
     private final PatientRepository patientRepository;
     private final CareGiverRepository careGiverRepository;
+    private final GlucoseAlertPolicyRepository glucoseAlertPolicyRepository;
 
     /**
      * 간병인 관계를 생성하는 메인 메서드
@@ -36,6 +39,7 @@ public class CreateCareGiverUseCase {
      */
     public CreateCareGiverResponse execute(Long memberId, CreateCareGiverRequest request) {
         var careGiver = saveCareGiverWithRequest(memberId, request);
+        createGlucoseAlertPolicy(careGiver);
         return createCareGiverResponse(careGiver);
     }
 
@@ -77,5 +81,10 @@ public class CreateCareGiverUseCase {
     private CreateCareGiverResponse createCareGiverResponse(CareGiver careGiver) {
         var patient = careGiver.getPatient();
         return CreateCareGiverResponse.of(careGiver.getId(), patient.getId(), patient.getName());
+    }
+
+    private void createGlucoseAlertPolicy(CareGiver careGiver) {
+        var glucoseAlertPolicy = new GlucoseAlertPolicy(careGiver);
+        glucoseAlertPolicyRepository.save(glucoseAlertPolicy);
     }
 }

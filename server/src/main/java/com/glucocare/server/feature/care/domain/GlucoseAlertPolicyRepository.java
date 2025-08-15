@@ -1,13 +1,11 @@
 package com.glucocare.server.feature.care.domain;
 
-import com.glucocare.server.feature.member.domain.Member;
-import com.glucocare.server.feature.patient.domain.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import java.util.Optional;
 
-public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
-    List<CareGiver> findAllByMember(Member member);
+public interface GlucoseAlertPolicyRepository extends JpaRepository<GlucoseAlertPolicy, Long> {
+    Optional<GlucoseAlertPolicy> findByCareGiver(CareGiver careGiver);
 
-    Boolean existsByMemberAndPatient(Member member, Patient patient);
+    Boolean existsByCareGiver(CareGiver careGiver);
 }

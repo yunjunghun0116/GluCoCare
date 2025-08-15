@@ -1,55 +1,52 @@
 package com.glucocare.server.client;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.glucocare.server.client.dto.CgmEntry;
-import com.glucocare.server.config.properties.CgmProperties;
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
+import com.glucocare.server.feature.care.domain.CareGiver;
+import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
+import com.glucocare.server.feature.notification.domain.FCMToken;
+import com.glucocare.server.feature.notification.domain.GlucoseWarningType;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.Message;
+import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-
-import java.net.URI;
-import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class FCMClient {
-
-    private final RestClient restClient;
-    private final CgmProperties cgmProperties;
-    private final ObjectMapper objectMapper;
-
-    public List<CgmEntry> getCgmEntries(String cgmServerUrl) {
-        var response = restClient.get()
-                                 .uri(URI.create(convertCgmServerUrlToEntriesRequest(cgmServerUrl)))
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .headers(headers -> {
-                                     headers.add("api-secret", cgmProperties.apiSecret());
-                                     headers.add("ngrok-skip-browser-warning", "true");
-                                     headers.add("Content-Type", "application/json");
-                                 })
-                                 .retrieve()
-                                 .body(String.class);
-        return convertJsonToList(response);
-    }
-
-    private String convertCgmServerUrlToEntriesRequest(String cgmServerUrl) {
-        return cgmServerUrl + "/api/v1/entries.json?count=2880&find[date][$gt]=1711929600000";
-    }
-
-    private <T> List<T> convertJsonToList(String json) {
+    public void sendFCMMessage(FCMToken fcmToken, CareGiver careGiver, GlucoseHistory glucoseHistory, GlucoseWarningType glucoseWarningType) {
         try {
-            JavaType type = objectMapper.getTypeFactory()
-                                        .constructCollectionType(List.class, CgmEntry.class);
-            return objectMapper.readValue(json, type);
-        } catch (JsonProcessingException e) {
-            throw new ApplicationException(ErrorMessage.INVALID_CONVERT_REQUEST);
+            var title = getTitle(glucoseWarningType);
+            var body = getBody(careGiver, glucoseHistory);
+            var message = Message.builder()
+                                 .setToken(fcmToken.getFcmToken())
+                                 .setNotification(Notification.builder()
+                                                              .setTitle(title)
+                                                              .setBody(body)
+                                                              .build())
+                                 .build();
+            FirebaseMessaging.getInstance()
+                             .send(message);
+            log.info("Title : {}, Body : {} 메시지 전송 완료", title, body);
+        } catch (Exception e) {
+            throw new ApplicationException(ErrorMessage.INTERNAL_SERVER_ERROR);
         }
+
+    }
+
+    private String getTitle(GlucoseWarningType glucoseWarningType) {
+        return switch (glucoseWarningType) {
+            case VERY_HIGH_RISK -> "GluCoCare 혈당 고위험수치 알림 ";
+            case HIGH_RISK -> "GluCoCare 혈당 위험수치 알림";
+            default -> null;
+        };
+    }
+
+    private String getBody(CareGiver careGiver, GlucoseHistory glucoseHistory) {
+        var patient = careGiver.getPatient();
+        return patient.getName() + "님의 혈당 수치가 " + glucoseHistory.getSgv() + "입니다.";
     }
 }

@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.fcmtoken.dto;
+package com.glucocare.server.feature.notification.dto;
 
 public record CreateFCMTokenResponse(
         Long id,

@@ -17,7 +17,7 @@ class MemberInformationScreen extends StatefulWidget {
 }
 
 class _MemberInformationScreenState extends State<MemberInformationScreen> {
-  final _nameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   bool get _buttonValue => _nameController.text.isNotEmpty;
 

@@ -1,15 +1,15 @@
 import 'package:app/core/exceptions/custom_exception.dart';
 import 'package:app/core/exceptions/exception_message.dart';
-import 'package:app/features/care_giver/data/models/care_giver_response_dto.dart';
-import 'package:app/features/care_giver/presentation/providers.dart';
-import 'package:app/features/glucose_history/presentation/widgets/glucose_chart.dart';
+import 'package:app/features/glucose_history/presentation/screens/glucose_screen.dart';
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/data/repositories/local_repository.dart';
-import '../../care_giver/presentation/screens/care_giver_screen.dart';
+import '../../care/data/models/care_giver_response.dart';
+import '../../care/presentation/providers.dart';
+import '../../care/presentation/screens/care_giver_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -19,7 +19,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  CareGiverResponseDto? careGiver;
+  CareGiverResponse? careGiver;
 
   @override
   void initState() {
@@ -76,7 +76,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ),
-        if (careGiver != null) GlucoseChart(key: ValueKey(careGiver!.patientId), patientId: careGiver!.patientId),
+        if (careGiver != null) Expanded(child: GlucoseScreen(careGiver: careGiver!)),
       ],
     );
   }

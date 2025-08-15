@@ -1,6 +1,6 @@
 import 'package:app/core/exceptions/custom_exception.dart';
 import 'package:app/core/exceptions/exception_message.dart';
-import 'package:app/features/auth/data/models/login_dto.dart';
+import 'package:app/features/auth/data/models/login_request.dart';
 import 'package:app/features/auth/presentation/providers.dart';
 import 'package:app/shared/widgets/common_check_box.dart';
 import 'package:flutter/material.dart';
@@ -20,13 +20,13 @@ class SignInScreen extends ConsumerStatefulWidget {
 }
 
 class _SignInScreenState extends ConsumerState<SignInScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _isAutoLogin = true;
 
   Future<void> loginWithEmailAndPassword() async {
-    var loginDto = LoginDto(email: _emailController.text, password: _passwordController.text);
-    var token = await ref.read(authControllerProvider.notifier).login(loginDto);
+    var loginRequest = LoginRequest(email: _emailController.text, password: _passwordController.text);
+    var token = await ref.read(authControllerProvider.notifier).login(loginRequest);
     if (!mounted) return;
     if (token == null) throw CustomException(ExceptionMessage.badRequest);
     SignUtil.login(context, ref: ref, token: token);

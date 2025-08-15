@@ -5,7 +5,7 @@ import '../../../../core/exceptions/custom_exception.dart';
 import '../../../../core/exceptions/exception_message.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/utils/sign_util.dart';
-import '../../data/models/register_dto.dart';
+import '../../data/models/register_request.dart';
 import '../providers.dart';
 import 'email_password_screen.dart';
 import 'member_information_screen.dart';
@@ -37,9 +37,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   });
 
   Future<void> register() async {
-    var registerJson = {"email": _email, "password": _password, "name": _name};
-    var registerDto = RegisterDto.fromJson(registerJson);
-    var token = await ref.read(authControllerProvider.notifier).register(registerDto);
+    var registerRequest = RegisterRequest(email: _email, password: _password, name: _name);
+    var token = await ref.read(authControllerProvider.notifier).register(registerRequest);
     if (!mounted) return;
     if (token == null) throw CustomException(ExceptionMessage.badRequest);
     SignUtil.login(context, ref: ref, token: token);

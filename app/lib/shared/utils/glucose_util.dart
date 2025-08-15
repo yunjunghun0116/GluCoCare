@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:app/features/glucose_history/data/models/glucose_history_response_dto.dart';
+import 'package:app/features/glucose_history/data/models/glucose_history_response.dart';
 import 'package:app/shared/utils/today_glucose.dart';
 
 final class GlucoseUtil {
-  static TodayGlucose? getLastDateGlucoseData(List<GlucoseHistoryResponseDto> lists) {
+  static TodayGlucose? getLastDateGlucoseData(List<GlucoseHistoryResponse> lists) {
     var today = lists.last.dateTime;
     var filteredList = lists
         .where((glucoseHistory) => isSameDate(glucoseHistory.dateTime, today))

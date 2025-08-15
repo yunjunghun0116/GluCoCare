@@ -40,8 +40,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   Future<bool> _validateSavedAccessToken() async {
     try {
-      var accessToken = LocalRepository().read<String>(LocalRepositoryKey.accessToken);
-      var success = await ref.read(authControllerProvider.notifier).autoLogin(accessToken);
+      var success = await ref.read(authControllerProvider.notifier).autoLogin();
       return success;
     } catch (e) {
       return false;

@@ -1,6 +1,6 @@
-import 'package:app/features/auth/data/models/login_dto.dart';
-import 'package:app/features/auth/data/models/register_dto.dart';
-import 'package:app/features/auth/data/models/token_response_dto.dart';
+import 'package:app/features/auth/data/models/login_request.dart';
+import 'package:app/features/auth/data/models/register_request.dart';
+import 'package:app/features/auth/data/models/token_response.dart';
 
 import '../../../../core/base/base_controller.dart';
 import '../../../../core/data/repositories/secure_repository.dart';
@@ -8,21 +8,21 @@ import '../../../../core/data/repositories/secure_repository.dart';
 class AuthController extends BaseController<BaseState> {
   AuthController(super.state, super.dio);
 
-  Future<String?> login(LoginDto loginDto) async {
+  Future<String?> login(LoginRequest loginRequest) async {
     var response = await postRequest(
       "/api/members/login",
-      data: {"email": loginDto.email, "password": loginDto.password},
+      data: {"email": loginRequest.email, "password": loginRequest.password},
     );
 
     if (response.statusCode == 200) {
-      var tokenResponse = TokenResponseDto.fromJson(response.data);
+      var tokenResponse = TokenResponse.fromJson(response.data);
       await SecureRepository().writeRefreshToken(tokenResponse.refreshToken);
       return tokenResponse.accessToken;
     }
     return null;
   }
 
-  Future<bool> autoLogin(String accessToken) async {
+  Future<bool> autoLogin() async {
     var response = await getRequest("/api/members/auto-login");
     if (response.statusCode == 200) {
       return true;
@@ -30,13 +30,13 @@ class AuthController extends BaseController<BaseState> {
     return false;
   }
 
-  Future<String?> register(RegisterDto registerDto) async {
+  Future<String?> register(RegisterRequest registerRequest) async {
     var response = await postRequest(
       "/api/members/register",
-      data: {"email": registerDto.email, "password": registerDto.password, "name": registerDto.name},
+      data: {"email": registerRequest.email, "password": registerRequest.password, "name": registerRequest.name},
     );
     if (response.statusCode == 200) {
-      var tokenResponse = TokenResponseDto.fromJson(response.data);
+      var tokenResponse = TokenResponse.fromJson(response.data);
       await SecureRepository().writeRefreshToken(tokenResponse.refreshToken);
       return tokenResponse.accessToken;
     }

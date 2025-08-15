@@ -1,23 +1,40 @@
-import 'dart:io';
-
+import 'package:app/features/main/screens/setting_screen.dart';
+import 'package:app/features/member/presentation/providers.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/notification/notification_service.dart';
 import '../../../shared/constants/app_colors.dart';
 import 'home_screen.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  var _currentIndex = 0;
+class _MainScreenState extends ConsumerState<MainScreen> {
+  int _currentIndex = 0;
 
-  Future<void> updateFCMToken() async {}
+  @override
+  void initState() {
+    super.initState();
+    notificationServiceInitialize();
+  }
+
+  void notificationServiceInitialize() async {
+    await NotificationService().requestPermission();
+    var token = await FirebaseMessaging.instance.getToken();
+    if (token == null) return;
+    ref.read(fcmTokenControllerProvider.notifier).updateFCMToken(token);
+
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+      ref.read(fcmTokenControllerProvider.notifier).updateFCMToken(newToken);
+    });
+  }
 
   Widget _getScreen() {
     Widget screen;
@@ -27,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
         break;
       case 1:
       default:
-        screen = Container();
+        screen = SettingScreen();
         break;
     }
     return SafeArea(child: screen);

@@ -27,7 +27,7 @@ class _SigningScreenState extends State<SigningScreen> {
       body: Column(
         children: [
           SizedBox(height: 100),
-          SizedBox(width: 200, height: 200, child: Image.asset("assets/logo/app_logo_no_background.png")),
+          SizedBox(width: 200, height: 200, child: Image.asset("assets/logo/app_logo.png")),
           Center(
             child: Center(
               child: Text(

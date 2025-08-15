@@ -19,9 +19,9 @@ class EmailPasswordScreen extends ConsumerStatefulWidget {
 }
 
 class _EmailPasswordScreenState extends ConsumerState<EmailPasswordScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _passwordCheckController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordCheckController = TextEditingController();
 
   @override
   void dispose() {

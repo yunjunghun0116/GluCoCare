@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:app/core/data/repositories/local_repository.dart';
 import 'package:app/core/data/repositories/secure_repository.dart';
 import 'package:app/core/exceptions/custom_exception.dart';
-import 'package:app/features/auth/data/models/token_response_dto.dart';
+import 'package:app/features/auth/data/models/token_response.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:dio/dio.dart';
 
@@ -61,7 +61,7 @@ class AuthInterceptor extends Interceptor {
     try {
       var response = await _dio.post('/api/members/refresh-token', data: {'token': refreshToken});
 
-      var tokenResponse = TokenResponseDto.fromJson(response.data);
+      var tokenResponse = TokenResponse.fromJson(response.data);
       await LocalRepository().save<String>(LocalRepositoryKey.accessToken, tokenResponse.accessToken);
       await SecureRepository().writeRefreshToken(tokenResponse.refreshToken);
       return true;

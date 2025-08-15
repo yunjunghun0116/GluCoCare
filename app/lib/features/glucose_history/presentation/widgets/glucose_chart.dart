@@ -1,45 +1,28 @@
-import 'package:app/features/glucose_history/data/models/glucose_history_response_dto.dart';
-import 'package:app/features/glucose_history/presentation/providers.dart';
+import 'package:app/features/glucose_history/data/models/glucose_history_response.dart';
 import 'package:app/shared/constants/app_colors.dart';
-import 'package:app/shared/utils/glucose_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class GlucoseChart extends ConsumerStatefulWidget {
-  final int patientId;
+  final List<GlucoseHistoryResponse> records;
 
-  const GlucoseChart({super.key, required this.patientId});
+  const GlucoseChart({super.key, required this.records});
 
   @override
   ConsumerState<GlucoseChart> createState() => _GlucoseChartState();
 }
 
 class _GlucoseChartState extends ConsumerState<GlucoseChart> {
-  final _controller = ScrollController();
-  var labelShowSet = <String>{};
-  var interval = 2.0;
-  var records = <GlucoseHistoryResponseDto>[];
+  final ScrollController _controller = ScrollController();
+  final Set<String> _labelShowSet = {};
+  double _interval = 2.0;
 
   double calculateWidthForChart(int dataLength) {
     var baseWidth = MediaQuery.of(context).size.width + 200;
-    var widthPerPoint = interval;
-    return baseWidth + widthPerPoint * records.length;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await setGlucoseHistories();
-    });
-  }
-
-  Future<void> setGlucoseHistories() async {
-    var result = await ref.read(glucoseHistoryControllerProvider.notifier).getAllGlucoseHistories(widget.patientId);
-    if (result == null || result.isEmpty) return;
-    setState(() => records = result);
+    var widthPerPoint = _interval;
+    return baseWidth + widthPerPoint * widget.records.length;
   }
 
   String getKey(DateTime date) {
@@ -48,22 +31,9 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
   @override
   Widget build(BuildContext context) {
-    if (records.isEmpty) {
-      return Column(
-        children: [
-          SizedBox(height: 20),
-          Center(
-            child: Text(
-              "해당 Care Receiver의 \n혈당 정보가 존재하지 않습니다.\n혈당 정보를 업로드해주세요.",
-              style: TextStyle(fontSize: 16, height: 20 / 16, color: AppColors.mainColor),
-            ),
-          ),
-        ],
-      );
-    }
-    labelShowSet.clear();
-    var maxDate = records.last.dateTime.add(Duration(hours: 3)).difference(DateTime.now()).isNegative
-        ? records.last.dateTime.add(Duration(hours: 3))
+    _labelShowSet.clear();
+    var maxDate = widget.records.last.dateTime.add(Duration(hours: 3)).difference(DateTime.now()).isNegative
+        ? widget.records.last.dateTime.add(Duration(hours: 3))
         : DateTime.now();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -73,7 +43,6 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
           child: Text(
@@ -82,7 +51,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(children: [1.0, 2.0, 3.0, 6.0].map((number) => getIntervalButton(number)).toList()),
         ),
         Container(
@@ -91,22 +60,22 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
             controller: _controller,
             scrollDirection: Axis.horizontal,
             child: SizedBox(
-              width: calculateWidthForChart(records.length),
-              height: 300,
+              width: calculateWidthForChart(widget.records.length),
+              height: 400,
               child: SfCartesianChart(
                 primaryXAxis: DateTimeAxis(
-                  minimum: records.first.dateTime.subtract(Duration(hours: 3)),
+                  minimum: widget.records.first.dateTime.subtract(Duration(hours: 3)),
                   maximum: maxDate,
-                  interval: interval,
+                  interval: _interval,
                   labelAlignment: LabelAlignment.center,
                   labelPosition: ChartDataLabelPosition.outside,
                   axisLabelFormatter: (AxisLabelRenderDetails details) {
                     var date = DateTime.fromMillisecondsSinceEpoch(details.value as int);
                     var key = getKey(date);
-                    var isAlreadyShown = labelShowSet.contains(key);
+                    var isAlreadyShown = _labelShowSet.contains(key);
 
                     if (!isAlreadyShown) {
-                      labelShowSet.add(key);
+                      _labelShowSet.add(key);
                       var monthDayString = DateFormat('MM/dd').format(date);
                       var hourMinuteString = DateFormat('HH:mm').format(date);
                       return ChartAxisLabel(
@@ -124,9 +93,9 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                 tooltipBehavior: TooltipBehavior(
                   enable: true,
                   builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
-                    final dto = data as GlucoseHistoryResponseDto;
-                    final dateStr = DateFormat('yyyy년 MM월 dd일').format(dto.dateTime);
-                    final timeStr = DateFormat('HH시 mm분').format(dto.dateTime);
+                    final response = data as GlucoseHistoryResponse;
+                    final dateStr = DateFormat('yyyy년 MM월 dd일').format(response.dateTime);
+                    final timeStr = DateFormat('HH시 mm분').format(response.dateTime);
                     return Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(6)),
@@ -136,7 +105,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                           Text(dateStr, style: TextStyle(color: Colors.white, fontSize: 12)),
                           Text(timeStr, style: TextStyle(color: Colors.white, fontSize: 12)),
                           Text(
-                            '혈당: ${dto.sgv}',
+                            '혈당: ${response.sgv}',
                             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -145,8 +114,8 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                   },
                 ),
                 series: <CartesianSeries>[
-                  LineSeries<GlucoseHistoryResponseDto, DateTime>(
-                    dataSource: records,
+                  LineSeries<GlucoseHistoryResponse, DateTime>(
+                    dataSource: widget.records,
                     xValueMapper: (dto, _) => dto.dateTime,
                     yValueMapper: (dto, _) => dto.sgv,
                     width: 2,
@@ -157,44 +126,14 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
             ),
           ),
         ),
-        SizedBox(height: 20),
-        Builder(
-          builder: (_) {
-            var todayGlucose = GlucoseUtil.getLastDateGlucoseData(records);
-            if (todayGlucose == null) return Container();
-            var lastDate = records.last.dateTime;
-            var lastDateString = DateFormat("MM월 dd일").format(lastDate);
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "통계 정보($lastDateString)",
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 20 / 16,
-                      color: AppColors.mainColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text("최고 혈당 수치 : ${todayGlucose.max}"),
-                  Text("최저 혈당 수치 : ${todayGlucose.min}"),
-                  Text("평균 혈당 수치 : ${todayGlucose.avg.toStringAsFixed(2)}"),
-                ],
-              ),
-            );
-          },
-        ),
       ],
     );
   }
 
   Widget getIntervalButton(double value) {
-    var isSelected = interval == value;
+    var isSelected = _interval == value;
     return GestureDetector(
-      onTap: () => setState(() => interval = value),
+      onTap: () => setState(() => _interval = value),
       child: Container(
         alignment: Alignment.center,
         width: 60,

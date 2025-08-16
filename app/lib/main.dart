@@ -11,10 +11,6 @@ import 'core/notification/notification_service.dart';
 
 final rootStateKey = GlobalKey<NavigatorState>();
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  NotificationService().showNotification(message);
-}
-
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
     ExceptionHandler().handleException(details.exception, details.stack, rootStateKey.currentContext);
@@ -22,9 +18,7 @@ void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     await NotificationService().initialize();
-    await NotificationService().settingHandler();
     runApp(ProviderScope(child: const MainApp()));
   }, (error, stackTrace) => ExceptionHandler().handleException(error, stackTrace, rootStateKey.currentContext));
 }

@@ -25,14 +25,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await careGiversInitialize();
+      try {
+        var lateCareGiverId = LocalRepository().read(LocalRepositoryKey.lateCareGiverId);
+        await careGiversInitialize(lateCareGiverId);
+      } catch (e) {
+        return;
+      }
     });
   }
 
-  Future<void> careGiversInitialize() async {
+  Future<void> careGiversInitialize(int careGiverId) async {
     try {
-      var lateCareGiverId = LocalRepository().read<int>(LocalRepositoryKey.lateCareGiverId);
-      var result = await ref.read(careGiverControllerProvider.notifier).getCareGiver(lateCareGiverId);
+      var result = await ref.read(careGiverControllerProvider.notifier).getCareGiver(careGiverId);
       if (result == null) throw CustomException(ExceptionMessage.badRequest);
       setState(() => careGiver = result);
     } on CustomException catch (e) {
@@ -53,8 +57,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             var result = await Navigator.push<int?>(context, MaterialPageRoute(builder: (_) => CareGiverScreen()));
             if (result == null) return;
             if (careGiver?.id == result) return;
-            await careGiversInitialize();
-            setState(() {});
+            await careGiversInitialize(result);
           },
           child: Container(
             color: AppColors.mainColor,
@@ -76,7 +79,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ),
-        if (careGiver != null) Expanded(child: GlucoseScreen(careGiver: careGiver!)),
+        if (careGiver != null)
+          Expanded(
+            child: GlucoseScreen(key: ValueKey(careGiver), careGiver: careGiver!),
+          ),
       ],
     );
   }

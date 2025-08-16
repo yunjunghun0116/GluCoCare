@@ -1,7 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -32,14 +32,15 @@ class NotificationService {
 
   Future<void> requestPermission() async {
     if (Platform.isAndroid) {
-      await _flutterLocalNotificationsPlugin
+      var success = await _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
+      log("Notification Service Permission Status : $success");
     }
     if (Platform.isIOS) {
-      await _flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(alert: true, badge: true, sound: true);
+      var settings = await FirebaseMessaging.instance.requestPermission(alert: true, badge: true, sound: true);
+      // 필요할 경우 이곳에서 setForegroundNotificationPresentationOptions 를 호출할 수도 있음.
+      log("Notification Service Permission Status : ${settings.authorizationStatus}");
     }
   }
 }

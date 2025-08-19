@@ -55,75 +55,122 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
           child: Row(children: [1.0, 2.0, 3.0, 6.0].map((number) => getIntervalButton(number)).toList()),
         ),
         Container(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          height: 40,
+          child: Text(
+            "혈당\n(mg/dL)",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 10, color: AppColors.fontGray600Color),
+          ),
+        ),
+        Container(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SingleChildScrollView(
-            controller: _controller,
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: calculateWidthForChart(widget.records.length),
-              height: 400,
-              child: SfCartesianChart(
-                primaryXAxis: DateTimeAxis(
-                  minimum: widget.records.first.dateTime.subtract(Duration(hours: 3)),
-                  maximum: maxDate,
-                  interval: _interval,
-                  labelAlignment: LabelAlignment.center,
-                  labelPosition: ChartDataLabelPosition.outside,
-                  axisLabelFormatter: (AxisLabelRenderDetails details) {
-                    var date = DateTime.fromMillisecondsSinceEpoch(details.value as int);
-                    var key = getKey(date);
-                    var isAlreadyShown = _labelShowSet.contains(key);
-
-                    if (!isAlreadyShown) {
-                      _labelShowSet.add(key);
-                      var monthDayString = DateFormat('MM/dd').format(date);
-                      var hourMinuteString = DateFormat('HH:mm').format(date);
-                      return ChartAxisLabel(
-                        "$monthDayString\n$hourMinuteString",
-                        TextStyle(fontSize: 12, color: AppColors.fontGray800Color, fontWeight: FontWeight.bold),
-                      );
-                    }
-                    return ChartAxisLabel(
-                      DateFormat('HH:mm').format(date),
-                      TextStyle(fontSize: 12, color: AppColors.fontGray800Color, fontWeight: FontWeight.bold),
-                    );
-                  },
-                ),
-                primaryYAxis: NumericAxis(minimum: 50, maximum: 300, interval: 50),
-                tooltipBehavior: TooltipBehavior(
-                  enable: true,
-                  builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
-                    final response = data as GlucoseHistoryResponse;
-                    final dateStr = DateFormat('yyyy년 MM월 dd일').format(response.dateTime);
-                    final timeStr = DateFormat('HH시 mm분').format(response.dateTime);
-                    return Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(6)),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 50,
+                height: 400,
+                child: Column(
+                  children: [
+                    Expanded(
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(dateStr, style: TextStyle(color: Colors.white, fontSize: 12)),
-                          Text(timeStr, style: TextStyle(color: Colors.white, fontSize: 12)),
-                          Text(
-                            '혈당: ${response.sgv}',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [300, 250, 200, 150, 100, 50]
+                            .map(
+                              (y) => Text(
+                                '$y',
+                                style: TextStyle(fontSize: 12, height: 20 / 12, color: AppColors.fontGray600Color),
+                              ),
+                            )
+                            .toList(),
                       ),
-                    );
-                  },
+                    ),
+                    SizedBox(height: 40),
+                  ],
                 ),
-                series: <CartesianSeries>[
-                  LineSeries<GlucoseHistoryResponse, DateTime>(
-                    dataSource: widget.records,
-                    xValueMapper: (dto, _) => dto.dateTime,
-                    yValueMapper: (dto, _) => dto.sgv,
-                    width: 2,
-                    markerSettings: MarkerSettings(isVisible: false, width: 3, height: 3),
-                  ),
-                ],
               ),
-            ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: _controller,
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: calculateWidthForChart(widget.records.length),
+                    height: 400,
+                    child: SfCartesianChart(
+                      primaryXAxis: DateTimeAxis(
+                        minimum: widget.records.first.dateTime.subtract(Duration(hours: 3)),
+                        maximum: maxDate,
+                        interval: _interval,
+                        labelAlignment: LabelAlignment.center,
+                        labelPosition: ChartDataLabelPosition.outside,
+                        axisLabelFormatter: (AxisLabelRenderDetails details) {
+                          var date = DateTime.fromMillisecondsSinceEpoch(details.value as int);
+                          var key = getKey(date);
+                          var isAlreadyShown = _labelShowSet.contains(key);
+
+                          if (!isAlreadyShown) {
+                            _labelShowSet.add(key);
+                            var monthDayString = DateFormat('MM/dd').format(date);
+                            var hourMinuteString = DateFormat('HH:mm').format(date);
+                            return ChartAxisLabel(
+                              "$monthDayString\n$hourMinuteString",
+                              TextStyle(fontSize: 12, color: AppColors.fontGray800Color, fontWeight: FontWeight.bold),
+                            );
+                          }
+                          return ChartAxisLabel(
+                            DateFormat('HH:mm').format(date),
+                            TextStyle(fontSize: 12, color: AppColors.fontGray800Color, fontWeight: FontWeight.bold),
+                          );
+                        },
+                      ),
+                      primaryYAxis: NumericAxis(
+                        minimum: 50,
+                        maximum: 300,
+                        interval: 50,
+                        axisLine: const AxisLine(width: 0),
+                        // ❌ Y축의 숫자 레이블(50, 100...) 숨기기
+                        labelStyle: const TextStyle(fontSize: 0),
+                        // ❌ Y축의 눈금(tick) 숨기기
+                        majorTickLines: const MajorTickLines(size: 0),
+                      ),
+                      tooltipBehavior: TooltipBehavior(
+                        enable: true,
+                        builder: (dynamic data, dynamic point, dynamic series, int pointIndex, int seriesIndex) {
+                          final response = data as GlucoseHistoryResponse;
+                          final dateStr = DateFormat('yyyy년 MM월 dd일').format(response.dateTime);
+                          final timeStr = DateFormat('HH시 mm분').format(response.dateTime);
+                          return Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(6)),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(dateStr, style: TextStyle(color: Colors.white, fontSize: 12)),
+                                Text(timeStr, style: TextStyle(color: Colors.white, fontSize: 12)),
+                                Text(
+                                  '혈당: ${response.sgv}',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      series: <CartesianSeries>[
+                        LineSeries<GlucoseHistoryResponse, DateTime>(
+                          dataSource: widget.records,
+                          xValueMapper: (dto, _) => dto.dateTime,
+                          yValueMapper: (dto, _) => dto.sgv,
+                          width: 2,
+                          markerSettings: MarkerSettings(isVisible: false, width: 3, height: 3),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],

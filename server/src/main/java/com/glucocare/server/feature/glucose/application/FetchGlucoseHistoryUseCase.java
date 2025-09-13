@@ -4,6 +4,7 @@ import com.glucocare.server.client.CgmServerClient;
 import com.glucocare.server.client.dto.CgmEntry;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
+import com.glucocare.server.feature.glucose.infra.GlucoseHistoryCache;
 import com.glucocare.server.feature.patient.domain.Patient;
 import com.glucocare.server.feature.patient.domain.PatientRepository;
 import jakarta.transaction.Transactional;
@@ -14,11 +15,12 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * CGM 서버로부터 혈당 데이터를 주기적으로 가져오는 Use Case 클래스
+ * CGM 서버로부터 혈당 데이터를 주기적으로 가져와 저장하는 Use Case 클래스
  * <p>
  * 이 클래스는 스케줄링을 통해 주기적으로 모든 환자들의 CGM 서버에서
  * 최신 혈당 데이터를 가져와 데이터베이스에 저장하는 비즈니스 로직을 처리합니다.
- * 중복 데이터 저장을 방지하기 위해 마지막 저장된 혈당 기록 이후의 데이터만 가져옵니다.
+ * 중복 데이터 저장을 방지하기 위해 마지막 저장된 혈당 기록 이후의 데이터만 가져오며,
+ * 새로운 혈당 데이터가 저장된 경우 해당 환자의 혈당 히스토리 Redis 캐시를 무효화합니다.
  */
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class FetchGlucoseHistoryUseCase {
     private final CgmServerClient cgmServerClient;
     private final PatientRepository patientRepository;
     private final GlucoseHistoryRepository glucoseHistoryRepository;
+    private final GlucoseHistoryCache glucoseHistoryCache;
 
     /**
      * 모든 환자의 혈당 데이터를 주기적으로 가져오는 메인 메서드
@@ -56,16 +59,24 @@ public class FetchGlucoseHistoryUseCase {
      * 2. 해당 환자의 가장 최근 저장된 혈당 기록 조회
      * 3. CGM 서버에서 가져온 데이터 중 최근 기록 이후의 새로운 데이터만 필터링
      * 4. 새로운 혈당 기록을 데이터베이스에 저장
+     * 5. 새로운 데이터가 저장된 경우 해당 환자의 혈당 히스토리 Redis 캐시를 무효화
      *
      * @param patient 혈당 데이터를 저장할 환자 엔티티
      */
     private void savePatientsGlucoseHistory(Patient patient) {
         var entries = cgmServerClient.getCgmEntries(patient.getCgmServerUrl());
         var recentHistory = glucoseHistoryRepository.findFirstByPatientOrderByDateDesc(patient);
+
+        var isGlucoseHistoryChanged = false;
         for (var entry : entries) {
             if (isEnd(entry, recentHistory)) break;
             var glucoseHistory = new GlucoseHistory(patient, entry.sgv(), entry.date());
             glucoseHistoryRepository.save(glucoseHistory);
+            isGlucoseHistoryChanged = true;
+        }
+
+        if (isGlucoseHistoryChanged) {
+            glucoseHistoryCache.clearByPatientId(patient.getId());
         }
     }
 

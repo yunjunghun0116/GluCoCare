@@ -12,4 +12,6 @@ public interface CareGiverRepository extends JpaRepository<CareGiver, Long> {
     List<CareGiver> findAllByPatient(Patient patient);
 
     Boolean existsByMemberAndPatient(Member member, Patient patient);
+
+    Boolean existsByMemberIdAndPatientId(Long memberId, Long patientId);
 }

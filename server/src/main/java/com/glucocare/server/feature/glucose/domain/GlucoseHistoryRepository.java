@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GlucoseHistoryRepository extends JpaRepository<GlucoseHistory, Long> {
-    List<GlucoseHistory> findAllByPatientOrderByDateDesc(Patient patient);
+    List<GlucoseHistory> findAllByPatientIdOrderByDateDesc(Long patientId);
 
     Optional<GlucoseHistory> findFirstByPatientOrderByDateDesc(Patient patient);
 }

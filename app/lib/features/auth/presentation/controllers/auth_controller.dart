@@ -1,3 +1,5 @@
+import 'package:app/core/exceptions/custom_exception.dart';
+import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/features/auth/data/models/login_request.dart';
 import 'package:app/features/auth/data/models/register_request.dart';
 import 'package:app/features/auth/data/models/token_response.dart';
@@ -9,17 +11,21 @@ class AuthController extends BaseController<BaseState> {
   AuthController(super.state, super.dio);
 
   Future<String?> login(LoginRequest loginRequest) async {
-    var response = await postRequest(
-      "/api/members/login",
-      data: {"email": loginRequest.email, "password": loginRequest.password},
-    );
+    try {
+      var response = await postRequest(
+        "/api/members/login",
+        data: {"email": loginRequest.email, "password": loginRequest.password},
+      );
 
-    if (response.statusCode == 200) {
-      var tokenResponse = TokenResponse.fromJson(response.data);
-      await SecureRepository().writeRefreshToken(tokenResponse.refreshToken);
-      return tokenResponse.accessToken;
+      if (response.statusCode == 200) {
+        var tokenResponse = TokenResponse.fromJson(response.data);
+        await SecureRepository().writeRefreshToken(tokenResponse.refreshToken);
+        return tokenResponse.accessToken;
+      }
+    } catch (exception) {
+      throw CustomException(ExceptionMessage.wrongEmailOrPassword);
+      return null;
     }
-    return null;
   }
 
   Future<bool> autoLogin() async {

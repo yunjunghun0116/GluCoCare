@@ -27,8 +27,8 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   Future<void> loginWithEmailAndPassword() async {
     var loginRequest = LoginRequest(email: _emailController.text, password: _passwordController.text);
     var token = await ref.read(authControllerProvider.notifier).login(loginRequest);
-    if (!mounted) return;
     if (token == null) throw CustomException(ExceptionMessage.badRequest);
+    if (!mounted) return;
     SignUtil.login(context, ref: ref, token: token);
   }
 

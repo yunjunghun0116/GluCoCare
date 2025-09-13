@@ -5,7 +5,7 @@ import {check, sleep} from "k6";
 const BASE_URL = "https://assured-mastodon-basically.ngrok-free.app";
 
 export const options = {
-    vus: 50,
+    vus: 100,
     duration: "1m"
 }
 
@@ -54,5 +54,5 @@ export default function (data) {
     }
 
     check(res, {"성공 코드": (r) => r.status === 200});
-    sleep(1);
+    sleep(0.5);
 }

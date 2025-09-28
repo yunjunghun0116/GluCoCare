@@ -10,30 +10,42 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "oauth_token")
+@Table(name = "fitbit_token")
 @Getter
-public class OauthToken extends BaseEntity {
+public class FitbitToken extends BaseEntity {
     @NotNull
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
     @NotNull
+    @Column(name = "fitbit_user_id")
+    private String fitbitUserId;
+    @NotNull
     @Column(name = "access_token")
     private String accessToken;
+    @NotNull
+    @Column(name = "expires_in")
+    private Integer expiresIn;
     @NotNull
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    protected OauthToken() {
+    protected FitbitToken() {
     }
 
-    public OauthToken(Member member, String refreshToken) {
+    public FitbitToken(Member member, String fitbitUserId, String accessToken, Integer expiresIn, String refreshToken) {
         this.member = member;
+        this.fitbitUserId = fitbitUserId;
+        this.accessToken = accessToken;
+        this.expiresIn = expiresIn;
         this.refreshToken = refreshToken;
     }
 
-    public void updateRefreshToken(String newRefreshToken) {
-        this.refreshToken = newRefreshToken;
+    public void refreshToken(String fitbitUserId, String accessToken, Integer expiresIn, String refreshToken) {
+        this.fitbitUserId = fitbitUserId;
+        this.accessToken = accessToken;
+        this.expiresIn = expiresIn;
+        this.refreshToken = refreshToken;
     }
 }

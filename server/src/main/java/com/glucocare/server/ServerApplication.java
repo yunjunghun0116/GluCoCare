@@ -1,6 +1,7 @@
 package com.glucocare.server;
 
 import com.glucocare.server.config.properties.CgmProperties;
+import com.glucocare.server.config.properties.FitbitProperties;
 import com.glucocare.server.config.properties.JwtProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableScheduling
-@EnableConfigurationProperties({JwtProperties.class, CgmProperties.class})
+@EnableConfigurationProperties({JwtProperties.class, CgmProperties.class, FitbitProperties.class})
 public class ServerApplication {
 
     public static void main(String[] args) {

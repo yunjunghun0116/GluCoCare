@@ -5,10 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface AuthTokenRepository extends JpaRepository<AuthToken, Long> {
-    Optional<AuthToken> findByRefreshToken(String refreshToken);
-
-    Optional<AuthToken> findByMember(Member member);
+public interface FitbitTokenRepository extends JpaRepository<FitbitToken, Long> {
+    Optional<FitbitToken> findByMember(Member member);
 
     Boolean existsByMember(Member member);
 }

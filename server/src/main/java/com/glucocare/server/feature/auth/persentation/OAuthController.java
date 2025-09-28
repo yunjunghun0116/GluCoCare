@@ -1,52 +1,36 @@
 package com.glucocare.server.feature.auth.persentation;
 
-import com.glucocare.server.feature.auth.application.*;
-import com.glucocare.server.feature.auth.dto.*;
-import jakarta.validation.Valid;
+import com.glucocare.server.client.FitbitClient;
+import com.glucocare.server.client.dto.FitbitOAuthResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/members")
-public class AuthController {
+@RequestMapping("/api/oauth")
+public class OAuthController {
 
-    private final LoginUseCase loginUseCase;
-    private final RegisterUseCase registerUseCase;
-    private final ExistsUniqueEmailUseCase existsUniqueEmailUseCase;
-    private final AutoLoginUseCase autoLoginUseCase;
-    private final RefreshTokenUseCase refreshTokenUseCase;
+    private final FitbitClient fitbitClient;
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        var auth = registerUseCase.execute(registerRequest);
-        return ResponseEntity.ok(auth);
+    @GetMapping("/authorize/fitbit")
+    public ResponseEntity<Void> authorizeFitbit() {
+        var authorizeUrl = fitbitClient.generateAuthorizeUrl();
+        var headers = new HttpHeaders();
+        headers.setLocation(URI.create(authorizeUrl));
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        var auth = loginUseCase.execute(loginRequest);
-        return ResponseEntity.ok(auth);
-    }
-
-    @GetMapping("/auto-login")
-    public ResponseEntity<Boolean> autoLogin(@AuthenticationPrincipal Long memberId) {
-        autoLoginUseCase.execute(memberId);
-        return ResponseEntity.ok()
-                             .build();
-    }
-
-    @PostMapping("/refresh-token")
-    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
-        var auth = refreshTokenUseCase.execute(refreshTokenRequest);
-        return ResponseEntity.ok(auth);
-    }
-
-    @PostMapping("/exists-email")
-    public ResponseEntity<Boolean> existsUniqueEmail(@Valid @RequestBody ExistsUniqueEmailRequest existsUniqueEmailRequest) {
-        var result = existsUniqueEmailUseCase.execute(existsUniqueEmailRequest);
-        return ResponseEntity.ok(result);
+    @GetMapping("/callback/fitbit")
+    public ResponseEntity<FitbitOAuthResponse> callbackFitbit(@RequestParam String code) {
+        var response = fitbitClient.getOAuthResponse(code);
+        return ResponseEntity.ok(response);
     }
 }

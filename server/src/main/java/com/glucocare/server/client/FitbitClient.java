@@ -1,53 +1,61 @@
 package com.glucocare.server.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.glucocare.server.client.dto.CgmEntry;
-import com.glucocare.server.config.properties.CgmProperties;
+import com.glucocare.server.client.dto.FitbitOAuthResponse;
+import com.glucocare.server.config.properties.FitbitProperties;
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CgmServerClient {
+public class FitbitClient {
 
     private final RestClient restClient;
-    private final CgmProperties cgmProperties;
+    private final FitbitProperties fitbitProperties;
     private final ObjectMapper objectMapper;
 
-    public List<CgmEntry> getCgmEntries(String cgmServerUrl) {
-        var response = restClient.get()
-                                 .uri(URI.create(convertCgmServerUrlToEntriesRequest(cgmServerUrl)))
-                                 .accept(MediaType.APPLICATION_JSON)
-                                 .headers(headers -> {
-                                     headers.add("api-secret", cgmProperties.apiSecret());
-                                     headers.add("ngrok-skip-browser-warning", "true");
-                                     headers.add("Content-Type", "application/json");
-                                 })
+    public String generateAuthorizeUrl() {
+        return "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + fitbitProperties.clientId() + "&scope=activity+heartrate+respiratory_rate+sleep+temperature&redirect_uri=" + fitbitProperties.redirectUri();
+    }
+
+    public FitbitOAuthResponse getOAuthResponse(String code) {
+        String authorization = fitbitProperties.clientId() + ":" + fitbitProperties.clientSecret();
+        String basic = Base64.getEncoder()
+                             .encodeToString(authorization.getBytes(StandardCharsets.UTF_8));
+
+        var body = new LinkedMultiValueMap<String, Object>();
+        body.add("client_id", fitbitProperties.clientId());
+        body.add("code", code);
+        body.add("grant_type", "authorization_code");
+        body.add("redirect_uri", fitbitProperties.redirectUri());
+
+        var response = restClient.post()
+                                 .uri(URI.create("https://api.fitbit.com/oauth2/token"))
+                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                 .header(HttpHeaders.AUTHORIZATION, "Basic " + basic)
+                                 .body(body)
                                  .retrieve()
                                  .body(String.class);
-        return convertJsonToList(response);
+
+        return convertJsonToResponse(response);
     }
 
-    private String convertCgmServerUrlToEntriesRequest(String cgmServerUrl) {
-        return cgmServerUrl + "/api/v1/entries.json?count=2880&find[date][$gt]=1711929600000";
-    }
-
-    private <T> List<T> convertJsonToList(String json) {
+    private FitbitOAuthResponse convertJsonToResponse(String json) {
         try {
-            JavaType type = objectMapper.getTypeFactory()
-                                        .constructCollectionType(List.class, CgmEntry.class);
-            return objectMapper.readValue(json, type);
+            return objectMapper.readValue(json, FitbitOAuthResponse.class);
         } catch (JsonProcessingException e) {
             throw new ApplicationException(ErrorMessage.INVALID_CONVERT_REQUEST);
         }

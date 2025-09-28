@@ -49,5 +49,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	
+	<key>NSHealthShareUsageDescription</key>
+    <string>사용자의 건강 정보를 활용하기 위해 이 앱에서 건강 정보에 접근을 하려고 합니다.</string>
 </dict>
 </plist>

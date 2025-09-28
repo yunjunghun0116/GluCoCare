@@ -40,8 +40,8 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
       _controller.jumpTo(_controller.position.maxScrollExtent);
     });
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
+      physics: ClampingScrollPhysics(),
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -129,9 +129,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                         maximum: 300,
                         interval: 50,
                         axisLine: const AxisLine(width: 0),
-                        // ❌ Y축의 숫자 레이블(50, 100...) 숨기기
                         labelStyle: const TextStyle(fontSize: 0),
-                        // ❌ Y축의 눈금(tick) 숨기기
                         majorTickLines: const MajorTickLines(size: 0),
                       ),
                       tooltipBehavior: TooltipBehavior(

@@ -22,10 +22,14 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   void initState() {
     super.initState();
-    notificationServiceInitialize();
+    initialize();
   }
 
-  void notificationServiceInitialize() async {
+  void initialize() async {
+    await notificationServiceInitialize();
+  }
+
+  Future<void> notificationServiceInitialize() async {
     await NotificationService().requestPermission();
     var token = await FirebaseMessaging.instance.getToken();
     if (token == null) return;

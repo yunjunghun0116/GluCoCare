@@ -1,9 +1,10 @@
 package com.glucocare.server.feature.glucose.application;
 
 import com.glucocare.server.client.CgmServerClient;
-import com.glucocare.server.client.dto.CgmEntry;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
+import com.glucocare.server.feature.glucose.domain.GlucoseSyncDate;
+import com.glucocare.server.feature.glucose.domain.GlucoseSyncDateRepository;
 import com.glucocare.server.feature.glucose.infra.GlucoseHistoryCache;
 import com.glucocare.server.feature.patient.domain.Patient;
 import com.glucocare.server.feature.patient.domain.PatientRepository;
@@ -12,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * CGM 서버로부터 혈당 데이터를 주기적으로 가져와 저장하는 Use Case 클래스
@@ -30,7 +34,9 @@ public class FetchGlucoseHistoryUseCase {
     private final CgmServerClient cgmServerClient;
     private final PatientRepository patientRepository;
     private final GlucoseHistoryRepository glucoseHistoryRepository;
+    private final GlucoseSyncDateRepository glucoseSyncDateRepository;
     private final GlucoseHistoryCache glucoseHistoryCache;
+    private final ZoneOffset zoneOffset = ZoneOffset.UTC;
 
     /**
      * 모든 환자의 혈당 데이터를 주기적으로 가져오는 메인 메서드
@@ -51,25 +57,14 @@ public class FetchGlucoseHistoryUseCase {
         }
     }
 
-    /**
-     * 특정 환자의 혈당 데이터를 CGM 서버에서 가져와 저장하는 메서드
-     * <p>
-     * 이 메서드는 다음과 같은 과정을 수행합니다:
-     * 1. 환자의 CGM 서버 URL을 통해 혈당 데이터 목록 조회
-     * 2. 해당 환자의 가장 최근 저장된 혈당 기록 조회
-     * 3. CGM 서버에서 가져온 데이터 중 최근 기록 이후의 새로운 데이터만 필터링
-     * 4. 새로운 혈당 기록을 데이터베이스에 저장
-     * 5. 새로운 데이터가 저장된 경우 해당 환자의 혈당 히스토리 Redis 캐시를 무효화
-     *
-     * @param patient 혈당 데이터를 저장할 환자 엔티티
-     */
     private void savePatientsGlucoseHistory(Patient patient) {
-        var entries = cgmServerClient.getCgmEntries(patient.getCgmServerUrl());
-        var recentHistory = glucoseHistoryRepository.findFirstByPatientOrderByDateDesc(patient);
-
+        var lastSyncMilliseconds = getMilliseconds(patient);
+        var entries = cgmServerClient.getCgmEntries(patient.getCgmServerUrl(), lastSyncMilliseconds);
         var isGlucoseHistoryChanged = false;
+        var validationSet = getValidationSet(patient, lastSyncMilliseconds);
+
         for (var entry : entries) {
-            if (isEnd(entry, recentHistory)) break;
+            if (validationSet.contains(entry.date())) continue;
             var glucoseHistory = new GlucoseHistory(patient, entry.sgv(), entry.date());
             glucoseHistoryRepository.save(glucoseHistory);
             isGlucoseHistoryChanged = true;
@@ -77,23 +72,47 @@ public class FetchGlucoseHistoryUseCase {
 
         if (isGlucoseHistoryChanged) {
             glucoseHistoryCache.clearByPatientId(patient.getId());
+
+            if (canAddSyncDate(lastSyncMilliseconds)) {
+                var todayDate = LocalDate.now(zoneOffset);
+                var newSyncDate = new GlucoseSyncDate(patient, todayDate);
+                glucoseSyncDateRepository.save(newSyncDate);
+            }
         }
     }
 
-    /**
-     * CGM 데이터 처리 종료 조건을 판단하는 메서드
-     * <p>
-     * 이 메서드는 중복 데이터 저장을 방지하기 위해 사용됩니다.
-     * CGM 서버에서 가져온 혈당 데이터가 이미 데이터베이스에 저장된
-     * 가장 최근 기록보다 오래된 경우 처리를 중단합니다.
-     *
-     * @param entry         CGM 서버에서 가져온 혈당 데이터 엔트리
-     * @param recentHistory 데이터베이스에 저장된 가장 최근 혈당 기록 (Optional)
-     * @return 처리를 중단해야 하면 true, 계속 처리하면 false
-     */
-    private boolean isEnd(CgmEntry entry, Optional<GlucoseHistory> recentHistory) {
-        if (recentHistory.isEmpty()) return false;
-        var history = recentHistory.get();
-        return entry.date() <= history.getDate();
+    private Set<Long> getValidationSet(Patient patient, Long lastSyncMilliseconds) {
+        var validationSet = new HashSet<Long>();
+
+        var histories = glucoseHistoryRepository.findAllByPatientAndDateGreaterThan(patient, lastSyncMilliseconds);
+
+        for (var history : histories) {
+            validationSet.add(history.getDate());
+        }
+
+        return validationSet;
+    }
+
+    private Long getMilliseconds(Patient patient) {
+        var lastSyncDate = glucoseSyncDateRepository.findFirstByPatientOrderByDateDesc(patient);
+        if (lastSyncDate.isPresent()) {
+            return lastSyncDate.get()
+                               .getDate()
+                               .atStartOfDay(zoneOffset)
+                               .toInstant()
+                               .toEpochMilli();
+        }
+        var defaultDate = LocalDate.of(2025, 1, 1);
+        return defaultDate.atStartOfDay(zoneOffset)
+                          .toInstant()
+                          .toEpochMilli();
+    }
+
+    private Boolean canAddSyncDate(Long milliseconds) {
+        var todayDate = LocalDate.now(zoneOffset);
+        var todayMilliseconds = todayDate.atStartOfDay(zoneOffset)
+                                         .toInstant()
+                                         .toEpochMilli();
+        return todayMilliseconds > milliseconds;
     }
 }

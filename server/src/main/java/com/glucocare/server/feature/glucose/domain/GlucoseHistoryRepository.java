@@ -10,4 +10,6 @@ public interface GlucoseHistoryRepository extends JpaRepository<GlucoseHistory, 
     List<GlucoseHistory> findAllByPatientIdOrderByDateDesc(Long patientId);
 
     Optional<GlucoseHistory> findFirstByPatientOrderByDateDesc(Patient patient);
+
+    List<GlucoseHistory> findAllByPatientAndDateGreaterThan(Patient patient, Long date);
 }

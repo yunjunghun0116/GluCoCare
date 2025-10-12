@@ -18,7 +18,7 @@ public class CareGiverCache {
         return redisTemplate.hasKey(key);
     }
 
-    public void createGlucoseHistories(Long memberId, Long patientId) {
+    public void cacheRelation(Long memberId, Long patientId) {
         var key = KEY_PREFIX + memberId + ":" + patientId;
 
         var valueOps = redisTemplate.opsForValue();

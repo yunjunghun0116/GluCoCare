@@ -14,9 +14,9 @@ import org.hibernate.annotations.OnDeleteAction;
 public class GlucoseAlertPolicy extends BaseEntity {
     @NotNull
     @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "care_giver_id")
+    @JoinColumn(name = "member_patient_relation_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private CareGiver careGiver;
+    private MemberPatientRelation memberPatientRelation;
     @NotNull
     @Column(name = "high_risk_value")
     private Integer highRiskValue;
@@ -28,10 +28,10 @@ public class GlucoseAlertPolicy extends BaseEntity {
     protected GlucoseAlertPolicy() {
     }
 
-    public GlucoseAlertPolicy(CareGiver careGiver) {
-        this.careGiver = careGiver;
-        this.highRiskValue = 150;
-        this.veryHighRiskValue = 200;
+    public GlucoseAlertPolicy(MemberPatientRelation memberPatientRelation) {
+        this.memberPatientRelation = memberPatientRelation;
+        this.highRiskValue = 140;
+        this.veryHighRiskValue = 180;
     }
 
     public void updateHighRiskValue(Integer newHighRiskValue) {

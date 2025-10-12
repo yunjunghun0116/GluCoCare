@@ -19,10 +19,34 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
   final Set<String> _labelShowSet = {};
   double _interval = 2.0;
 
-  double calculateWidthForChart(int dataLength) {
-    var baseWidth = MediaQuery.of(context).size.width + 200;
-    var widthPerPoint = _interval;
-    return baseWidth + widthPerPoint * widget.records.length;
+  // double calculateWidthForChart(int dataLength) {
+  //   var baseWidth = MediaQuery.of(context).size.width + 200;
+  //   var widthPerPoint = _interval;
+  //   return baseWidth + widthPerPoint * widget.records.length;
+  // }
+
+  double calculateWidthForChart() {
+    if (widget.records.isEmpty) return MediaQuery.of(context).size.width;
+
+    // 시작 시간과 끝 시간 계산
+    var minDate = widget.records.first.dateTime.subtract(Duration(hours: 3));
+    var maxDate = widget.records.last.dateTime.add(Duration(hours: 3)).difference(DateTime.now()).isNegative
+        ? widget.records.last.dateTime.add(Duration(hours: 3))
+        : DateTime.now();
+
+    // 전체 시간 범위(시간 단위)
+    var totalHours = maxDate.difference(minDate).inHours;
+
+    // interval당 픽셀 수
+    var pixelsPerInterval = 60.0;
+
+    // 전체 너비 = (전체 시간 / interval) * interval당 픽셀
+    var totalIntervals = totalHours / _interval;
+    var calculatedWidth = totalIntervals * pixelsPerInterval;
+
+    // 최소 너비 보장
+    var minWidth = MediaQuery.of(context).size.width;
+    return calculatedWidth > minWidth ? calculatedWidth : minWidth;
   }
 
   String getKey(DateTime date) {
@@ -95,7 +119,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                   controller: _controller,
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
-                    width: calculateWidthForChart(widget.records.length),
+                    width: calculateWidthForChart(),
                     height: 400,
                     child: SfCartesianChart(
                       primaryXAxis: DateTimeAxis(

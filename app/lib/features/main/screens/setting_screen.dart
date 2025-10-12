@@ -8,6 +8,8 @@ import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../patient/presentation/screens/patient_screen.dart';
+
 class SettingScreen extends ConsumerStatefulWidget {
   const SettingScreen({super.key});
 
@@ -83,6 +85,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             if (!result) return;
             initializeName();
           },
+        ),
+        getActiveButton(
+          title: "Care Receiver 등록하기",
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PatientScreen())),
         ),
       ],
     );

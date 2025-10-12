@@ -1,5 +1,7 @@
+import 'package:app/core/health/health_connector.dart';
 import 'package:app/features/main/screens/setting_screen.dart';
 import 'package:app/features/member/presentation/providers.dart';
+import 'package:app/features/patient/presentation/providers.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   void initialize() async {
     await notificationServiceInitialize();
+    await healthConnectorInitialize();
+  }
+
+  Future<void> healthConnectorInitialize() async {
+    var isPatients = await ref.read(patientController.notifier).existsPatients();
+    if (!isPatients) return;
+    await HealthConnector().initialize();
   }
 
   Future<void> notificationServiceInitialize() async {
@@ -56,6 +65,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    HealthConnector().readBloodGlucose();
     return Scaffold(
       appBar: CommonAppBar(title: "GluCoCare", showLeading: false),
       backgroundColor: AppColors.backgroundColor,

@@ -24,9 +24,9 @@ public class Patient extends BaseEntity {
     protected Patient() {
     }
 
-    public Patient(String name, String cgmServerUrl) {
+    public Patient(String name) {
         this.name = name;
-        this.cgmServerUrl = cgmServerUrl;
+        this.cgmServerUrl = "";
     }
 
     public void updateCgmServerUrl(String newCgmServerUrl) {

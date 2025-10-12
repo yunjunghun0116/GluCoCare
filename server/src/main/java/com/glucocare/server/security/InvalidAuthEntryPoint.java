@@ -15,8 +15,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
- * 인증 실패 시 예외 처리 핸들러
- * Spring Security에서 비인증 사용자가 보호된 리소스에 접근할 때 호출되는 엔트리 포인트
+ * 인증 실패 엔트리 포인트
+ * <p>
+ * Spring Security에서 비인증 사용자가 보호된 리소스에 접근할 때 호출되는 엔트리 포인트입니다.
+ * 401 Unauthorized 상태코드와 에러 메시지를 JSON 형태로 반환합니다.
  */
 @Component
 @RequiredArgsConstructor
@@ -25,8 +27,14 @@ public class InvalidAuthEntryPoint implements AuthenticationEntryPoint {
     private final ObjectMapper objectMapper;
 
     /**
-     * 인증 실패 시 호출되는 메서드
-     * 401 Unauthorized 상태코드와 에러 메시지를 JSON 형태로 반환
+     * 인증 실패 시 401 Unauthorized 응답 반환
+     * <p>
+     * 처리 단계:
+     * 1. 요청 속성에서 예외 메시지 추출
+     * 2. 예외 응답 객체 생성 (상태코드 401, 에러 메시지 포함)
+     * 3. 응답 헤더 설정 (Content-Type: application/json, Character-Encoding: UTF-8)
+     * 4. 응답 상태코드 401 설정
+     * 5. JSON 형태로 예외 응답 작성
      *
      * @param request       HTTP 요청 객체
      * @param response      HTTP 응답 객체

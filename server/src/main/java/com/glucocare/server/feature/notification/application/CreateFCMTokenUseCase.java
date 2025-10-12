@@ -12,11 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * FCM 토큰 생성 및 업데이트 기능을 담당하는 Use Case 클래스
+ * FCM 토큰 생성 Use Case
  * <p>
- * 이 클래스는 Firebase Cloud Messaging(FCM) 토큰을 생성하거나 업데이트하는
- * 비즈니스 로직을 처리합니다. FCM 토큰은 푸시 알림 전송을 위해 필요한
- * 기기별 고유 식별자입니다.
+ * FCM 토큰을 생성하거나 업데이트합니다.
+ * FCM 토큰은 푸시 알림 전송을 위해 필요한 기기별 고유 식별자입니다.
+ * 기존 토큰이 있으면 업데이트하고, 없으면 새로 생성합니다.
  */
 @Service
 @RequiredArgsConstructor
@@ -26,17 +26,16 @@ public class CreateFCMTokenUseCase {
     private final FCMTokenRepository fcmTokenRepository;
 
     /**
-     * FCM 토큰을 생성하거나 업데이트하는 메인 메서드
+     * FCM 토큰 생성 또는 업데이트
      * <p>
-     * 이 메서드는 다음과 같은 과정을 수행합니다:
-     * 1. 회원에게 기존 FCM 토큰이 있는지 확인
-     * 2. 기존 토큰이 있으면 업데이트, 없으면 새로 생성
-     * 3. 생성 또는 업데이트된 FCM 토큰 정보를 응답 객체로 변환
+     * 비즈니스 로직 순서:
+     * 1. 회원 ID와 FCM 토큰 값으로 FCM 토큰 생성 또는 업데이트
+     * 2. 생성/업데이트된 FCM 토큰 정보를 응답 DTO로 변환하여 반환
      *
      * @param memberId FCM 토큰을 생성/업데이트할 회원의 ID
-     * @param request  FCM 토큰 생성 요청 정보 (FCM 토큰 값 포함)
-     * @return 생성되거나 업데이트된 FCM 토큰 정보를 담은 응답 객체
-     * @throws ApplicationException 회원을 찾을 수 없는 경우
+     * @param request  FCM 토큰 값을 포함한 생성 요청
+     * @return FCM 토큰 ID와 토큰 값을 포함한 응답
+     * @throws ApplicationException 회원을 찾을 수 없는 경우 (NOT_FOUND)
      */
     public CreateFCMTokenResponse execute(Long memberId, CreateFCMTokenRequest request) {
         var token = createFCMTokenWithRequest(memberId, request);
@@ -44,19 +43,24 @@ public class CreateFCMTokenUseCase {
     }
 
     /**
-     * FCM 토큰을 생성하거나 업데이트하는 내부 메서드
+     * FCM 토큰 엔티티 생성 또는 업데이트
      * <p>
-     * 이 메서드는 다음과 같은 과정을 수행합니다:
-     * 1. 주어진 memberId로 회원 존재 여부 확인
+     * 처리 단계:
+     * 1. 회원 ID로 데이터베이스에서 회원 엔티티 조회
      * 2. 해당 회원의 기존 FCM 토큰 존재 여부 확인
-     * 3. 기존 토큰이 있으면 토큰 값 업데이트
-     * 4. 기존 토큰이 없으면 새로운 FCM 토큰 엔티티 생성
-     * 5. 변경사항을 데이터베이스에 저장
+     * 3. 기존 토큰이 있으면:
+     *    - 기존 토큰 엔티티 조회
+     *    - 토큰 값 업데이트
+     *    - 데이터베이스에 저장
+     * 4. 기존 토큰이 없으면:
+     *    - 새로운 FCM 토큰 엔티티 생성
+     *    - 데이터베이스에 저장
+     * 5. 생성/업데이트된 FCM 토큰 엔티티 반환
      *
      * @param memberId FCM 토큰을 생성/업데이트할 회원의 ID
-     * @param request  FCM 토큰 생성 요청 정보
-     * @return 생성되거나 업데이트된 FCM 토큰 엔티티
-     * @throws ApplicationException 회원을 찾을 수 없는 경우
+     * @param request  FCM 토큰 값을 포함한 생성 요청
+     * @return 생성/업데이트된 FCM 토큰 엔티티
+     * @throws ApplicationException 회원을 찾을 수 없는 경우 (NOT_FOUND)
      */
     private FCMToken createFCMTokenWithRequest(Long memberId, CreateFCMTokenRequest request) {
         var member = memberRepository.findById(memberId)
@@ -74,10 +78,12 @@ public class CreateFCMTokenUseCase {
     }
 
     /**
-     * FCM 토큰 엔티티를 응답 객체로 변환하는 메서드
+     * FCM 토큰 엔티티를 응답 DTO로 변환
      * <p>
-     * FCM 토큰 엔티티에서 필요한 정보(토큰 ID, FCM 토큰 값)를 추출하여
-     * 클라이언트에게 반환할 응답 객체를 생성합니다.
+     * 처리 단계:
+     * 1. FCM 토큰 엔티티에서 ID와 토큰 값 추출
+     * 2. 응답 DTO 생성
+     * 3. 생성된 응답 DTO 반환
      *
      * @param fcmToken 변환할 FCM 토큰 엔티티
      * @return FCM 토큰 ID와 토큰 값을 포함한 응답 객체

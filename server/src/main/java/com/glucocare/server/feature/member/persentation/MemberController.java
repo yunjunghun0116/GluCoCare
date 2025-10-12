@@ -3,7 +3,7 @@ package com.glucocare.server.feature.member.persentation;
 import com.glucocare.server.feature.member.application.DeleteMemberUseCase;
 import com.glucocare.server.feature.member.application.ReadMemberNameUseCase;
 import com.glucocare.server.feature.member.application.UpdateNameUseCase;
-import com.glucocare.server.feature.member.dto.UpdateNameRequest;
+import com.glucocare.server.feature.member.dto.UpdateMemberNameRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +26,8 @@ public class MemberController {
     }
 
     @PostMapping("/update-name")
-    public ResponseEntity<Void> updateName(@AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateNameRequest updateNameRequest) {
-        updateNameUseCase.execute(memberId, updateNameRequest);
+    public ResponseEntity<Void> updateName(@AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateMemberNameRequest updateMemberNameRequest) {
+        updateNameUseCase.execute(memberId, updateMemberNameRequest);
         return ResponseEntity.ok()
                              .build();
     }

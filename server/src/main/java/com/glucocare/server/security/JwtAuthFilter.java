@@ -28,7 +28,9 @@ import java.util.List;
 
 /**
  * JWT 인증 필터
- * 모든 HTTP 요청에 대해 JWT 토큰 검증을 수행하는 Spring Security 필터
+ * <p>
+ * 모든 HTTP 요청에 대해 JWT 토큰 검증을 수행하는 Spring Security 필터입니다.
+ * Authorization 헤더에서 JWT 토큰을 추출하여 검증하고, 유효한 경우 SecurityContext에 인증 정보를 설정합니다.
  */
 @Component
 @RequiredArgsConstructor
@@ -40,7 +42,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
 
     /**
-     * 모든 HTTP 요청에 대해 JWT 토큰 검증을 수행
+     * 모든 HTTP 요청에 대해 JWT 토큰 검증 수행
+     * <p>
+     * 처리 단계:
+     * 1. 인증을 건너뛸 수 있는 요청인지 확인 (OPTIONS, Swagger, 로그인, 회원가입 등)
+     * 2. 건너뛸 수 있으면 다음 필터로 이동
+     * 3. Authorization 헤더에서 JWT 토큰 추출
+     * 4. 토큰이 없거나 형식이 잘못되었으면 401 응답 반환
+     * 5. 토큰에서 회원 ID 추출
+     * 6. 토큰이 만료되었으면 401 응답 반환
+     * 7. SecurityContext에 인증 정보 설정
+     * 8. 다음 필터로 이동
      *
      * @param request     HTTP 요청 객체
      * @param response    HTTP 응답 객체
@@ -73,10 +85,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 멤버 인증 토큰을 SecurityContext에 설정
+     * SecurityContext에 인증 정보 설정
+     * <p>
+     * 처리 단계:
+     * 1. 회원 ID로 데이터베이스에서 회원 엔티티 조회
+     * 2. 회원의 역할(Role)로 권한 목록 생성
+     * 3. 회원 ID, 이메일, 권한 목록으로 인증 토큰 생성
+     * 4. 요청 정보로 인증 세부 정보 생성 및 설정
+     * 5. SecurityContext에 인증 토큰 설정
      *
      * @param request  HTTP 요청 객체
-     * @param memberId 멤버 ID
+     * @param memberId 회원 ID
+     * @throws ApplicationException 회원을 찾을 수 없는 경우 (NOT_FOUND)
      */
     private void setMemberAuthToken(HttpServletRequest request, Long memberId) {
         var member = memberRepository.findById(memberId)
@@ -92,11 +112,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     /**
-     * JWT 토큰에서 멤버 ID를 추출
+     * JWT 토큰에서 회원 ID 추출
+     * <p>
+     * 처리 단계:
+     * 1. JwtProvider로 토큰에서 회원 ID 추출 시도
+     * 2. 성공하면 회원 ID 반환
+     * 3. 실패하면 요청 속성에 에러 메시지 설정 후 null 반환
      *
      * @param request HTTP 요청 객체
      * @param token   JWT 토큰
-     * @return 멤버 ID (토큰이 유효하지 않으면 null)
+     * @return 회원 ID (토큰이 유효하지 않으면 null)
      */
     private Long getMemberIdWithToken(HttpServletRequest request, String token) {
         try {
@@ -108,7 +133,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Authorization 헤더에서 JWT 토큰을 추출
+     * Authorization 헤더에서 JWT 토큰 추출
+     * <p>
+     * 처리 단계:
+     * 1. Authorization 헤더 조회
+     * 2. 헤더가 없거나 "Bearer "로 시작하지 않으면 에러 메시지 설정 후 null 반환
+     * 3. 헤더를 공백으로 분리
+     * 4. 분리된 배열의 길이가 2가 아니면 에러 메시지 설정 후 null 반환
+     * 5. 두 번째 요소(토큰 문자열) 반환
      *
      * @param request HTTP 요청 객체
      * @return JWT 토큰 (헤더가 유효하지 않으면 null)
@@ -129,9 +161,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     /**
      * 인증을 건너뛸 수 있는 요청인지 확인
+     * <p>
+     * 처리 단계:
+     * 1. OPTIONS 메서드면 true 반환 (CORS Preflight 요청)
+     * 2. 인증 제외 URI 목록 생성 (Swagger, 로그인, 회원가입, OAuth 등)
+     * 3. 요청 URI 조회
+     * 4. 요청 URI가 인증 제외 URI 중 하나로 시작하면 true 반환
+     * 5. 모든 조건에 해당하지 않으면 false 반환
      *
      * @param request HTTP 요청 객체
-     * @return 인증을 건너뛸 수 있으면 true
+     * @return 인증을 건너뛸 수 있으면 true, 그렇지 않으면 false
      */
     private boolean canSkipFilter(HttpServletRequest request) {
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
@@ -148,7 +187,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 토큰 관련 예외 발생 시 401 응답을 즉시 반환
+     * 토큰 예외 발생 시 401 Unauthorized 응답 즉시 반환
+     * <p>
+     * 처리 단계:
+     * 1. 응답 상태코드를 401로 설정
+     * 2. Content-Type을 application/json으로 설정
+     * 3. Character-Encoding을 UTF-8로 설정
+     * 4. 예외 응답 객체 생성 (상태코드 401, 에러 메시지 포함)
+     * 5. JSON 형태로 예외 응답 작성
      *
      * @param response HTTP 응답 객체
      * @param message  에러 메시지

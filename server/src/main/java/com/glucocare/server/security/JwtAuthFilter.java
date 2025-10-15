@@ -45,13 +45,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * 모든 HTTP 요청에 대해 JWT 토큰 검증 수행
      * <p>
      * 처리 단계:
-     * 1. 인증을 건너뛸 수 있는 요청인지 확인 (OPTIONS, Swagger, 로그인, 회원가입 등)
+     * 1. 인증을 건너뛸 수 있는 요청인지 확인 (OPTIONS, 토큰 존재하지 않는 요청 등)
      * 2. 건너뛸 수 있으면 다음 필터로 이동
      * 3. Authorization 헤더에서 JWT 토큰 추출
      * 4. 토큰이 없거나 형식이 잘못되었으면 401 응답 반환
      * 5. 토큰에서 회원 ID 추출
      * 6. 토큰이 만료되었으면 401 응답 반환
      * 7. SecurityContext에 인증 정보 설정
+     * => 헤더가 필요한 요청의 경우는 SecurityContext 를 통해 isAuthenticated() 가 true 일때만 호출할 수 있기 때문에 이곳에서 인증 처리를 해주는게 필요
+     * => OPTIONS, 회원가입, 로그인 등 토큰이 존재하지 않는 경우에는 SecurityConfig 에서 permitAll() 을 통해 다음 단계로 넘어갈 수 있도록 해주어야 함.
      * 8. 다음 필터로 이동
      *
      * @param request     HTTP 요청 객체
@@ -137,21 +139,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * <p>
      * 처리 단계:
      * 1. Authorization 헤더 조회
-     * 2. 헤더가 없거나 "Bearer "로 시작하지 않으면 에러 메시지 설정 후 null 반환
-     * 3. 헤더를 공백으로 분리
-     * 4. 분리된 배열의 길이가 2가 아니면 에러 메시지 설정 후 null 반환
-     * 5. 두 번째 요소(토큰 문자열) 반환
+     * 2. 헤더를 공백으로 분리
+     * 3. 분리된 배열의 길이가 2가 아니면 에러 메시지 설정 후 null 반환
+     * 4. 두 번째 요소(토큰 문자열) 반환
      *
      * @param request HTTP 요청 객체
      * @return JWT 토큰 (헤더가 유효하지 않으면 null)
      */
     private String getTokenWithAuthorizationHeader(HttpServletRequest request) {
-        var authorizationHeader = request.getHeader("Authorization");
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            request.setAttribute("exception", "잘못된 토큰 정보입니다.");
-            return null;
-        }
-        var header = authorizationHeader.split(" ");
+        var auth = request.getHeader("Authorization");
+        var header = auth.split(" ");
         if (header.length != 2) {
             request.setAttribute("exception", "잘못된 토큰 정보입니다.");
             return null;
@@ -164,10 +161,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      * <p>
      * 처리 단계:
      * 1. OPTIONS 메서드면 true 반환 (CORS Preflight 요청)
-     * 2. 인증 제외 URI 목록 생성 (Swagger, 로그인, 회원가입, OAuth 등)
-     * 3. 요청 URI 조회
-     * 4. 요청 URI가 인증 제외 URI 중 하나로 시작하면 true 반환
-     * 5. 모든 조건에 해당하지 않으면 false 반환
+     * 2. 인증 헤더가 존재할 경우에 Bearer 인증 방식이 아닐 경우에 true 반환
+     * 3. 인증 헤더가 존재하지 않을 경우에 true 반환
+     * 4. 인증 헤더가 존재하고, Bearer 인증 방식일 경우 false 반환
      *
      * @param request HTTP 요청 객체
      * @return 인증을 건너뛸 수 있으면 true, 그렇지 않으면 false
@@ -176,14 +172,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
-        var skipUris = List.of("/swagger-ui", "/swagger-resources", "/v3/api-docs", "/api/members/login", "/api/members/register", "/api/members/exists-email", "/api/members/refresh-token", "/api/oauth");
-        var uri = request.getRequestURI();
-        for (var skipUri : skipUris) {
-            if (uri.startsWith(skipUri)) {
-                return true;
-            }
-        }
-        return false;
+        var auth = request.getHeader("Authorization");
+        return auth == null || !auth.startsWith("Bearer ");
     }
 
     /**

@@ -19,12 +19,6 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
   final Set<String> _labelShowSet = {};
   double _interval = 2.0;
 
-  // double calculateWidthForChart(int dataLength) {
-  //   var baseWidth = MediaQuery.of(context).size.width + 200;
-  //   var widthPerPoint = _interval;
-  //   return baseWidth + widthPerPoint * widget.records.length;
-  // }
-
   double calculateWidthForChart() {
     if (widget.records.isEmpty) return MediaQuery.of(context).size.width;
 

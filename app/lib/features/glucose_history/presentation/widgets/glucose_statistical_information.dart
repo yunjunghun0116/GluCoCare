@@ -1,4 +1,5 @@
 import 'package:app/features/glucose_history/data/models/glucose_history_response.dart';
+import 'package:app/features/glucose_history/presentation/screens/glucose_upload_screen.dart';
 import 'package:app/features/glucose_warning/presentation/providers.dart';
 import 'package:app/features/glucose_warning/presentation/screens/glucose_warning_screen.dart';
 import 'package:app/shared/constants/app_colors.dart';
@@ -65,12 +66,16 @@ class _GlucoseStatisticalInformationState extends ConsumerState<GlucoseStatistic
         ),
         Container(width: double.infinity, height: 1, color: AppColors.fontGray400Color),
         getActiveButton(
+          title: "직접 측정 혈당 추가하기",
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GlucoseUploadScreen())),
+        ),
+        getActiveButton(
           title: "혈당 위험 구간 알림 설정하기",
           onTap: () async {
             var glucoseAlertPolicy = await ref
                 .read(glucoseWarningControllerProvider.notifier)
                 .getGlucoseAlertPolicy(widget.careGiver);
-            if (!mounted) return;
+            if (!context.mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(

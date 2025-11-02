@@ -10,6 +10,9 @@ enum ExceptionMessage {
   invalidAuthentication(401, "유효하지 않은 인증정보입니다. 다시 로그인 후 진행해 주세요."),
   invalidPermission(400, "허용되지 않은 요청입니다. 설정 앱을 통해 권한을 허용해 주세요."),
   healthConnectPermission(400, "헬스 커넥트 권한이 거부되었습니다. 설정 앱을 통해 권한을 허용해 주세요."),
+  invalidDate(400, "유효하지 않은 일자입니다. 다시 한번 확인해 주세요."),
+  invalidTime(400, "유효하지 않은 시간입니다. 다시 한번 확인해 주세요."),
+  invalidGlucoseRange(400, "혈당은 최소 50 이상, 최대 400 이하까지만 추가할 수 있습니다."),
   /* NULL 관련 메시지 */
   nullPointException(400, "존재하지 않는 값입니다. 확인 후 다시 요청해 주세요."),
   /* 이메일 및 패스워드 관련 메시지 */

@@ -25,7 +25,7 @@ public class PatientController {
     private final UpdateCgmServerUrlUseCase updateCgmServerUrlUseCase;
 
     @PostMapping
-    public ResponseEntity<CreatePatientResponse> createPatient(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreatePatientRequest createPatientRequest) {
+    public ResponseEntity<CreatePatientResponse> create(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreatePatientRequest createPatientRequest) {
         var response = createPatientUseCase.execute(memberId, createPatientRequest);
         return ResponseEntity.ok(response);
     }
@@ -37,12 +37,12 @@ public class PatientController {
     }
 
     @GetMapping
-    public ResponseEntity<ReadPatientResponse> readPatient(@AuthenticationPrincipal Long memberId) {
+    public ResponseEntity<ReadPatientResponse> read(@AuthenticationPrincipal Long memberId) {
         var response = readPatientUseCase.execute(memberId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{patientId}")
+    @PostMapping("/{patientId}/update-cgm-server-url")
     public ResponseEntity<Void> updateCgmServerUrl(@PathVariable Long patientId, @Valid @RequestBody UpdateCgmServerUrlRequest updateCgmServerUrlRequest) {
         updateCgmServerUrlUseCase.execute(patientId, updateCgmServerUrlRequest);
         return ResponseEntity.ok()

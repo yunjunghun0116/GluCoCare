@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.auth.persentation;
+package com.glucocare.server.feature.auth.presentation;
 
 import com.glucocare.server.feature.auth.application.*;
 import com.glucocare.server.feature.auth.dto.*;

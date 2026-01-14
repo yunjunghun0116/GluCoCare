@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface GlucoseAlertPolicyRepository extends JpaRepository<GlucoseAlertPolicy, Long> {
-    Optional<GlucoseAlertPolicy> findByMemberPatientRelation(MemberPatientRelation memberPatientRelation);
+    Optional<GlucoseAlertPolicy> findByCareRelation(CareRelation careRelation);
 
-    Boolean existsByMemberPatientRelation(MemberPatientRelation memberPatientRelation);
+    Boolean existsByCareRelation(CareRelation careRelation);
 }

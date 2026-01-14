@@ -173,12 +173,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return true;
         }
 
-        var skipUris = List.of("/swagger-ui", "/swagger-resources", "/v3/api-docs", "/api/members/login", "/api/members/register", "/api/members/exists-email", "/api/members/refresh-token", "/api/oauth");
+        var skipUris = List.of("/swagger", "/swagger-ui", "/v3/api-docs", "/swagger-resources", "/api/members/login", "/api/members/register", "/api/members/refresh-token", "/api/members/exists-email", "/api/members/confirm", "/api/oauth", "/api/v1");
         var uri = request.getRequestURI();
+        if (uri.contains("/api/v1")) return true;
         for (var skipUri : skipUris) {
-            if (uri.startsWith(skipUri)) {
-                return true;
-            }
+            if (uri.startsWith(skipUri)) return true;
         }
 
         var auth = request.getHeader("Authorization");

@@ -3,10 +3,17 @@ package com.glucocare.server.feature.care.domain;
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
 import com.glucocare.server.feature.member.domain.Member;
-import com.glucocare.server.feature.patient.domain.Patient;
 import com.glucocare.server.shared.domain.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import static jakarta.persistence.FetchType.LAZY;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.hibernate.annotations.OnDelete;
@@ -15,7 +22,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Table(name = "member_patient_relation")
 @Getter
-public class MemberPatientRelation extends BaseEntity {
+public class CareRelation extends BaseEntity {
     @NotNull
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -25,7 +32,7 @@ public class MemberPatientRelation extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "patient_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Patient patient;
+    private Member patient;
     @NotNull
     @Enumerated(value = EnumType.STRING)
     @Column(name = "relation_type")
@@ -38,10 +45,10 @@ public class MemberPatientRelation extends BaseEntity {
     private GlucoseAlertPolicy glucoseAlertPolicy;
 
 
-    protected MemberPatientRelation() {
+    protected CareRelation() {
     }
 
-    public MemberPatientRelation(Member member, Patient patient, RelationType relationType) {
+    public CareRelation(Member member, Member patient, RelationType relationType) {
         this.member = member;
         this.patient = patient;
         this.relationType = relationType;

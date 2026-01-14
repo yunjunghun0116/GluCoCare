@@ -2,8 +2,7 @@ package com.glucocare.server.feature.glucose.application;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
-import com.glucocare.server.feature.care.domain.MemberPatientRelationRepository;
-import com.glucocare.server.feature.care.infra.CareGiverCache;
+import com.glucocare.server.feature.care.domain.CareRelationRepository;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
 import com.glucocare.server.feature.glucose.dto.ReadGlucoseHistoryResponse;
@@ -19,8 +18,7 @@ import java.util.List;
 @Transactional
 public class ReadAllGlucoseHistoryUseCase {
     private final GlucoseHistoryRepository glucoseHistoryRepository;
-    private final MemberPatientRelationRepository memberPatientRelationRepository;
-    private final CareGiverCache careGiverCache;
+    private final CareRelationRepository careRelationRepository;
     private final GlucoseHistoryCache glucoseHistoryCache;
 
     public List<ReadGlucoseHistoryResponse> execute(Long memberId, Long patientId) {
@@ -42,11 +40,8 @@ public class ReadAllGlucoseHistoryUseCase {
     }
 
     private void validateCareGiver(Long memberId, Long patientId) {
-        if (careGiverCache.existsByMemberIdAndPatientId(memberId, patientId)) return;
-        if (!memberPatientRelationRepository.existsByMemberIdAndPatientId(memberId, patientId)) {
+        if (!careRelationRepository.existsByMemberIdAndPatientId(memberId, patientId)) {
             throw new ApplicationException(ErrorMessage.INVALID_ACCESS);
         }
-
-        careGiverCache.cacheRelation(memberId, patientId);
     }
 }

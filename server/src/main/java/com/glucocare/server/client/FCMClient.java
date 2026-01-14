@@ -2,7 +2,7 @@ package com.glucocare.server.client;
 
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
-import com.glucocare.server.feature.care.domain.MemberPatientRelation;
+import com.glucocare.server.feature.care.domain.CareRelation;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
 import com.glucocare.server.feature.notification.domain.FCMToken;
 import com.glucocare.server.feature.notification.domain.GlucoseWarningType;
@@ -33,16 +33,16 @@ public class FCMClient {
      * 5. 전송 성공 시 로그 기록
      * 6. 전송 실패 시 에러 로그 기록 및 예외 발생
      *
-     * @param fcmToken              수신자의 FCM 토큰 정보
-     * @param memberPatientRelation 간병인 관계 엔티티 (환자 정보 포함)
-     * @param glucoseHistory        혈당 기록 엔티티
-     * @param glucoseWarningType    혈당 경고 타입 (VERY_HIGH_RISK, HIGH_RISK)
+     * @param fcmToken           수신자의 FCM 토큰 정보
+     * @param careRelation       간병인 관계 엔티티 (환자 정보 포함)
+     * @param glucoseHistory     혈당 기록 엔티티
+     * @param glucoseWarningType 혈당 경고 타입 (VERY_HIGH_RISK, HIGH_RISK)
      * @throws ApplicationException FCM 메시지 전송 실패 시 (INTERNAL_SERVER_ERROR)
      */
-    public void sendFCMMessage(FCMToken fcmToken, MemberPatientRelation memberPatientRelation, GlucoseHistory glucoseHistory, GlucoseWarningType glucoseWarningType) {
+    public void sendFCMMessage(FCMToken fcmToken, CareRelation careRelation, GlucoseHistory glucoseHistory, GlucoseWarningType glucoseWarningType) {
         try {
             var title = getTitle(glucoseWarningType);
-            var body = getBody(memberPatientRelation, glucoseHistory);
+            var body = getBody(careRelation, glucoseHistory);
             var message = Message.builder()
                                  .setToken(fcmToken.getFcmToken())
                                  .setNotification(Notification.builder()
@@ -87,12 +87,12 @@ public class FCMClient {
      * 2. 환자 이름과 혈당 수치(SGV)를 조합하여 본문 생성
      * 3. 생성된 본문 반환
      *
-     * @param memberPatientRelation 간병인 관계 엔티티 (환자 정보 포함)
-     * @param glucoseHistory        혈당 기록 엔티티 (혈당 수치 포함)
+     * @param careRelation   간병인 관계 엔티티 (환자 정보 포함)
+     * @param glucoseHistory 혈당 기록 엔티티 (혈당 수치 포함)
      * @return 알림 본문 문자열 (형식: "{환자명}님의 혈당 수치가 {혈당값}입니다.")
      */
-    private String getBody(MemberPatientRelation memberPatientRelation, GlucoseHistory glucoseHistory) {
-        var patient = memberPatientRelation.getPatient();
+    private String getBody(CareRelation careRelation, GlucoseHistory glucoseHistory) {
+        var patient = careRelation.getPatient();
         return patient.getName() + "님의 혈당 수치가 " + glucoseHistory.getSgv() + "입니다.";
     }
 }

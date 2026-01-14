@@ -1,4 +1,4 @@
-package com.glucocare.server.feature.member.persentation;
+package com.glucocare.server.feature.member.presentation;
 
 import com.glucocare.server.feature.member.application.DeleteMemberUseCase;
 import com.glucocare.server.feature.member.application.ReadMemberNameUseCase;

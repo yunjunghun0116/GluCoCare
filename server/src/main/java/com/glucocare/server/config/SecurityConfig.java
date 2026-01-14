@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 /**
  * Spring Security 설정 클래스
@@ -27,6 +28,7 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final InvalidAuthEntryPoint invalidAuthEntryPoint;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     /**
      * Spring Security 필터 체인 설정
@@ -38,16 +40,20 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource))
+            .csrf(AbstractHttpConfigurer::disable)
             .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
             .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests.requestMatchers(HttpMethod.OPTIONS, "/**")
                                                                                    .permitAll()
-                                                                                   .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
+                                                                                   .requestMatchers("/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**")
                                                                                    .permitAll()
                                                                                    .requestMatchers("/api/members/login", "/api/members/register", "/api/members/exists-email", "/api/members/refresh-token", "/api/oauth/**")
                                                                                    .permitAll()
+                                                                                   .requestMatchers("/{memberId}/api/v1/**", "/api/v1/**")
+                                                                                   .permitAll()
                                                                                    .anyRequest()
                                                                                    .authenticated())
+            .httpBasic(AbstractHttpConfigurer::disable)
             .formLogin(AbstractHttpConfigurer::disable)
             .sessionManagement(it -> it.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

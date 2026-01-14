@@ -1,7 +1,11 @@
 package com.glucocare.server.feature.member.domain;
 
 import com.glucocare.server.shared.domain.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
@@ -22,6 +26,9 @@ public class Member extends BaseEntity {
     @Column(name = "name")
     private String name;
     @NotNull
+    @Column(name = "name")
+    private Boolean isPatient = false;
+    @NotNull
     @Enumerated(value = EnumType.STRING)
     @Column(name = "member_role")
     private MemberRole memberRole = MemberRole.MEMBER;
@@ -37,5 +44,9 @@ public class Member extends BaseEntity {
 
     public void updateName(String newName) {
         this.name = newName;
+    }
+
+    public void updateMemberToPatient() {
+        this.isPatient = true;
     }
 }

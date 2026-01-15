@@ -5,13 +5,13 @@ import com.glucocare.server.exception.ErrorMessage;
 import com.glucocare.server.feature.care.domain.CareRelation;
 import com.glucocare.server.feature.care.domain.CareRelationRepository;
 import com.glucocare.server.feature.care.dto.ReadCareRelationResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ReadCareRelationUseCase {
     private final CareRelationRepository careRelationRepository;
 

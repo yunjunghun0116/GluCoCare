@@ -2,8 +2,12 @@ package com.glucocare.server.feature.auth.domain;
 
 import com.glucocare.server.feature.member.domain.Member;
 import com.glucocare.server.shared.domain.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import static jakarta.persistence.FetchType.LAZY;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.hibernate.annotations.OnDelete;

@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface FCMTokenRepository extends JpaRepository<FCMToken, Long> {
-    Optional<FCMToken> findByMember(Member member);
+public interface FcmTokenRepository extends JpaRepository<FcmToken, Long> {
+    Optional<FcmToken> findByMember(Member member);
 
     Boolean existsByMember(Member member);
 }

@@ -9,10 +9,10 @@ import com.glucocare.server.feature.auth.dto.RegisterRequest;
 import com.glucocare.server.feature.member.domain.Member;
 import com.glucocare.server.feature.member.domain.MemberRepository;
 import com.glucocare.server.security.JwtProvider;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

@@ -6,10 +6,10 @@ import com.glucocare.server.feature.auth.domain.AuthTokenRepository;
 import com.glucocare.server.feature.auth.dto.AuthResponse;
 import com.glucocare.server.feature.auth.dto.RefreshTokenRequest;
 import com.glucocare.server.security.JwtProvider;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service

@@ -7,15 +7,15 @@ import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
 import com.glucocare.server.feature.glucose.dto.ReadGlucoseHistoryResponse;
 import com.glucocare.server.feature.glucose.infra.GlucoseHistoryCache;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ReadAllGlucoseHistoryUseCase {
     private final GlucoseHistoryRepository glucoseHistoryRepository;
     private final CareRelationRepository careRelationRepository;

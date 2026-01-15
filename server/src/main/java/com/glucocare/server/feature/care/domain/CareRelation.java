@@ -38,7 +38,7 @@ public class CareRelation extends BaseEntity {
     @Column(name = "relation_type")
     private RelationType relationType = RelationType.CAREGIVER;
     @OneToOne(
-            mappedBy = "memberPatientRelation",
+            mappedBy = "careRelation",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )

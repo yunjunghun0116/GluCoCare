@@ -7,9 +7,9 @@ import com.glucocare.server.feature.care.domain.CareRelationRepository;
 import com.glucocare.server.feature.care.domain.GlucoseAlertPolicy;
 import com.glucocare.server.feature.care.domain.GlucoseAlertPolicyRepository;
 import com.glucocare.server.feature.care.dto.ReadGlucoseAlertPolicyResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

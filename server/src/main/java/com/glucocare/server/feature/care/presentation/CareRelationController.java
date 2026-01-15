@@ -23,8 +23,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/care-givers")
-public class CareGiverRelationController {
+@RequestMapping("/api/care-relations")
+public class CareRelationController {
 
     private final CreateCareRelationUseCase createCareRelationUseCase;
     private final ReadCareRelationUseCase readCareRelationUseCase;
@@ -32,25 +32,25 @@ public class CareGiverRelationController {
     private final DeleteCareRelationUseCase deleteCareRelationUseCase;
 
     @PostMapping
-    public ResponseEntity<CreateCareRelationResponse> createCareGiver(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateCareRelationRequest createCareRelationRequest) {
+    public ResponseEntity<CreateCareRelationResponse> createCareRelation(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateCareRelationRequest createCareRelationRequest) {
         var response = createCareRelationUseCase.execute(memberId, createCareRelationRequest);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReadCareRelationResponse> readCareGiver(@AuthenticationPrincipal Long memberId, @PathVariable Long id) {
+    public ResponseEntity<ReadCareRelationResponse> readCareRelation(@AuthenticationPrincipal Long memberId, @PathVariable Long id) {
         var response = readCareRelationUseCase.execute(memberId, id);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<ReadCareRelationResponse>> readCareGivers(@AuthenticationPrincipal Long memberId) {
+    public ResponseEntity<List<ReadCareRelationResponse>> readCareRelations(@AuthenticationPrincipal Long memberId) {
         var response = readAllCareRelationUseCase.execute(memberId);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCareGiver(@AuthenticationPrincipal Long memberId, @PathVariable Long id) {
+    public ResponseEntity<Void> deleteCareRelation(@AuthenticationPrincipal Long memberId, @PathVariable Long id) {
         deleteCareRelationUseCase.execute(memberId, id);
         return ResponseEntity.ok()
                              .build();

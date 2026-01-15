@@ -1,6 +1,6 @@
 package com.glucocare.server.feature.notification.presentation;
 
-import com.glucocare.server.feature.notification.application.CreateFCMTokenUseCase;
+import com.glucocare.server.feature.notification.application.CreateFcmTokenUseCase;
 import com.glucocare.server.feature.notification.dto.CreateFCMTokenRequest;
 import com.glucocare.server.feature.notification.dto.CreateFCMTokenResponse;
 import jakarta.validation.Valid;
@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/fcm-tokens")
 public class FCMTokenController {
 
-    private final CreateFCMTokenUseCase createFCMTokenUseCase;
+    private final CreateFcmTokenUseCase createFCMTokenUseCase;
 
     @PostMapping
-    public ResponseEntity<CreateFCMTokenResponse> createFCMToken(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateFCMTokenRequest createFCMTokenRequest) {
+    public ResponseEntity<CreateFCMTokenResponse> createFcmToken(@AuthenticationPrincipal Long memberId, @Valid @RequestBody CreateFCMTokenRequest createFCMTokenRequest) {
         var response = createFCMTokenUseCase.execute(memberId, createFCMTokenRequest);
         return ResponseEntity.ok(response);
     }

@@ -4,9 +4,9 @@ import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
 import com.glucocare.server.feature.member.domain.MemberRepository;
 import com.glucocare.server.feature.member.dto.UpdateMemberNameRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

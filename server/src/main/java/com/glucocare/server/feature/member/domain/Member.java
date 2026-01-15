@@ -26,7 +26,7 @@ public class Member extends BaseEntity {
     @Column(name = "name")
     private String name;
     @NotNull
-    @Column(name = "name")
+    @Column(name = "is_patient")
     private Boolean isPatient = false;
     @NotNull
     @Enumerated(value = EnumType.STRING)

@@ -8,9 +8,11 @@ import java.util.List;
 public interface CareRelationRepository extends JpaRepository<CareRelation, Long> {
     List<CareRelation> findAllByMember(Member member);
 
-    List<CareRelation> findAllByPatient(Member patient);
+    List<CareRelation> findAllByPatientIn(List<Member> patients);
 
     Boolean existsByMemberAndPatient(Member member, Member patient);
 
     Boolean existsByMemberIdAndPatientId(Long memberId, Long patientId);
+
+    Boolean existsByMemberAndPatientAndRelationType(Member member, Member patient, RelationType relationType);
 }

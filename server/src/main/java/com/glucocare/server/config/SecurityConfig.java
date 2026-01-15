@@ -17,10 +17,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-/**
- * Spring Security 설정 클래스
- * JWT 기반 인증 및 보안 설정을 구성
- */
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -30,14 +26,6 @@ public class SecurityConfig {
     private final InvalidAuthEntryPoint invalidAuthEntryPoint;
     private final CorsConfigurationSource corsConfigurationSource;
 
-    /**
-     * Spring Security 필터 체인 설정
-     * CORS, CSRF, 인증 및 인가 규칙을 정의
-     *
-     * @param http HttpSecurity 객체
-     * @return 구성된 SecurityFilterChain
-     * @throws Exception 보안 설정 오류
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource))
@@ -49,7 +37,7 @@ public class SecurityConfig {
                                                                                    .permitAll()
                                                                                    .requestMatchers("/api/members/login", "/api/members/register", "/api/members/exists-email", "/api/members/refresh-token", "/api/oauth/**")
                                                                                    .permitAll()
-                                                                                   .requestMatchers("/{memberId}/api/v1/**", "/api/v1/**")
+                                                                                   .requestMatchers("/{patientId}/api/v1/**", "/api/v1/**")
                                                                                    .permitAll()
                                                                                    .anyRequest()
                                                                                    .authenticated())
@@ -61,12 +49,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * 비밀번호 암호화 빈 등록
-     * BCrypt 알고리즘을 사용하여 비밀번호를 암호화
-     *
-     * @return BCryptPasswordEncoder 인스턴스
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

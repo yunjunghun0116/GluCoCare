@@ -2,6 +2,7 @@ package com.glucocare.server.feature.glucose.presentation;
 
 import com.glucocare.server.feature.glucose.application.DexcomCreateGlucoseHistoryUseCase;
 import com.glucocare.server.feature.glucose.dto.DexcomGlucoseRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,9 @@ public class DexcomController {
     private final DexcomCreateGlucoseHistoryUseCase createGlucoseHistoryUseCase;
 
     @PostMapping("/entries")
-    public ResponseEntity<Void> create(@PathVariable Long patientId, @RequestBody List<DexcomGlucoseRequest> entries) {
-        createGlucoseHistoryUseCase.execute(patientId, entries);
+    public ResponseEntity<Void> create(HttpServletRequest request, @PathVariable Long patientId, @RequestBody List<DexcomGlucoseRequest> entries) {
+        var accessCode = extractAccessCode(request);
+        createGlucoseHistoryUseCase.execute(patientId, accessCode, entries);
         return ResponseEntity.ok()
                              .build();
     }
@@ -45,5 +47,16 @@ public class DexcomController {
     public ResponseEntity<Void> uploadTreatments(@PathVariable Long patientId) {
         return ResponseEntity.noContent()
                              .build();
+    }
+
+    private String extractAccessCode(HttpServletRequest request) {
+        var auth = request.getHeader("Authorization");
+        if (auth == null || !auth.startsWith("Basic ")) return null;
+
+        var base64 = auth.substring("Basic ".length());
+        var decoded = new String(java.util.Base64.getDecoder()
+                                                 .decode(base64), java.nio.charset.StandardCharsets.UTF_8);
+        var idx = decoded.indexOf(':');
+        return (decoded.indexOf(':') >= 0) ? decoded.substring(0, idx) : decoded;
     }
 }

@@ -14,7 +14,8 @@ public enum ErrorMessage {
     ALREADY_EXISTS(409, "이미 존재하는 객체입니다."),
     ALREADY_EXISTS_PATIENT(409, "환자 등록은 최대 1명까지만 할 수 있습니다."),
     BAD_REQUEST(400, "잘못된 요청입니다."),
-    INTERNAL_SERVER_ERROR(500, "서버 내부의 문제로 인해 요청을 처리할 수 없습니다.");
+    INTERNAL_SERVER_ERROR(500, "서버 내부의 문제로 인해 요청을 처리할 수 없습니다."),
+    GENERATE_ACCESS_CODE_ERROR(400, "고유 코드를 만드는 과정에서 에러가 발생했습니다. 잠시 후 다시 시도해 주세요.");
 
     private final int code;
     private final String message;

@@ -1,5 +1,7 @@
 package com.glucocare.server.feature.member.domain;
 
+import com.glucocare.server.exception.ApplicationException;
+import com.glucocare.server.exception.ErrorMessage;
 import com.glucocare.server.shared.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,6 +31,9 @@ public class Member extends BaseEntity {
     @Column(name = "is_patient")
     private Boolean isPatient = false;
     @NotNull
+    @Column(name = "access_code")
+    private String accessCode = "";
+    @NotNull
     @Enumerated(value = EnumType.STRING)
     @Column(name = "member_role")
     private MemberRole memberRole = MemberRole.MEMBER;
@@ -48,5 +53,15 @@ public class Member extends BaseEntity {
 
     public void updateMemberToPatient() {
         this.isPatient = true;
+    }
+
+    public void updateAccessCode(String accessCode) {
+        this.accessCode = accessCode;
+    }
+
+    public void validateAccessCode(String accessCode) {
+        if (!this.accessCode.equals(accessCode)) {
+            throw new ApplicationException(ErrorMessage.BAD_REQUEST);
+        }
     }
 }

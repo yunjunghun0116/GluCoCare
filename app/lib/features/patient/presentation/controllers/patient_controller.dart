@@ -1,35 +1,54 @@
-import 'package:app/features/patient/data/models/create_patient_response.dart';
-
 import '../../../../core/base/base_controller.dart';
 import '../../../../core/exceptions/custom_exception.dart';
 import '../../../../core/exceptions/exception_message.dart';
-import '../../data/models/read_patient_response.dart';
 
-class PatientController extends BaseController<BaseState> {
-  PatientController(super.state, super.dio);
+class MemberController extends BaseController<BaseState> {
+  MemberController(super.state, super.dio);
 
-  Future<bool> existsPatients() async {
-    var response = await getRequest("/api/patients/exists");
+  Future<String?> readName() async {
+    var response = await getRequest("/api/members/name");
+    if (response.statusCode == 200) {
+      return response.data;
+    }
+    return null;
+  }
+
+  Future<String?> readPatientInformation() async {
+    var response = await getRequest("/api/members/patient");
+    if (response.statusCode == 200) {
+      return response.data;
+    }
+    return null;
+  }
+
+  Future<bool> readIsPatient() async {
+    var response = await getRequest("/api/members/is-patient");
     if (response.statusCode == 200) {
       return response.data;
     }
     return false;
   }
 
-  Future<CreatePatientResponse> createPatient(String patientName) async {
-    var response = await postRequest("/api/patients", data: {"name": patientName});
+  Future<bool> updateName(String newName) async {
+    var response = await postRequest("/api/members/update-name", data: {"name": newName});
     if (response.statusCode == 200) {
-      var patientResponse = CreatePatientResponse.fromJson(response.data);
-      return patientResponse;
+      return true;
     }
     throw CustomException(ExceptionMessage.badRequest);
   }
 
-  Future<ReadPatientResponse> readPatient() async {
-    var response = await getRequest("/api/patients");
+  Future<bool> updateToPatient() async {
+    var response = await postRequest("/api/members/update-to-patient");
     if (response.statusCode == 200) {
-      var patientResponse = ReadPatientResponse.fromJson(response.data);
-      return patientResponse;
+      return true;
+    }
+    throw CustomException(ExceptionMessage.badRequest);
+  }
+
+  Future<bool> delete() async {
+    var response = await deleteRequest("/api/members");
+    if (response.statusCode == 200) {
+      return true;
     }
     throw CustomException(ExceptionMessage.badRequest);
   }

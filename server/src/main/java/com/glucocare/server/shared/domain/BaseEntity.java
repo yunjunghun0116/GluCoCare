@@ -26,9 +26,9 @@ public abstract class BaseEntity {
     @CreatedDate
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime createdDate;
+    private LocalDateTime createdAt;
     @LastModifiedDate
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime lastModifiedDate;
+    private LocalDateTime lastModifiedAt;
 }

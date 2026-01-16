@@ -14,6 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.MessageDigest;
+import java.time.ZoneOffset;
+import java.util.Base64;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,6 +29,8 @@ public class RegisterUseCase {
 
     public AuthResponse execute(RegisterRequest request) {
         var member = saveMemberWithRequest(request);
+        var accessCode = generateAccessCode(member);
+        member.updateAccessCode(accessCode);
         return saveRefreshToken(member);
     }
 
@@ -46,5 +52,22 @@ public class RegisterUseCase {
         var authToken = new AuthToken(member, tokenResponse.refreshToken());
         authTokenRepository.save(authToken);
         return tokenResponse;
+    }
+
+    private String generateAccessCode(Member member) {
+        try {
+            var input = member.getId() + ":" + member.getCreatedAt()
+                                                     .toInstant(ZoneOffset.UTC)
+                                                     .getEpochSecond();
+            var digest = MessageDigest.getInstance("SHA-256");
+            var hash = digest.digest(input.getBytes());
+
+            var encoded = Base64.getUrlEncoder()
+                                .withoutPadding()
+                                .encodeToString(hash);
+            return encoded.substring(0, 8);
+        } catch (Exception e) {
+            throw new ApplicationException(ErrorMessage.GENERATE_ACCESS_CODE_ERROR);
+        }
     }
 }

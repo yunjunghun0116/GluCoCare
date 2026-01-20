@@ -29,7 +29,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
   }
 
   void initializeName() async {
-    var result = await ref.read(memberControllerProvider.notifier).getName();
+    var result = await ref.read(memberControllerProvider.notifier).readName();
     if (result == null) return;
     setState(() => name = result);
   }
@@ -87,7 +87,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           },
         ),
         getActiveButton(
-          title: "Care Receiver 등록하기",
+          title: "혈당 관리가 필요한가요?",
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PatientScreen())),
         ),
       ],

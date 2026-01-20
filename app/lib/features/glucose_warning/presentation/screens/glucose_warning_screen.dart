@@ -1,4 +1,4 @@
-import 'package:app/features/care/data/models/care_giver_response.dart';
+import 'package:app/features/care/data/models/care_relation_response.dart';
 import 'package:app/features/glucose_warning/data/models/glucose_alert_policy_response.dart';
 import 'package:app/features/glucose_warning/presentation/providers.dart';
 import 'package:app/features/glucose_warning/presentation/screens/glucose_value_select_screen.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GlucoseWarningScreen extends ConsumerStatefulWidget {
-  final CareGiverResponse careGiver;
+  final CareRelationResponse careGiver;
   final GlucoseAlertPolicyResponse glucoseAlertPolicy;
 
   const GlucoseWarningScreen({super.key, required this.careGiver, required this.glucoseAlertPolicy});

@@ -1,21 +1,21 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'care_giver_response.g.dart';
+part 'care_relation_response.g.dart';
 
 @JsonSerializable()
-class CareGiverResponse {
+class CareRelationResponse {
   final int id;
   final int patientId;
   final String patientName;
 
-  CareGiverResponse({required this.id, required this.patientId, required this.patientName});
+  CareRelationResponse({required this.id, required this.patientId, required this.patientName});
 
-  factory CareGiverResponse.fromJson(Map<String, dynamic> json) => _$CareGiverResponseFromJson(json);
+  factory CareRelationResponse.fromJson(Map<String, dynamic> json) => _$CareRelationResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CareGiverResponseToJson(this);
+  Map<String, dynamic> toJson() => _$CareRelationResponseToJson(this);
 
   @override
   String toString() {
-    return 'CareGiverResponse{id: $id, patientId: $patientId, patientName: $patientName}';
+    return 'CareRelationResponse{id: $id, patientId: $patientId, patientName: $patientName}';
   }
 }

@@ -2,41 +2,41 @@ import 'package:app/core/exceptions/custom_exception.dart';
 import 'package:app/core/exceptions/exception_message.dart';
 
 import '../../../../core/base/base_controller.dart';
-import '../../data/models/care_giver_response.dart';
-import '../../data/models/create_care_giver_request.dart';
+import '../../data/models/care_relation_response.dart';
+import '../../data/models/create_care_relation_request.dart';
 
-class CareGiverController extends BaseController<BaseState> {
-  CareGiverController(super.state, super.dio);
+class CareRelationController extends BaseController<BaseState> {
+  CareRelationController(super.state, super.dio);
 
-  Future<CareGiverResponse?> createCareGiver(CreateCareGiverRequest createCareGiverDto) async {
+  Future<CareRelationResponse?> createCareRelation(CreateCareRelationRequest createCareRelationDto) async {
     var response = await postRequest(
-      "/api/care-givers",
-      data: {"name": createCareGiverDto.patientName, "patientId": createCareGiverDto.patientId},
+      "/api/care-relations",
+      data: {"relationType": "CAREGIVER", "patientId": createCareRelationDto.patientId},
     );
     if (response.statusCode == 200) {
-      return CareGiverResponse.fromJson(response.data);
+      return CareRelationResponse.fromJson(response.data);
     }
     return null;
   }
 
-  Future<CareGiverResponse?> getCareGiver(int id) async {
-    var response = await getRequest("/api/care-givers/$id");
+  Future<CareRelationResponse?> getCareRelation(int id) async {
+    var response = await getRequest("/api/care-relations/$id");
     if (response.statusCode == 200) {
-      return CareGiverResponse.fromJson(response.data);
+      return CareRelationResponse.fromJson(response.data);
     }
     return null;
   }
 
-  Future<List<CareGiverResponse>?> getAllCareGiver() async {
-    var response = await getRequest("/api/care-givers");
+  Future<List<CareRelationResponse>?> getAllCareRelations() async {
+    var response = await getRequest("/api/care-relations");
     if (response.statusCode == 200) {
-      return (response.data as List).map((data) => CareGiverResponse.fromJson(data)).toList();
+      return (response.data as List).map((data) => CareRelationResponse.fromJson(data)).toList();
     }
     return null;
   }
 
-  Future<void> deleteCareGiver(int id) async {
-    var response = await deleteRequest("/api/care-givers/$id");
+  Future<void> deleteCareRelation(int id) async {
+    var response = await deleteRequest("/api/care-relations/$id");
     if (response.statusCode == 200) {
       return;
     }

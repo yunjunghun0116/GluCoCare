@@ -11,10 +11,7 @@ class HealthConnector {
 
   final Health health;
 
-  static final List<HealthDataType> types = [
-    HealthDataType.BLOOD_GLUCOSE, // READ_BLOOD_GLUCOSE 필요
-    HealthDataType.HEART_RATE, // READ_HEART_RATE 필요
-  ];
+  static final List<HealthDataType> types = [HealthDataType.BLOOD_GLUCOSE];
 
   Future<bool> initialize() async {
     try {
@@ -41,24 +38,6 @@ class HealthConnector {
     return isAvailable;
   }
 
-  Future<void> readHeartRate() async {
-    var endDate = DateTime.now();
-    var startDate = endDate.subtract(Duration(days: 14));
-    List<HealthDataPoint> heartRateData = await health.getHealthDataFromTypes(
-      types: [HealthDataType.HEART_RATE],
-      startTime: startDate,
-      endTime: endDate,
-    );
-
-    for (var point in heartRateData) {
-      print('심박수: ${point.value.toJson()} BPM');
-      var pointData = point.toJson();
-      print("json : ${pointData['value']['numericValue']}");
-      var date = point.dateFrom;
-      print('측정 시간: ${date.millisecondsSinceEpoch}');
-    }
-  }
-
   Future<void> readBloodGlucose() async {
     var endDate = DateTime.now();
     var startDate = endDate.subtract(Duration(days: 14));
@@ -73,8 +52,7 @@ class HealthConnector {
       var pointData = point.toJson();
       print("json : ${pointData['value']['numericValue']}");
       var date = point.dateFrom;
-      print('측정 시간: ${date.millisecondsSinceEpoch}'); // 이 값으로 데이터 저장하면 될 듯
-      //1759386657665
+      print('측정 시간: ${date.toUtc().toIso8601String()}'); // 이 값으로 데이터 저장하면 될 듯
       //1759386657665
     }
   }

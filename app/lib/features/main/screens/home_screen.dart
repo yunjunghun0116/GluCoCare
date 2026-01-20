@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/data/repositories/local_repository.dart';
-import '../../care/data/models/care_giver_response.dart';
+import '../../care/data/models/care_relation_response.dart';
 import '../../care/presentation/providers.dart';
-import '../../care/presentation/screens/care_giver_screen.dart';
+import '../../care/presentation/screens/care_relation_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -19,31 +19,28 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  CareGiverResponse? careGiver;
+  CareRelationResponse? careRelation;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        var lateCareGiverId = LocalRepository().read(LocalRepositoryKey.lateCareGiverId);
-        await careGiversInitialize(lateCareGiverId);
-      } catch (e) {
-        return;
-      }
+      careRelationsInitialize();
     });
   }
 
-  Future<void> careGiversInitialize(int careGiverId) async {
+  Future<void> careRelationsInitialize() async {
     try {
-      var result = await ref.read(careGiverControllerProvider.notifier).getCareGiver(careGiverId);
+      var lateCareRelationId = LocalRepository().read(LocalRepositoryKey.lateCareRelationId);
+      var result = await ref.read(careGiverControllerProvider.notifier).getCareRelation(lateCareRelationId);
       if (result == null) throw CustomException(ExceptionMessage.badRequest);
-      setState(() => careGiver = result);
+      setState(() => careRelation = result);
     } on CustomException catch (e) {
-      var result = await ref.read(careGiverControllerProvider.notifier).getAllCareGiver();
+      var result = await ref.read(careGiverControllerProvider.notifier).getAllCareRelations();
+      print(careRelation);
       if (result == null || result.isEmpty) return;
-      await LocalRepository().save<int>(LocalRepositoryKey.lateCareGiverId, result.first.id);
-      setState(() => careGiver = result.first);
+      await LocalRepository().save<int>(LocalRepositoryKey.lateCareRelationId, result.first.id);
+      setState(() => careRelation = result.first);
     }
   }
 
@@ -56,8 +53,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           onTap: () async {
             var result = await Navigator.push<int?>(context, MaterialPageRoute(builder: (_) => CareGiverScreen()));
             if (result == null) return;
-            if (careGiver?.id == result) return;
-            await careGiversInitialize(result);
+            if (careRelation?.id == result) return;
+            await careRelationsInitialize();
           },
           child: Container(
             color: AppColors.mainColor,
@@ -65,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Row(
               children: [
                 Text(
-                  careGiver?.patientName ?? "Care Receiver 를 선택해 주세요.",
+                  careRelation?.patientName ?? "Care Receiver 를 선택해 주세요.",
                   style: TextStyle(
                     fontSize: 16,
                     height: 20 / 16,
@@ -79,9 +76,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ),
-        if (careGiver != null)
+        if (careRelation != null)
           Expanded(
-            child: GlucoseScreen(key: ValueKey(careGiver), careGiver: careGiver!),
+            child: GlucoseScreen(key: ValueKey(careRelation), careGiver: careRelation!),
           ),
       ],
     );

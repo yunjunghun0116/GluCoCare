@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/constants/app_colors.dart';
-import '../../../care/data/models/care_giver_response.dart';
+import '../../../care/data/models/care_relation_response.dart';
 import '../../data/models/glucose_history_response.dart';
 import '../providers.dart';
 
 class GlucoseScreen extends ConsumerStatefulWidget {
-  final CareGiverResponse careGiver;
+  final CareRelationResponse careGiver;
 
   const GlucoseScreen({super.key, required this.careGiver});
 

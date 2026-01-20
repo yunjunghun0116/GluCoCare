@@ -6,9 +6,9 @@ import 'package:app/shared/widgets/common_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/care_giver_response.dart';
+import '../../data/models/care_relation_response.dart';
 import '../providers.dart';
-import 'create_care_giver_screen.dart';
+import 'create_care_relation_screen.dart';
 
 class CareGiverScreen extends ConsumerStatefulWidget {
   const CareGiverScreen({super.key});
@@ -18,12 +18,12 @@ class CareGiverScreen extends ConsumerStatefulWidget {
 }
 
 class _CareGiverScreenState extends ConsumerState<CareGiverScreen> {
-  List<CareGiverResponse> _careGivers = [];
+  List<CareRelationResponse> _careRelations = [];
 
-  void selectCareReceiver(CareGiverResponse careGiver) async {
-    await LocalRepository().save<int>(LocalRepositoryKey.lateCareGiverId, careGiver.id);
+  void selectCareReceiver(CareRelationResponse careRelation) async {
+    await LocalRepository().save<int>(LocalRepositoryKey.lateCareRelationId, careRelation.id);
     if (!mounted) return;
-    Navigator.pop(context, careGiver.id);
+    Navigator.pop(context, careRelation.id);
   }
 
   @override
@@ -35,15 +35,15 @@ class _CareGiverScreenState extends ConsumerState<CareGiverScreen> {
   }
 
   Future<void> careGiversInitialize() async {
-    var result = await ref.read(careGiverControllerProvider.notifier).getAllCareGiver();
+    var result = await ref.read(careGiverControllerProvider.notifier).getAllCareRelations();
     if (result == null) return;
-    setState(() => _careGivers = result);
+    setState(() => _careRelations = result);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: "Care Receiver"),
+      appBar: CommonAppBar(title: "혈당 관리"),
       backgroundColor: AppColors.backgroundColor,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,20 +66,20 @@ class _CareGiverScreenState extends ConsumerState<CareGiverScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Text(
-              "등록된 Care Receiver 목록",
+              "등록된 사람들 목록",
               style: TextStyle(fontSize: 16, height: 20 / 16, fontWeight: FontWeight.bold, color: AppColors.mainColor),
             ),
           ),
           Container(width: double.infinity, height: 1, color: AppColors.mainColor),
-          ..._careGivers.map((careGiver) => getCareGiverCard(careGiver)),
+          ..._careRelations.map((careGiver) => getCareGiverCard(careGiver)),
         ],
       ),
     );
   }
 
-  Widget getCareGiverCard(CareGiverResponse careGiver) {
+  Widget getCareGiverCard(CareRelationResponse careRelation) {
     return GestureDetector(
-      onTap: () => selectCareReceiver(careGiver),
+      onTap: () => selectCareReceiver(careRelation),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
@@ -93,7 +93,7 @@ class _CareGiverScreenState extends ConsumerState<CareGiverScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Care Receiver 정보",
+                    "등록된 사람 정보",
                     style: TextStyle(
                       fontSize: 14,
                       height: 20 / 14,
@@ -103,7 +103,7 @@ class _CareGiverScreenState extends ConsumerState<CareGiverScreen> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    "ID : ${careGiver.patientId}, 이름 : ${careGiver.patientName}",
+                    "이름 : ${careRelation.patientName} (ID : ${careRelation.patientId})",
                     style: TextStyle(
                       fontSize: 16,
                       height: 20 / 16,

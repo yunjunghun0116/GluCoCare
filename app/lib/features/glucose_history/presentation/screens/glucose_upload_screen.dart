@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:app/core/data/repositories/local_repository.dart';
 import 'package:app/core/exceptions/custom_exception.dart';
 import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/features/glucose_history/data/models/create_glucose_history_request.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/constants/app_colors.dart';
+import '../../../../shared/constants/local_repository_key.dart';
 import '../../../../shared/widgets/common_app_bar.dart';
 import '../../../../shared/widgets/common_text_field.dart';
 
@@ -134,7 +136,13 @@ class _GlucoseUploadScreenState extends ConsumerState<GlucoseUploadScreen> {
                   if (value > 400) throw Exception();
 
                   var date = DateTime(_date!.year, _date!.month, _date!.day, _timeOfDay!.hour, _timeOfDay!.minute);
-                  var request = CreateGlucoseHistoryRequest(dateTime: date, sgv: value);
+                  var lateCareRelationId = LocalRepository().read(LocalRepositoryKey.lateCareRelationId);
+                  var request = CreateGlucoseHistoryRequest(
+                    careRelationId: lateCareRelationId,
+                    dateTime: date,
+                    sgv: value,
+                  );
+
                   var result = await ref.read(glucoseHistoryControllerProvider.notifier).createGlucoseHistory(request);
                   if (result) {
                     if (!context.mounted) return;

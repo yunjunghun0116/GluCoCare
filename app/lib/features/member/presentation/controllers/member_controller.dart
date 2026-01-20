@@ -5,7 +5,7 @@ import '../../../../core/exceptions/exception_message.dart';
 class MemberController extends BaseController<BaseState> {
   MemberController(super.state, super.dio);
 
-  Future<String?> getName() async {
+  Future<String?> readName() async {
     var response = await getRequest("/api/members/name");
     if (response.statusCode == 200) {
       return response.data;

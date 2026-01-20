@@ -1,15 +1,11 @@
-import 'package:app/core/exceptions/custom_exception.dart';
-import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/features/patient/data/models/read_patient_response.dart';
 import 'package:app/features/patient/presentation/providers.dart';
-import 'package:app/shared/constants/app_reg_exp.dart';
 import 'package:app/shared/widgets/common_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/constants/app_colors.dart';
 import '../../../../shared/widgets/common_app_bar.dart';
-import '../../../../shared/widgets/common_text_field.dart';
 
 class PatientScreen extends ConsumerStatefulWidget {
   const PatientScreen({super.key});
@@ -24,6 +20,11 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
   bool existsPatient = false;
   ReadPatientResponse? patientResponse;
 
+  String getDexcomServerUrl() {
+    if (patientResponse == null) return "";
+    return "https://${patientResponse!.accessCode}@assured-mastodon-basically.ngrok-free.app/${patientResponse!.id}/api/v1";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -34,9 +35,9 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       FocusScope.of(context).unfocus();
 
-      existsPatient = await ref.read(patientController.notifier).existsPatients();
+      existsPatient = await ref.read(patientControllerProvider.notifier).readIsPatient();
       if (existsPatient) {
-        patientResponse = await ref.read(patientController.notifier).readPatient();
+        patientResponse = await ref.read(patientControllerProvider.notifier).readPatientInformation();
         _nameController.text = patientResponse?.name ?? "";
       }
       setState(() {});
@@ -46,20 +47,20 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: "Care Receiver ${existsPatient ? "정보" : "등록"}", onBack: () => Navigator.pop(context)),
+      appBar: CommonAppBar(title: "혈당 관리 ${existsPatient ? "정보" : "등록"}", onBack: () => Navigator.pop(context)),
       backgroundColor: AppColors.backgroundColor,
       body: Builder(
         builder: (context) {
           if (existsPatient) {
-            return readCareReceiverContainer();
+            return readCareRelationContainer();
           }
-          return registerCareReceiverForm();
+          return registerCareRelationForm();
         },
       ),
     );
   }
 
-  Widget readCareReceiverContainer() {
+  Widget readCareRelationContainer() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: RichText(
@@ -77,9 +78,9 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            TextSpan(text: "연속혈당측정기 SERVER URL\n"),
+            TextSpan(text: "xDrip+ Server URL\n"),
             TextSpan(
-              text: patientResponse?.cgmServerUrl ?? "",
+              text: getDexcomServerUrl(),
               style: TextStyle(
                 fontSize: 14,
                 height: 20 / 14,
@@ -93,26 +94,31 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
     );
   }
 
-  Widget registerCareReceiverForm() {
+  Widget registerCareRelationForm() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 10),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            "성명",
+            "설명",
             style: TextStyle(fontSize: 16, height: 20 / 16, color: AppColors.mainColor, fontWeight: FontWeight.bold),
           ),
         ),
-        CommonTextField(controller: _nameController, hintText: "성명을 입력해 주세요."),
+        SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            "혈당 변화를 기록하고,나 뿐만 아니라\n가족이나 다른 사람들과 공유함으로써 혈당을\n더 잘 이해하고 관리하기 위한 설정입니다.",
+            style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray600Color),
+          ),
+        ),
         SizedBox(height: 30),
         CommonButton(
           value: true,
           onTap: () async {
-            if (!AppRegExp.nameRegExp.hasMatch(_nameController.text)) {
-              throw CustomException(ExceptionMessage.wrongCareReceiverNameRegExp);
-            }
-            await ref.read(patientController.notifier).createPatient(_nameController.text);
+            await ref.read(patientControllerProvider.notifier).updateToPatient();
             initializePatient();
           },
           title: "등록",

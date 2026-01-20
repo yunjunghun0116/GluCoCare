@@ -1,4 +1,4 @@
-import 'package:app/features/care/data/models/care_giver_response.dart';
+import 'package:app/features/care/data/models/care_relation_response.dart';
 import 'package:app/features/glucose_warning/data/models/glucose_alert_policy_response.dart';
 
 import '../../../../core/base/base_controller.dart';
@@ -8,8 +8,8 @@ import '../../../../core/exceptions/exception_message.dart';
 class GlucoseWarningController extends BaseController<BaseState> {
   GlucoseWarningController(super.state, super.dio);
 
-  Future<GlucoseAlertPolicyResponse> getGlucoseAlertPolicy(CareGiverResponse careGiver) async {
-    var response = await getRequest("/api/glucose-alert-policies?careGiverId=${careGiver.id}");
+  Future<GlucoseAlertPolicyResponse> getGlucoseAlertPolicy(CareRelationResponse careRelation) async {
+    var response = await getRequest("/api/glucose-alert-policies?careRelationId=${careRelation.id}");
     if (response.statusCode == 200) {
       return GlucoseAlertPolicyResponse.fromJson(response.data);
     }

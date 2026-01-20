@@ -6,9 +6,10 @@ part 'read_patient_response.g.dart';
 class ReadPatientResponse {
   final int id;
   final String name;
-  final String cgmServerUrl;
+  final bool isPatient;
+  final String accessCode;
 
-  ReadPatientResponse({required this.id, required this.name, required this.cgmServerUrl});
+  ReadPatientResponse({required this.id, required this.name, required this.isPatient, required this.accessCode});
 
   factory ReadPatientResponse.fromJson(Map<String, dynamic> json) => _$ReadPatientResponseFromJson(json);
 
@@ -16,6 +17,6 @@ class ReadPatientResponse {
 
   @override
   String toString() {
-    return 'ReadPatientResponse{id: $id, name: $name, cgmServerUrl: $cgmServerUrl}';
+    return 'ReadPatientResponse{id: $id, name: $name, isPatient: $isPatient, accessCode: $accessCode}';
   }
 }

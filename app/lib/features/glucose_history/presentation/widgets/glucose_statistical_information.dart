@@ -8,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../../care/data/models/care_giver_response.dart';
+import '../../../care/data/models/care_relation_response.dart';
 
 class GlucoseStatisticalInformation extends ConsumerStatefulWidget {
-  final CareGiverResponse careGiver;
+  final CareRelationResponse careGiver;
   final List<GlucoseHistoryResponse> records;
 
   const GlucoseStatisticalInformation({super.key, required this.careGiver, required this.records});

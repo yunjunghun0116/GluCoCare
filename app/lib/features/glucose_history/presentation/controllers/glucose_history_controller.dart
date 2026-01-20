@@ -19,7 +19,11 @@ class GlucoseHistoryController extends BaseController<BaseState> {
   Future<bool> createGlucoseHistory(CreateGlucoseHistoryRequest request) async {
     var response = await postRequest(
       "/api/glucose-histories",
-      data: {"dateTime": request.dateTime.toUtc().toIso8601String(), "value": request.sgv},
+      data: {
+        "careRelationId": request.careRelationId,
+        "dateTime": request.dateTime.toIso8601String(),
+        "sgv": request.sgv,
+      },
     );
     if (response.statusCode == 200) {
       return true;

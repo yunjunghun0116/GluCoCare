@@ -33,8 +33,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
 
   Future<void> healthConnectorInitialize() async {
-    var isPatients = await ref.read(patientController.notifier).existsPatients();
-    if (!isPatients) return;
+    var isPatient = await ref.read(patientControllerProvider.notifier).readIsPatient();
+    if (!isPatient) return;
     await HealthConnector().initialize();
   }
 

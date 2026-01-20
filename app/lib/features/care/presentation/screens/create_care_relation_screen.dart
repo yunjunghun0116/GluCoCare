@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/widgets/common_text_field.dart';
-import '../../data/models/create_care_giver_request.dart';
+import '../../data/models/create_care_relation_request.dart';
 import '../providers.dart';
 
 class CreateCareGiverScreen extends ConsumerStatefulWidget {
@@ -23,11 +23,11 @@ class _CreateCareGiverScreenState extends ConsumerState<CreateCareGiverScreen> {
 
   void createCareGiver() async {
     try {
-      var createCareGiverDto = CreateCareGiverRequest(
+      var createCareGiverDto = CreateCareRelationRequest(
         patientId: int.parse(_idController.text),
         patientName: _nameController.text,
       );
-      await ref.read(careGiverControllerProvider.notifier).createCareGiver(createCareGiverDto);
+      await ref.read(careGiverControllerProvider.notifier).createCareRelation(createCareGiverDto);
       if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {
@@ -39,14 +39,14 @@ class _CreateCareGiverScreenState extends ConsumerState<CreateCareGiverScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
-      appBar: CommonAppBar(title: "Care Receiver 등록"),
+      appBar: CommonAppBar(title: "함께 관리할 사람 등록"),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              "Care Receiver의 정보를 입력해 주세요.",
+              "함께 혈당을 관리할 사람의\n정보를 입력해 주세요.",
               style: TextStyle(
                 fontSize: 16,
                 height: 20 / 16,

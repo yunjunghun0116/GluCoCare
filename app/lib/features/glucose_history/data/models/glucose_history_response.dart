@@ -1,5 +1,3 @@
-import 'package:app/shared/utils/glucose_util.dart';
-
 class GlucoseHistoryResponse {
   final int id;
   final DateTime dateTime;
@@ -8,7 +6,6 @@ class GlucoseHistoryResponse {
   GlucoseHistoryResponse({required this.id, required this.dateTime, required this.sgv});
 
   factory GlucoseHistoryResponse.fromJson(Map<String, dynamic> json) {
-    var dateTime = GlucoseUtil.getLocalDate(json['date']);
-    return GlucoseHistoryResponse(id: json['id'], dateTime: dateTime, sgv: json['sgv']);
+    return GlucoseHistoryResponse(id: json['id'], dateTime: DateTime.parse(json['date']), sgv: json['sgv']);
   }
 }

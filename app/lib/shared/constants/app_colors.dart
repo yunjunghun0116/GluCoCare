@@ -9,6 +9,10 @@ abstract final class AppColors {
   static const Color blackColor = Color(0xFF121212);
   static const Color backgroundColor = Color(0xFFFAFAFA);
 
+  static const Color glucoseNormalColor = Color(0xFF5DADEC);
+  static const Color glucoseWarningColor = Color(0xFFFFB627);
+  static const Color glucoseDangerColor = Color(0xFFD7263D);
+
   static const Color subColor1 = Color(0xFF253D3D);
   static const Color subColor2 = Color(0xFF29575A);
   static const Color subColor3 = Color(0xFF326C72);

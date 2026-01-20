@@ -20,7 +20,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@Table(name = "member_patient_relation")
+@Table(name = "care_relation")
 @Getter
 public class CareRelation extends BaseEntity {
     @NotNull

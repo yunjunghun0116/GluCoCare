@@ -7,7 +7,6 @@ import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
 import com.glucocare.server.feature.glucose.dto.CreateGlucoseHistoryRequest;
 import com.glucocare.server.feature.glucose.infra.GlucoseHistoryCache;
-import com.glucocare.server.feature.member.domain.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,19 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CreateGlucoseHistoryUseCase {
 
-    private final MemberRepository memberRepository;
     private final GlucoseHistoryRepository glucoseHistoryRepository;
     private final CareRelationRepository careRelationRepository;
     private final GlucoseHistoryCache glucoseHistoryCache;
 
     public void execute(Long memberId, CreateGlucoseHistoryRequest request) {
-        if (!careRelationRepository.existsByMemberIdAndPatientId(memberId, request.patientId())) {
-            throw new ApplicationException(ErrorMessage.INVALID_ACCESS);
-        }
-        var patient = memberRepository.findById(request.patientId())
-                                      .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+        var careRelation = careRelationRepository.findById(request.careRelationId())
+                                                 .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+        careRelation.validateOwnership(memberId);
+        var patient = careRelation.getPatient();
         var glucoseHistory = new GlucoseHistory(patient, request.sgv(), request.dateTime());
         glucoseHistoryRepository.save(glucoseHistory);
-        glucoseHistoryCache.clearByPatientId(request.patientId());
+        glucoseHistoryCache.clearByPatientId(patient.getId());
     }
 }

@@ -51,8 +51,8 @@
 	</array>
 	
 	<key>NSHealthShareUsageDescription</key>
-    <string>We will sync your data with the Apple Health app to give you better insights</string>
+    <string>애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
     <key>NSHealthUpdateUsageDescription</key>
-    <string>We will sync your data with the Apple Health app to give you better insights</string>
+    <string>W애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
 </dict>
 </plist>

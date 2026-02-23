@@ -1,4 +1,5 @@
 import 'package:app/core/health/health_connector.dart';
+import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/features/main/screens/setting_screen.dart';
 import 'package:app/features/member/presentation/providers.dart';
 import 'package:app/features/patient/presentation/providers.dart';
@@ -36,6 +37,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     var isPatient = await ref.read(patientControllerProvider.notifier).readIsPatient();
     if (!isPatient) return;
     await HealthConnector().initialize();
+    ref.read(healthControllerProvider.notifier).startFetch();
   }
 
   Future<void> notificationServiceInitialize() async {
@@ -65,7 +67,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    HealthConnector().readBloodGlucose();
     return Scaffold(
       appBar: CommonAppBar(title: "GluCoCare", showLeading: false),
       backgroundColor: AppColors.backgroundColor,

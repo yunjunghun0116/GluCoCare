@@ -1,5 +1,7 @@
+import 'package:app/core/data/repositories/local_repository.dart';
 import 'package:app/core/exceptions/custom_exception.dart';
 import 'package:app/core/exceptions/exception_message.dart';
+import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:health/health.dart';
 
 class HealthConnector {
@@ -15,7 +17,7 @@ class HealthConnector {
 
   Future<bool> initialize() async {
     try {
-      var isAvailable = await isHealthConnectAvailable();
+      var isAvailable = await _isHealthConnectAvailable();
       if (!isAvailable) return false;
 
       bool authorized = await health.requestAuthorization(
@@ -29,7 +31,7 @@ class HealthConnector {
     }
   }
 
-  Future<bool> isHealthConnectAvailable() async {
+  Future<bool> _isHealthConnectAvailable() async {
     var isAvailable = await health.isHealthConnectAvailable();
     if (!isAvailable) {
       await health.installHealthConnect();
@@ -38,13 +40,20 @@ class HealthConnector {
     return isAvailable;
   }
 
-  Future<void> readBloodGlucose() async {
-    var endDate = DateTime.now();
-    var startDate = endDate.subtract(Duration(days: 14));
-    List<HealthDataPoint> glucoseData = await health.getHealthDataFromTypes(
+  Future<List<HealthDataPoint>> fetchBloodGlucose() async {
+    var nowDate = DateTime.now();
+    late DateTime startDate;
+    try {
+      var lastSyncDateTime = LocalRepository().read<String>(LocalRepositoryKey.lastSyncDateTime);
+      startDate = DateTime.parse(lastSyncDateTime);
+    } catch (e) {
+      startDate = nowDate.subtract(Duration(days: 90));
+    }
+
+    var glucoseData = await health.getHealthDataFromTypes(
       types: [HealthDataType.BLOOD_GLUCOSE],
       startTime: startDate,
-      endTime: endDate,
+      endTime: nowDate,
     );
 
     for (var point in glucoseData) {
@@ -55,5 +64,6 @@ class HealthConnector {
       print('측정 시간: ${date.toUtc().toIso8601String()}'); // 이 값으로 데이터 저장하면 될 듯
       //1759386657665
     }
+    return glucoseData;
   }
 }

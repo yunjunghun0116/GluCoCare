@@ -105,6 +105,14 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
                 height: 20 / 14,
                 color: AppColors.fontGray400Color,
                 fontWeight: FontWeight.bold,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+            WidgetSpan(child: SizedBox(width: 6)),
+            WidgetSpan(
+              child: GestureDetector(
+                onTap: _copyRecognizer.onTap,
+                child: Icon(Icons.copy_rounded, size: 20, color: AppColors.fontGray400Color),
               ),
             ),
           ],

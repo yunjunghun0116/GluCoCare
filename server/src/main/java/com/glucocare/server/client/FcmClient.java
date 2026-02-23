@@ -52,6 +52,7 @@ public class FcmClient {
 
     private String getBody(CareRelation careRelation, GlucoseHistory glucoseHistory) {
         var patient = careRelation.getPatient();
-        return patient.getName() + "님의 혈당 수치가 " + glucoseHistory.getSgv() + "입니다.";
+        return patient.getName() + "님의 혈당 수치가 " + glucoseHistory.getSgv() + "입니다. 곧 혈당 고위험 수치에 도달할 수 있으니 가벼운 걷기나 운동을 수행해 주세요.";
+        // return patient.getName() + "님의 혈당 수치가 " + glucoseHistory.getSgv() + "입니다.";
     }
 }

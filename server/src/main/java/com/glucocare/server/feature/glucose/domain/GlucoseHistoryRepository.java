@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface GlucoseHistoryRepository extends JpaRepository<GlucoseHistory, Long> {
-    List<GlucoseHistory> findAllByPatientIdOrderByDateDesc(Long patientId);
+    List<GlucoseHistory> findAllByPatientOrderByDateDesc(Member patient);
 
     @Query(
             """
@@ -21,4 +21,6 @@ public interface GlucoseHistoryRepository extends JpaRepository<GlucoseHistory, 
             """
     )
     List<GlucoseHistory> findLatestByPatient(@Param("patients") List<Member> patients);
+
+    List<GlucoseHistory> findTop20ByPatientOrderByDateDesc(Member patient);
 }

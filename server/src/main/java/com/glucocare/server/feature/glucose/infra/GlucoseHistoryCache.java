@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.glucocare.server.exception.ApplicationException;
 import com.glucocare.server.exception.ErrorMessage;
 import com.glucocare.server.feature.glucose.dto.ReadGlucoseHistoryResponse;
+import com.glucocare.server.feature.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,13 @@ public class GlucoseHistoryCache {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    public Boolean existsByPatientId(Long patientId) {
-        var key = KEY_PREFIX + patientId;
+    public Boolean existsByPatient(Member patient) {
+        var key = KEY_PREFIX + patient.getId();
         return redisTemplate.hasKey(key);
     }
 
-    public List<ReadGlucoseHistoryResponse> readAllByPatientId(Long patientId) {
-        var key = KEY_PREFIX + patientId;
+    public List<ReadGlucoseHistoryResponse> readAllByPatient(Member patient) {
+        var key = KEY_PREFIX + patient.getId();
         var json = redisTemplate.opsForValue()
                                 .get(key);
         if (json == null) return List.of();
@@ -39,8 +40,8 @@ public class GlucoseHistoryCache {
         }
     }
 
-    public void createGlucoseHistories(Long patientId, List<ReadGlucoseHistoryResponse> histories) {
-        var key = KEY_PREFIX + patientId;
+    public void createGlucoseHistories(Member patient, List<ReadGlucoseHistoryResponse> histories) {
+        var key = KEY_PREFIX + patient.getId();
         if (redisTemplate.hasKey(key)) {
             redisTemplate.delete(key);
         }

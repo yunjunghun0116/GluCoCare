@@ -21,27 +21,24 @@ public class ReadAllGlucoseHistoryUseCase {
     private final CareRelationRepository careRelationRepository;
     private final GlucoseHistoryCache glucoseHistoryCache;
 
-    public List<ReadGlucoseHistoryResponse> execute(Long memberId, Long patientId) {
-        validateCareGiver(memberId, patientId);
-        if (glucoseHistoryCache.existsByPatientId(patientId)) {
-            return glucoseHistoryCache.readAllByPatientId(patientId);
+    public List<ReadGlucoseHistoryResponse> execute(Long memberId, Long careRelationId) {
+        var careRelation = careRelationRepository.findById(careRelationId)
+                                                 .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+        careRelation.validateOwnership(memberId);
+        var patient = careRelation.getPatient();
+        if (glucoseHistoryCache.existsByPatient(patient)) {
+            return glucoseHistoryCache.readAllByPatient(patient);
         }
 
-        var result = glucoseHistoryRepository.findAllByPatientIdOrderByDateDesc(patientId)
+        var result = glucoseHistoryRepository.findAllByPatientOrderByDateDesc(patient)
                                              .stream()
                                              .map(this::convertGlucoseHistoryResponse)
                                              .toList();
-        glucoseHistoryCache.createGlucoseHistories(patientId, result);
+        glucoseHistoryCache.createGlucoseHistories(patient, result);
         return result;
     }
 
     private ReadGlucoseHistoryResponse convertGlucoseHistoryResponse(GlucoseHistory glucoseHistory) {
         return ReadGlucoseHistoryResponse.of(glucoseHistory.getId(), glucoseHistory.getDate(), glucoseHistory.getSgv());
-    }
-
-    private void validateCareGiver(Long memberId, Long patientId) {
-        if (!careRelationRepository.existsByMemberIdAndPatientId(memberId, patientId)) {
-            throw new ApplicationException(ErrorMessage.INVALID_ACCESS);
-        }
     }
 }

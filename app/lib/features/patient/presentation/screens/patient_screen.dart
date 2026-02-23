@@ -1,7 +1,10 @@
 import 'package:app/features/patient/data/models/read_patient_response.dart';
 import 'package:app/features/patient/presentation/providers.dart';
+import 'package:app/shared/utils/local_util.dart';
 import 'package:app/shared/widgets/common_button.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/constants/app_colors.dart';
@@ -16,6 +19,7 @@ class PatientScreen extends ConsumerStatefulWidget {
 
 class _PatientScreenState extends ConsumerState<PatientScreen> {
   final _nameController = TextEditingController();
+  late final TapGestureRecognizer _copyRecognizer;
 
   bool existsPatient = false;
   ReadPatientResponse? patientResponse;
@@ -40,8 +44,22 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
         patientResponse = await ref.read(patientControllerProvider.notifier).readPatientInformation();
         _nameController.text = patientResponse?.name ?? "";
       }
+
+      _copyRecognizer = TapGestureRecognizer()
+        ..onTap = () async {
+          var url = getDexcomServerUrl();
+          await Clipboard.setData(ClipboardData(text: url));
+          if (!mounted) return;
+          LocalUtil.showMessage(context, message: "URL이 클립보드에 복사됐습니다.");
+        };
       setState(() {});
     });
+  }
+
+  @override
+  void dispose() {
+    _copyRecognizer.dispose();
+    super.dispose();
   }
 
   @override
@@ -81,6 +99,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
             TextSpan(text: "xDrip+ Server URL\n"),
             TextSpan(
               text: getDexcomServerUrl(),
+              recognizer: _copyRecognizer,
               style: TextStyle(
                 fontSize: 14,
                 height: 20 / 14,

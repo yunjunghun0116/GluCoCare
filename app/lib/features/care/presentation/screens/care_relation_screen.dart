@@ -35,7 +35,7 @@ class _CareGiverScreenState extends ConsumerState<CareGiverScreen> {
   }
 
   Future<void> careGiversInitialize() async {
-    var result = await ref.read(careGiverControllerProvider.notifier).getAllCareRelations();
+    var result = await ref.read(careRelationControllerProvider.notifier).getAllCareRelations();
     if (result == null) return;
     setState(() => _careRelations = result);
   }

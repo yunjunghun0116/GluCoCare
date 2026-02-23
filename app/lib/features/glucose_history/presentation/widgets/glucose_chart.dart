@@ -1,9 +1,16 @@
+import 'package:app/features/care/presentation/providers.dart';
 import 'package:app/features/glucose_history/data/models/glucose_history_response.dart';
+import 'package:app/features/glucose_history/data/models/predict_glucose_response.dart';
+import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+
+import '../../../../core/data/repositories/local_repository.dart';
+import '../../../../core/exceptions/custom_exception.dart';
+import '../../../../shared/constants/local_repository_key.dart';
 
 class GlucoseChart extends ConsumerStatefulWidget {
   final List<GlucoseHistoryResponse> records;
@@ -16,16 +23,18 @@ class GlucoseChart extends ConsumerStatefulWidget {
 
 class _GlucoseChartState extends ConsumerState<GlucoseChart> {
   final ScrollController _controller = ScrollController();
+  final List<PredictGlucoseResponse> _normalPredictGlucoseList = [];
+  final List<PredictGlucoseResponse> _exercisePredictGlucoseList = [];
   late final TrackballBehavior _trackball;
   final Set<String> _labelShowSet = {};
-  double _interval = 2;
+  double _interval = 1;
   double? _selectedGlucoseHistoryXPosition;
   int? _selectedGlucoseHistoryIndex;
 
   DateTime get minDate => widget.records.first.dateTime.subtract(Duration(hours: _interval.toInt()));
 
   DateTime get maxDate => widget.records.last.dateTime.add(Duration(hours: 3)).difference(DateTime.now()).isNegative
-      ? widget.records.last.dateTime.add(Duration(hours: 3))
+      ? widget.records.last.dateTime.add(Duration(hours: 2))
       : DateTime.now();
 
   double calculateWidthForChart() {
@@ -33,7 +42,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
     // 전체 시간 범위(시간 단위)
     var totalHours = maxDate.difference(minDate).inHours;
     // interval당 픽셀 수
-    var pixelsPerInterval = 80;
+    var pixelsPerInterval = 100;
     // 전체 너비 = (전체 시간 / interval) * interval당 픽셀
     var totalIntervals = totalHours / _interval;
     var calculatedWidth = totalIntervals * pixelsPerInterval;
@@ -42,80 +51,40 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
     return calculatedWidth > minWidth ? calculatedWidth : minWidth;
   }
 
-  List<GlucoseHistoryResponse> getNormalGlucoseHistories() {
-    return [
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 15), sgv: 104),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 20), sgv: 102),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 25), sgv: 101),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 30), sgv: 99),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 35), sgv: 102),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 40), sgv: 98),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 45), sgv: 101),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 50), sgv: 106),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 55), sgv: 108),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 00), sgv: 104),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 05), sgv: 103),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 10), sgv: 102),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 15), sgv: 100),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 20), sgv: 104),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 25), sgv: 103),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 30), sgv: 104),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 35), sgv: 103),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 40), sgv: 104),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 45), sgv: 103),
-    ];
-  }
-
-  List<GlucoseHistoryResponse> getMealGlucoseHistories() {
-    return [
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 15), sgv: 104),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 20), sgv: 110),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 25), sgv: 118),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 30), sgv: 126),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 35), sgv: 138),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 40), sgv: 152),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 45), sgv: 165),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 50), sgv: 168),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 55), sgv: 167),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 00), sgv: 172),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 05), sgv: 168),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 10), sgv: 169),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 15), sgv: 165),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 20), sgv: 160),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 25), sgv: 158),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 30), sgv: 156),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 35), sgv: 150),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 40), sgv: 143),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 45), sgv: 140),
-    ];
-  }
-
-  List<GlucoseHistoryResponse> getExerciseGlucoseHistories() {
-    return [
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 15), sgv: 104),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 20), sgv: 105),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 25), sgv: 100),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 30), sgv: 97),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 35), sgv: 94),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 40), sgv: 92),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 45), sgv: 89),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 50), sgv: 86),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 8, 55), sgv: 85),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 00), sgv: 80),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 05), sgv: 76),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 10), sgv: 74),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 15), sgv: 68),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 20), sgv: 66),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 25), sgv: 65),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 30), sgv: 68),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 35), sgv: 74),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 40), sgv: 77),
-      GlucoseHistoryResponse(id: 10000, dateTime: DateTime(2026, 1, 11, 9, 45), sgv: 80),
-    ];
-  }
-
   String getKey(DateTime date) {
     return "${date.month}-${date.day}";
+  }
+
+  void initPredictGlucoseList() async {
+    late int careRelationId;
+    try {
+      careRelationId = LocalRepository().read<int>(LocalRepositoryKey.lateCareRelationId);
+    } on CustomException catch (_) {
+      var result = await ref.read(careRelationControllerProvider.notifier).getAllCareRelations();
+      if (result == null || result.isEmpty) return;
+      await LocalRepository().save<int>(LocalRepositoryKey.lateCareRelationId, result.first.id);
+      careRelationId = result.first.id;
+    }
+
+    var normalPredictGlucoseList = await ref
+        .read(glucoseHistoryControllerProvider.notifier)
+        .getPredictGlucose(careRelationId);
+    if (normalPredictGlucoseList != null && normalPredictGlucoseList.isNotEmpty) {
+      _normalPredictGlucoseList
+        ..clear()
+        ..addAll(normalPredictGlucoseList);
+    }
+
+    var exercisePredictGlucoseList = await ref
+        .read(glucoseHistoryControllerProvider.notifier)
+        .getPredictGlucoseWithExercise(careRelationId);
+    if (exercisePredictGlucoseList != null && exercisePredictGlucoseList.isNotEmpty) {
+      _exercisePredictGlucoseList
+        ..clear()
+        ..addAll(exercisePredictGlucoseList);
+    }
+
+    setState(() {});
   }
 
   @override
@@ -130,15 +99,14 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
       // 세로선
       tooltipDisplayMode: TrackballDisplayMode.none,
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.jumpTo(_controller.position.maxScrollExtent);
+      initPredictGlucoseList();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    _labelShowSet.clear();
-
     return ListView(
       physics: ClampingScrollPhysics(),
       children: [
@@ -197,8 +165,10 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                                 minimum: minDate,
                                 maximum: maxDate,
                                 interval: _interval,
+                                intervalType: DateTimeIntervalType.hours,
                                 labelAlignment: LabelAlignment.center,
                                 labelPosition: ChartDataLabelPosition.outside,
+                                labelIntersectAction: AxisLabelIntersectAction.hide,
                                 axisLabelFormatter: (AxisLabelRenderDetails details) {
                                   var date = DateTime.fromMillisecondsSinceEpoch(details.value as int);
                                   var key = getKey(date);
@@ -269,32 +239,23 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                                   },
                                   markerSettings: MarkerSettings(isVisible: false),
                                 ),
-                                LineSeries<GlucoseHistoryResponse, DateTime>(
-                                  dataSource: getNormalGlucoseHistories(),
+                                LineSeries<PredictGlucoseResponse, DateTime>(
+                                  dataSource: _normalPredictGlucoseList,
                                   xValueMapper: (dto, _) => dto.dateTime,
-                                  yValueMapper: (dto, _) => dto.sgv,
+                                  yValueMapper: (dto, _) => dto.mean,
                                   width: 2,
                                   color: Color(0xFF2F8F9D),
                                   markerSettings: MarkerSettings(isVisible: false),
-                                  name: "가만히 있을 때",
+                                  name: "휴식 평균",
                                 ),
-                                LineSeries<GlucoseHistoryResponse, DateTime>(
-                                  dataSource: getMealGlucoseHistories(),
+                                LineSeries<PredictGlucoseResponse, DateTime>(
+                                  dataSource: _exercisePredictGlucoseList,
                                   xValueMapper: (dto, _) => dto.dateTime,
-                                  yValueMapper: (dto, _) => dto.sgv,
-                                  width: 2,
-                                  color: Colors.yellow,
-                                  markerSettings: MarkerSettings(isVisible: false),
-                                  name: "음식 섭취",
-                                ),
-                                LineSeries<GlucoseHistoryResponse, DateTime>(
-                                  dataSource: getExerciseGlucoseHistories(),
-                                  xValueMapper: (dto, _) => dto.dateTime,
-                                  yValueMapper: (dto, _) => dto.sgv,
+                                  yValueMapper: (dto, _) => dto.mean,
                                   width: 2,
                                   color: Colors.orange,
                                   markerSettings: MarkerSettings(isVisible: false),
-                                  name: "운동할 때",
+                                  name: "운동 평균",
                                 ),
                               ],
                             ),
@@ -321,10 +282,10 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(width: 30, height: 3, color: Colors.yellow),
+                              Container(width: 30, height: 3, color: Colors.green),
                               SizedBox(width: 10),
                               Text(
-                                "식사 하기",
+                                "음식 섭취",
                                 style: TextStyle(fontSize: 12, height: 14 / 12, color: AppColors.mainColor),
                               ),
                             ],
@@ -335,7 +296,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                               Container(width: 30, height: 3, color: Colors.orange),
                               SizedBox(width: 10),
                               Text(
-                                "운동 하기",
+                                "운동",
                                 style: TextStyle(fontSize: 12, height: 14 / 12, color: AppColors.mainColor),
                               ),
                             ],
@@ -346,7 +307,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                               Container(width: 30, height: 3, color: Color(0xFF2F8F9D)),
                               SizedBox(width: 10),
                               Text(
-                                "가만히 있기",
+                                "휴식",
                                 style: TextStyle(fontSize: 12, height: 14 / 12, color: AppColors.mainColor),
                               ),
                             ],
@@ -366,8 +327,15 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
   Widget getIntervalButton(double value) {
     var isSelected = _interval == value;
+
     return GestureDetector(
-      onTap: () => setState(() => _interval = value),
+      onTap: () {
+        _labelShowSet.clear();
+        setState(() => _interval = value);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _controller.jumpTo(_controller.position.maxScrollExtent);
+        });
+      },
       child: Container(
         alignment: Alignment.center,
         width: 60,

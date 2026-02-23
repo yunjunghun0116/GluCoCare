@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'controllers/care_relation_controller.dart';
 
 // --- Controller Providers ---
-final careGiverControllerProvider = StateNotifierProvider<CareRelationController, BaseState>((ref) {
+final careRelationControllerProvider = StateNotifierProvider<CareRelationController, BaseState>((ref) {
   var dio = ref.read(dioProvider);
   return CareRelationController(BaseState(), dio);
 });

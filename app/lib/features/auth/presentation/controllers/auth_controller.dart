@@ -24,8 +24,8 @@ class AuthController extends BaseController<BaseState> {
       }
     } catch (exception) {
       throw CustomException(ExceptionMessage.wrongEmailOrPassword);
-      return null;
     }
+    return null;
   }
 
   Future<bool> autoLogin() async {

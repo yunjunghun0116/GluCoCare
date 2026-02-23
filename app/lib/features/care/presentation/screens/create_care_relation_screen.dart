@@ -27,7 +27,7 @@ class _CreateCareGiverScreenState extends ConsumerState<CreateCareGiverScreen> {
         patientId: int.parse(_idController.text),
         patientName: _nameController.text,
       );
-      await ref.read(careGiverControllerProvider.notifier).createCareRelation(createCareGiverDto);
+      await ref.read(careRelationControllerProvider.notifier).createCareRelation(createCareGiverDto);
       if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {

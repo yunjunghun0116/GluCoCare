@@ -9,9 +9,9 @@ import '../../data/models/glucose_history_response.dart';
 import '../providers.dart';
 
 class GlucoseScreen extends ConsumerStatefulWidget {
-  final CareRelationResponse careGiver;
+  final CareRelationResponse careRelation;
 
-  const GlucoseScreen({super.key, required this.careGiver});
+  const GlucoseScreen({super.key, required this.careRelation});
 
   @override
   ConsumerState<GlucoseScreen> createState() => _GlucoseScreenState();
@@ -32,7 +32,7 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
   Future<void> setGlucoseHistories() async {
     var result = await ref
         .read(glucoseHistoryControllerProvider.notifier)
-        .getAllGlucoseHistories(widget.careGiver.patientId);
+        .getAllGlucoseHistories(widget.careRelation.id);
     if (result == null || result.isEmpty) return;
     setState(() => _records = result);
   }
@@ -44,8 +44,9 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
           SizedBox(height: 20),
           Center(
             child: Text(
-              "해당 Care Receiver의 \n혈당 정보가 존재하지 않습니다.\n혈당 정보를 업로드해주세요.",
+              "해당 등록자의 혈당 정보가 존재하지 않습니다.\n혈당 정보를 업로드해주세요.",
               style: TextStyle(fontSize: 16, height: 20 / 16, color: AppColors.mainColor),
+              textAlign: TextAlign.center,
             ),
           ),
         ],
@@ -56,7 +57,7 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
         return GlucoseChart(records: _records);
       case 1:
       default:
-        return GlucoseStatisticalInformation(careGiver: widget.careGiver, records: _records);
+        return GlucoseStatisticalInformation(careGiver: widget.careRelation, records: _records);
     }
   }
 

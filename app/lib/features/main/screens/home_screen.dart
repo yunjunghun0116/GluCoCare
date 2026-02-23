@@ -31,13 +31,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> careRelationsInitialize() async {
     try {
-      var lateCareRelationId = LocalRepository().read(LocalRepositoryKey.lateCareRelationId);
-      var result = await ref.read(careGiverControllerProvider.notifier).getCareRelation(lateCareRelationId);
+      var lateCareRelationId = LocalRepository().read<int>(LocalRepositoryKey.lateCareRelationId);
+      var result = await ref.read(careRelationControllerProvider.notifier).getCareRelation(lateCareRelationId);
       if (result == null) throw CustomException(ExceptionMessage.badRequest);
       setState(() => careRelation = result);
     } on CustomException catch (e) {
-      var result = await ref.read(careGiverControllerProvider.notifier).getAllCareRelations();
-      print(careRelation);
+      var result = await ref.read(careRelationControllerProvider.notifier).getAllCareRelations();
       if (result == null || result.isEmpty) return;
       await LocalRepository().save<int>(LocalRepositoryKey.lateCareRelationId, result.first.id);
       setState(() => careRelation = result.first);
@@ -62,7 +61,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Row(
               children: [
                 Text(
-                  careRelation?.patientName ?? "Care Receiver 를 선택해 주세요.",
+                  careRelation?.patientName ?? "함께 혈당을 관리할 사람을 선택해 주세요.",
                   style: TextStyle(
                     fontSize: 16,
                     height: 20 / 16,
@@ -78,7 +77,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         if (careRelation != null)
           Expanded(
-            child: GlucoseScreen(key: ValueKey(careRelation), careGiver: careRelation!),
+            child: GlucoseScreen(key: ValueKey(careRelation), careRelation: careRelation!),
           ),
       ],
     );

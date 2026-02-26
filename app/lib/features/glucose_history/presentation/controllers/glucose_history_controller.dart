@@ -44,7 +44,7 @@ class GlucoseHistoryController extends BaseController<BaseState> {
       "/api/glucose-histories",
       data: {
         "careRelationId": request.careRelationId,
-        "dateTime": request.dateTime.toIso8601String(),
+        "dateTime": request.dateTime.millisecondsSinceEpoch,
         "sgv": request.sgv,
       },
     );

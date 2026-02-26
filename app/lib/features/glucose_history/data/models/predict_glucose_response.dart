@@ -14,12 +14,9 @@ class PredictGlucoseResponse {
   });
 
   factory PredictGlucoseResponse.fromJson(Map<String, dynamic> json) {
-    return PredictGlucoseResponse(
-      id: json['id'],
-      dateTime: DateTime.parse(json['date']),
-      mean: json['mean'],
-      min: json['min'],
-      max: json['max'],
-    );
+    final epochMs = (json['dateTime'] as num).toInt();
+    final dt = DateTime.fromMillisecondsSinceEpoch(epochMs, isUtc: true).toLocal();
+
+    return PredictGlucoseResponse(id: json['id'], dateTime: dt, mean: json['mean'], min: json['min'], max: json['max']);
   }
 }

@@ -27,8 +27,11 @@ class HealthController extends BaseController<BaseState> {
 
   Future<void> _fetch() async {
     var data = await _healthConnector.fetchBloodGlucose();
-    var requests = data.map((point) => HealthUploadRequest.fromPoint(point)).toList();
-    var response = await postRequest("/api/health", data: {"glucoseRequestList": requests});
+    var requests = data
+        .map((point) => HealthUploadRequest.fromPoint(point))
+        .map((request) => request.toJson())
+        .toList();
+    var response = await postRequest("/api/health", data: requests);
 
     if (response.statusCode == 200) {
       LocalRepository().save(LocalRepositoryKey.lastSyncDateTime, DateTime.now().toIso8601String());

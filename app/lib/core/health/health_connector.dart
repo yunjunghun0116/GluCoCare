@@ -56,14 +56,6 @@ class HealthConnector {
       endTime: nowDate,
     );
 
-    for (var point in glucoseData) {
-      print('혈당: ${point.value} ${point.unit}'); // 예: 120 mg/dL
-      var pointData = point.toJson();
-      print("json : ${pointData['value']['numericValue']}");
-      var date = point.dateFrom;
-      print('측정 시간: ${date.toUtc().toIso8601String()}'); // 이 값으로 데이터 저장하면 될 듯
-      //1759386657665
-    }
     return glucoseData;
   }
 }

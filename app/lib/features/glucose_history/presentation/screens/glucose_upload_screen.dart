@@ -134,7 +134,6 @@ class _GlucoseUploadScreenState extends ConsumerState<GlucoseUploadScreen> {
                   var value = int.parse(_valueController.text);
                   if (value < 50) throw Exception();
                   if (value > 400) throw Exception();
-
                   var date = DateTime(_date!.year, _date!.month, _date!.day, _timeOfDay!.hour, _timeOfDay!.minute);
                   var lateCareRelationId = LocalRepository().read(LocalRepositoryKey.lateCareRelationId);
                   var request = CreateGlucoseHistoryRequest(

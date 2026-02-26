@@ -6,6 +6,9 @@ class GlucoseHistoryResponse {
   GlucoseHistoryResponse({required this.id, required this.dateTime, required this.sgv});
 
   factory GlucoseHistoryResponse.fromJson(Map<String, dynamic> json) {
-    return GlucoseHistoryResponse(id: json['id'], dateTime: DateTime.parse(json['date']), sgv: json['sgv']);
+    final epochMs = (json['dateTime'] as num).toInt();
+    final dt = DateTime.fromMillisecondsSinceEpoch(epochMs, isUtc: true).toLocal();
+
+    return GlucoseHistoryResponse(id: json['id'], dateTime: dt, sgv: json['sgv']);
   }
 }

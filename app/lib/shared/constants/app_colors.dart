@@ -49,4 +49,8 @@ abstract final class AppColors {
 
   static const Color blurColor = Color(0x33000000);
   static const Color flushBarBackgroundColor = Color(0xFF222C31);
+
+  static const Color glucoseNormalBandColor = Color(0xFFC8E6C9);
+  static const Color glucoseWarningBandColor = Color(0xFFFFECB3);
+  static const Color glucoseDangerBandColor = Color(0xFFFFCDD2);
 }

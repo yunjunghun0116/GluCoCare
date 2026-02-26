@@ -24,7 +24,7 @@ public class PredictGlucoseWithExerciseUseCase {
         var careRelation = careRelationRepository.findById(careRelationId)
                                                  .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
         careRelation.validateOwnership(memberId);
-        var recentGlucoseHistories = glucoseHistoryRepository.findTop20ByPatientOrderByDateDesc(careRelation.getPatient());
+        var recentGlucoseHistories = glucoseHistoryRepository.findTop20ByPatientOrderByDateTimeDesc(careRelation.getPatient());
         if (recentGlucoseHistories.size() < 20) {
             throw new ApplicationException(ErrorMessage.NEED_MORE_GLUCOSE_HISTORIES);
         }

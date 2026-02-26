@@ -15,7 +15,7 @@ import java.util.List;
 public class HealthGlucoseHistoryBulkRepository {
 
     private static final String UPSERT_SQL = """
-                                             INSERT INTO glucose_history (patient_id, date, sgv, created_at, last_modified_at)
+                                             INSERT INTO glucose_history (patient_id, dateTime, sgv, created_at, last_modified_at)
                                              VALUES (?, ?, ?, ?, ?)
                                              ON DUPLICATE KEY UPDATE
                                                  sgv = VALUES(sgv),
@@ -27,7 +27,7 @@ public class HealthGlucoseHistoryBulkRepository {
     public void upsertBatch(Long patientId, List<HealthGlucoseRequest> glucoseRequestList) {
         jdbcTemplate.batchUpdate(UPSERT_SQL, glucoseRequestList, 500, (ps, r) -> {
             ps.setLong(1, patientId);
-            ps.setTimestamp(2, Timestamp.valueOf(r.date()));
+            ps.setLong(2, r.dateTime());
             ps.setInt(3, r.sgv());
 
             var now = LocalDateTime.now(ZONE);

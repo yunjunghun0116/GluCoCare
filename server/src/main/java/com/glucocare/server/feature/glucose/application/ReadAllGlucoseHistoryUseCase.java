@@ -30,7 +30,7 @@ public class ReadAllGlucoseHistoryUseCase {
             return glucoseHistoryCache.readAllByPatient(patient);
         }
 
-        var result = glucoseHistoryRepository.findAllByPatientOrderByDateDesc(patient)
+        var result = glucoseHistoryRepository.findAllByPatientOrderByDateTimeDesc(patient)
                                              .stream()
                                              .map(this::convertGlucoseHistoryResponse)
                                              .toList();
@@ -39,6 +39,6 @@ public class ReadAllGlucoseHistoryUseCase {
     }
 
     private ReadGlucoseHistoryResponse convertGlucoseHistoryResponse(GlucoseHistory glucoseHistory) {
-        return ReadGlucoseHistoryResponse.of(glucoseHistory.getId(), glucoseHistory.getDate(), glucoseHistory.getSgv());
+        return ReadGlucoseHistoryResponse.of(glucoseHistory.getId(), glucoseHistory.getDateTime(), glucoseHistory.getSgv());
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.List;
 public class DexcomGlucoseHistoryBulkRepository {
 
     private static final String UPSERT_SQL = """
-                                             INSERT INTO glucose_history (patient_id, date, sgv, created_at, last_modified_at)
+                                             INSERT INTO glucose_history (patient_id, dateTime, sgv, created_at, last_modified_at)
                                              VALUES (?, ?, ?, ?, ?)
                                              ON DUPLICATE KEY UPDATE
                                                  sgv = VALUES(sgv),
@@ -28,8 +27,7 @@ public class DexcomGlucoseHistoryBulkRepository {
     public void upsertBatch(Long patientId, List<DexcomGlucoseRequest> glucoseRequestList) {
         jdbcTemplate.batchUpdate(UPSERT_SQL, glucoseRequestList, 500, (ps, r) -> {
             ps.setLong(1, patientId);
-            var timestamp = LocalDateTime.ofInstant(Instant.ofEpochMilli(r.date()), ZONE);
-            ps.setTimestamp(2, Timestamp.valueOf(timestamp));
+            ps.setLong(2, r.date());
             ps.setInt(3, r.sgv());
 
             var now = LocalDateTime.now(ZONE);

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.net.URI;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,12 +29,7 @@ public class PredictClient {
 
     public List<PredictGlucoseResponse> predictFutureGlucose(List<GlucoseHistory> glucoseHistories) {
         var points = glucoseHistories.stream()
-                                     .map(g -> Map.of("dateTime",
-                                                      g.getDate()
-                                                       .atOffset(ZoneOffset.ofHours(9))
-                                                       .toString(),
-                                                      "sgv",
-                                                      g.getSgv()))
+                                     .map(g -> Map.of("dateTime", g.getDateTime(), "sgv", g.getSgv()))
                                      .toList();
 
         var body = Map.of("points", points, "sigma_scale", 1.2, "clip_min", 40, "clip_max", 400);
@@ -59,9 +53,9 @@ public class PredictClient {
         var recentGlucoseHistory = glucoseHistories.getFirst();
         for (var time : timeKeys) {
             var prediction = predictions.get(time.toString());
-            var dateTime = recentGlucoseHistory.getDate()
-                                               .plusMinutes(time);
-            predictGlucoseList.add(PredictGlucoseResponse.of(PREDICT_ID, dateTime, prediction.mean(), prediction.pi90()[0], prediction.pi90()[1]));
+            var timestamp = recentGlucoseHistory.getDateTime() + time * 60_000L;
+
+            predictGlucoseList.add(PredictGlucoseResponse.of(PREDICT_ID, timestamp, prediction.mean(), prediction.pi90()[0], prediction.pi90()[1]));
         }
 
         return predictGlucoseList;
@@ -69,12 +63,7 @@ public class PredictClient {
 
     public List<PredictGlucoseResponse> predictExerciseGlucose(List<GlucoseHistory> glucoseHistories, Integer duration) {
         var points = glucoseHistories.stream()
-                                     .map(g -> Map.of("dateTime",
-                                                      g.getDate()
-                                                       .atOffset(ZoneOffset.ofHours(9))
-                                                       .toString(),
-                                                      "sgv",
-                                                      g.getSgv()))
+                                     .map(g -> Map.of("dateTime", g.getDateTime(), "sgv", g.getSgv()))
                                      .toList();
 
         var body = Map.of("points", points, "planned_duration_min", duration, "planned_mets", 4.0, "exercise_effect_scale", 1.0);
@@ -98,9 +87,8 @@ public class PredictClient {
         var recentGlucoseHistory = glucoseHistories.getFirst();
         for (var time : timeKeys) {
             var prediction = predictions.get(time.toString());
-            var dateTime = recentGlucoseHistory.getDate()
-                                               .plusMinutes(time);
-            predictGlucoseList.add(PredictGlucoseResponse.of(PREDICT_ID, dateTime, prediction.mean(), prediction.pi90()[0], prediction.pi90()[1]));
+            var timestamp = recentGlucoseHistory.getDateTime() + time * 60_000L;
+            predictGlucoseList.add(PredictGlucoseResponse.of(PREDICT_ID, timestamp, prediction.mean(), prediction.pi90()[0], prediction.pi90()[1]));
         }
 
         return predictGlucoseList;

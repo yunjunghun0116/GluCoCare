@@ -66,7 +66,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
     return "${date.month}-${date.day}";
   }
 
-  Future<void> initPredictGlucoseList() async {
+  Future<void> _initPredictGlucoseList() async {
     late int careRelationId;
     try {
       careRelationId = LocalRepository().read<int>(LocalRepositoryKey.lateCareRelationId);
@@ -129,7 +129,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.jumpTo(_controller.position.maxScrollExtent);
-      initPredictGlucoseList();
+      _initPredictGlucoseList();
     });
   }
 

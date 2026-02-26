@@ -5,6 +5,7 @@ import 'package:app/shared/utils/today_glucose.dart';
 
 final class GlucoseUtil {
   static TodayGlucose? getLastDateGlucoseData(List<GlucoseHistoryResponse> lists) {
+    if (lists.isEmpty) return null;
     var today = lists.last.dateTime;
     var filteredList = lists
         .where((glucoseHistory) => isSameDate(glucoseHistory.dateTime, today))
@@ -30,8 +31,7 @@ final class GlucoseUtil {
     return true;
   }
 
-  static DateTime getLocalDate(int date) {
-    var dateTime = DateTime.fromMillisecondsSinceEpoch(date, isUtc: true).toLocal();
-    return dateTime;
+  static DateTime getLocalDate(int dateTime) {
+    return DateTime.fromMillisecondsSinceEpoch(dateTime, isUtc: true).toLocal();
   }
 }

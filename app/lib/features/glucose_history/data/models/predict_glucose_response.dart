@@ -1,3 +1,5 @@
+import '../../../../shared/utils/glucose_util.dart';
+
 class PredictGlucoseResponse {
   final int id;
   final DateTime dateTime;
@@ -15,7 +17,7 @@ class PredictGlucoseResponse {
 
   factory PredictGlucoseResponse.fromJson(Map<String, dynamic> json) {
     final epochMs = (json['dateTime'] as num).toInt();
-    final dt = DateTime.fromMillisecondsSinceEpoch(epochMs, isUtc: true).toLocal();
+    final dt = GlucoseUtil.getLocalDate(epochMs);
 
     return PredictGlucoseResponse(id: json['id'], dateTime: dt, mean: json['mean'], min: json['min'], max: json['max']);
   }

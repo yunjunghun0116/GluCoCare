@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../care/data/models/care_relation_response.dart';
 import '../../data/models/glucose_history_response.dart';
+import '../controllers/health_controller.dart';
 import '../providers.dart';
 
 class GlucoseScreen extends ConsumerStatefulWidget {
@@ -26,6 +27,12 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await setGlucoseHistories();
+
+      ref.listen<HealthState>(healthControllerProvider, (previous, next) {
+        if (next.lastSyncTime != null && next.lastSyncTime != previous?.lastSyncTime) {
+          setGlucoseHistories();
+        }
+      });
     });
   }
 

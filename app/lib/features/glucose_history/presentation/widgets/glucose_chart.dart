@@ -40,9 +40,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
   DateTime get minDate => widget.records.first.dateTime.subtract(Duration(hours: _interval.toInt()));
 
-  DateTime get maxDate => widget.records.last.dateTime.add(Duration(hours: 3)).difference(DateTime.now()).isNegative
-      ? widget.records.last.dateTime.add(Duration(hours: 2))
-      : DateTime.now();
+  DateTime get maxDate => widget.records.last.dateTime.add(Duration(minutes: 100));
 
   double? _cachedChartWidth;
 
@@ -102,6 +100,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
         normalPredictList: _normalPredictGlucoseList,
         exercisePredictList: _exercisePredictGlucoseList,
       );
+      _cachedChartWidth = null;
       setState(() => _isPredictLoading = false);
     }
   }
@@ -162,25 +161,28 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 50,
+                width: 40,
                 height: 400,
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: _yAxis.labels
-                            .map(
-                              (y) => Text(
-                                '$y',
-                                style: TextStyle(fontSize: 12, height: 20 / 12, color: AppColors.fontGray600Color),
-                              ),
-                            )
-                            .toList(),
-                      ),
+                child: SfCartesianChart(
+                  margin: EdgeInsets.only(top: 10, bottom: 40),
+                  plotAreaBorderWidth: 0,
+                  plotAreaBackgroundColor: Colors.transparent,
+                  primaryXAxis: DateTimeAxis(isVisible: false, minimum: minDate, maximum: maxDate),
+                  primaryYAxis: NumericAxis(
+                    minimum: _yAxis.min.toDouble(),
+                    maximum: _yAxis.max.toDouble(),
+                    interval: _yAxis.interval.toDouble(),
+                    axisLine: const AxisLine(width: 0),
+                    majorTickLines: const MajorTickLines(size: 0),
+                    majorGridLines: const MajorGridLines(width: 0),
+                    labelStyle: TextStyle(fontSize: 12, color: AppColors.fontGray600Color),
+                  ),
+                  series: <CartesianSeries>[
+                    LineSeries<Map<String, dynamic>, DateTime>(
+                      dataSource: const [],
+                      xValueMapper: (data, _) => data['x'] as DateTime,
+                      yValueMapper: (data, _) => data['y'] as double,
                     ),
-                    SizedBox(height: 30),
                   ],
                 ),
               ),
@@ -269,7 +271,6 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                               trackballBehavior: _isInPredictionZone ? _trackballHidden : _trackballNormal,
                               onTrackballPositionChanging: (TrackballArgs args) {
                                 var info = args.chartPointInfo;
-
                                 if (info.seriesIndex != 0) {
                                   if (!_isInPredictionZone) {
                                     setState(() => _isInPredictionZone = true);
@@ -277,11 +278,9 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                                   }
                                   return;
                                 }
-
                                 if (_isInPredictionZone) {
                                   setState(() => _isInPredictionZone = false);
                                 }
-
                                 var idx = info.dataPointIndex;
                                 var xPosition = info.xPosition;
                                 if (_tooltipNotifier.value?.index == idx) return;
@@ -314,7 +313,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                                   xValueMapper: (dto, _) => dto.dateTime,
                                   yValueMapper: (dto, _) => dto.mean,
                                   width: 3,
-                                  color: Color(0xFF2F8F9D),
+                                  color: AppColors.doNothingColor,
                                   markerSettings: MarkerSettings(isVisible: false),
                                   name: "휴식 평균",
                                 ),
@@ -323,7 +322,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                                   xValueMapper: (dto, _) => dto.dateTime,
                                   yValueMapper: (dto, _) => dto.mean,
                                   width: 3,
-                                  color: Colors.orange,
+                                  color: AppColors.doExerciseColor,
                                   markerSettings: MarkerSettings(isVisible: false),
                                   name: "운동 평균",
                                 ),
@@ -361,7 +360,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(width: 30, height: 3, color: Colors.orange),
+                              Container(width: 30, height: 3, color: AppColors.doExerciseColor),
                               SizedBox(width: 10),
                               Text(
                                 "운동",
@@ -372,7 +371,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(width: 30, height: 3, color: Color(0xFF2F8F9D)),
+                              Container(width: 30, height: 3, color: AppColors.doNothingColor),
                               SizedBox(width: 10),
                               Text(
                                 "휴식",

@@ -53,4 +53,7 @@ abstract final class AppColors {
   static const Color glucoseNormalBandColor = Color(0xFFC8E6C9);
   static const Color glucoseWarningBandColor = Color(0xFFFFECB3);
   static const Color glucoseDangerBandColor = Color(0xFFFFCDD2);
+
+  static const Color doNothingColor = Color(0xFF7B61FF);
+  static const Color doExerciseColor = Color(0xFFFF4D4D);
 }

@@ -32,6 +32,13 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
   @override
   void initState() {
     super.initState();
+    _copyRecognizer = TapGestureRecognizer()
+      ..onTap = () {
+        var url = getDexcomServerUrl();
+        Clipboard.setData(ClipboardData(text: url));
+        if (!mounted) return;
+        LocalUtil.showMessage(context, message: "URL이 클립보드에 복사됐습니다.");
+      };
     initializePatient();
   }
 
@@ -45,13 +52,6 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
         _nameController.text = patientResponse?.name ?? "";
       }
 
-      _copyRecognizer = TapGestureRecognizer()
-        ..onTap = () async {
-          var url = getDexcomServerUrl();
-          await Clipboard.setData(ClipboardData(text: url));
-          if (!mounted) return;
-          LocalUtil.showMessage(context, message: "URL이 클립보드에 복사됐습니다.");
-        };
       setState(() {});
     });
   }

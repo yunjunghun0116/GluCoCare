@@ -7,7 +7,18 @@ import 'package:app/shared/constants/local_repository_key.dart';
 import '../../../../core/base/base_controller.dart';
 import '../../../../core/health/health_connector.dart';
 
-class HealthController extends BaseController<BaseState> {
+class HealthState extends BaseState {
+  final DateTime? lastSyncTime;
+
+  const HealthState({super.isLoading, this.lastSyncTime});
+
+  @override
+  HealthState copyWith({bool? isLoading, DateTime? lastSyncTime}) {
+    return HealthState(isLoading: isLoading ?? this.isLoading, lastSyncTime: lastSyncTime ?? this.lastSyncTime);
+  }
+}
+
+class HealthController extends BaseController<HealthState> {
   final HealthConnector _healthConnector;
   Timer? _timer;
 
@@ -26,7 +37,10 @@ class HealthController extends BaseController<BaseState> {
   }
 
   Future<void> _fetch() async {
+    var nowDate = DateTime.now();
     var data = await _healthConnector.fetchBloodGlucose();
+    if (data.isEmpty) return;
+
     var requests = data
         .map((point) => HealthUploadRequest.fromPoint(point))
         .map((request) => request.toJson())
@@ -34,7 +48,8 @@ class HealthController extends BaseController<BaseState> {
     var response = await postRequest("/api/health", data: requests);
 
     if (response.statusCode == 200) {
-      LocalRepository().save(LocalRepositoryKey.lastSyncDateTime, DateTime.now().toIso8601String());
+      LocalRepository().save(LocalRepositoryKey.lastSyncDateTime, nowDate);
+      state = state.copyWith(lastSyncTime: nowDate);
     }
   }
 

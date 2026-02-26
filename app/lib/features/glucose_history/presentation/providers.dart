@@ -11,8 +11,8 @@ final glucoseHistoryControllerProvider = StateNotifierProvider<GlucoseHistoryCon
   return GlucoseHistoryController(BaseState(), dio);
 });
 
-final healthControllerProvider = StateNotifierProvider<HealthController, BaseState>((ref) {
+final healthControllerProvider = StateNotifierProvider<HealthController, HealthState>((ref) {
   var dio = ref.read(dioProvider);
   var healthConnector = HealthConnector();
-  return HealthController(BaseState(), dio, healthConnector: healthConnector);
+  return HealthController(HealthState(), dio, healthConnector: healthConnector);
 });

@@ -36,6 +36,8 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
 
   void logOut() async {
     LocalRepository().delete(LocalRepositoryKey.accessToken);
+    LocalRepository().delete(LocalRepositoryKey.lateCareRelationId);
+    LocalRepository().delete(LocalRepositoryKey.lastSyncDateTime);
     await SecureRepository().deleteRefreshToken();
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => SignInScreen()), (route) => false);

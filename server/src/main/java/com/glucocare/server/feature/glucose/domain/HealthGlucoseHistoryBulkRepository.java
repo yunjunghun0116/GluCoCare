@@ -15,7 +15,7 @@ import java.util.List;
 public class HealthGlucoseHistoryBulkRepository {
 
     private static final String UPSERT_SQL = """
-                                             INSERT INTO glucose_history (patient_id, dateTime, sgv, created_at, last_modified_at)
+                                             INSERT INTO glucose_history (patient_id, date_time, sgv, created_at, last_modified_at)
                                              VALUES (?, ?, ?, ?, ?)
                                              ON DUPLICATE KEY UPDATE
                                                  sgv = VALUES(sgv),

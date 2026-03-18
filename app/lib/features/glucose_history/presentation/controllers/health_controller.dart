@@ -48,7 +48,7 @@ class HealthController extends BaseController<HealthState> {
     var response = await postRequest("/api/health", data: requests);
 
     if (response.statusCode == 200) {
-      LocalRepository().save(LocalRepositoryKey.lastSyncDateTime, nowDate);
+      LocalRepository().save<int>(LocalRepositoryKey.lastSyncDateTime, nowDate.millisecondsSinceEpoch);
       state = state.copyWith(lastSyncTime: nowDate);
     }
   }

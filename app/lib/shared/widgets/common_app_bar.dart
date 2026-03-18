@@ -5,10 +5,11 @@ import '../constants/app_colors.dart';
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final String? title;
+  final bool? centerTitle;
   final List<Widget>? actions;
   final bool showLeading;
 
-  const CommonAppBar({super.key, this.onBack, this.title, this.actions, this.showLeading = true});
+  const CommonAppBar({super.key, this.onBack, this.title, this.centerTitle, this.actions, this.showLeading = true});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +17,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: AppColors.fontGray800Color,
       backgroundColor: AppColors.backgroundColor,
       surfaceTintColor: AppColors.backgroundColor,
+      centerTitle: centerTitle,
       leadingWidth: 48,
       automaticallyImplyLeading: false,
       leading: showLeading

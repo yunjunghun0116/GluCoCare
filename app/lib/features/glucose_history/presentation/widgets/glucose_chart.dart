@@ -14,11 +14,14 @@ import '../../../../core/data/repositories/local_repository.dart';
 import '../../../../core/exceptions/custom_exception.dart';
 import '../../../../shared/constants/local_repository_key.dart';
 import 'glucose_chart_tooltip.dart';
+import 'glucose_exercise_container.dart';
 
 class GlucoseChart extends ConsumerStatefulWidget {
   final List<GlucoseHistoryResponse> records;
+  final VoidCallback onRefresh;
+  final bool isLoading;
 
-  const GlucoseChart({super.key, required this.records});
+  const GlucoseChart({super.key, required this.records, required this.onRefresh, required this.isLoading});
 
   @override
   ConsumerState<GlucoseChart> createState() => _GlucoseChartState();
@@ -26,8 +29,8 @@ class GlucoseChart extends ConsumerStatefulWidget {
 
 class _GlucoseChartState extends ConsumerState<GlucoseChart> {
   final ScrollController _controller = ScrollController();
-  final List<PredictGlucoseResponse> _normalPredictGlucoseList = [];
-  final List<PredictGlucoseResponse> _exercisePredictGlucoseList = [];
+  List<PredictGlucoseResponse> _normalPredictGlucoseList = [];
+  List<PredictGlucoseResponse> _exercisePredictGlucoseList = [];
 
   late final TrackballBehavior _trackballNormal;
   late final TrackballBehavior _trackballHidden;
@@ -37,6 +40,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
   double _interval = 1;
   final _tooltipNotifier = ValueNotifier<({double xPosition, int index})?>(null);
   late GlucoseChartYAxis _yAxis;
+  late PredictGlucoseResponse _lastGlucoseRecord;
 
   DateTime get minDate => widget.records.first.dateTime.subtract(Duration(hours: _interval.toInt()));
 
@@ -65,33 +69,11 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
   }
 
   Future<void> _initPredictGlucoseList() async {
-    late int careRelationId;
+    var careRelationId = await _readCareRelationId();
+    if (careRelationId == null) return;
     try {
-      careRelationId = LocalRepository().read<int>(LocalRepositoryKey.lateCareRelationId);
-    } on CustomException catch (_) {
-      var result = await ref.read(careRelationControllerProvider.notifier).getAllCareRelations();
-      if (result == null || result.isEmpty) return;
-      await LocalRepository().save<int>(LocalRepositoryKey.lateCareRelationId, result.first.id);
-      careRelationId = result.first.id;
-    }
-    try {
-      var normalPredictGlucoseList = await ref
-          .read(glucoseHistoryControllerProvider.notifier)
-          .getPredictGlucose(careRelationId);
-      if (normalPredictGlucoseList != null && normalPredictGlucoseList.isNotEmpty) {
-        _normalPredictGlucoseList
-          ..clear()
-          ..addAll(normalPredictGlucoseList);
-      }
-
-      var exercisePredictGlucoseList = await ref
-          .read(glucoseHistoryControllerProvider.notifier)
-          .getPredictGlucoseWithExercise(careRelationId);
-      if (exercisePredictGlucoseList != null && exercisePredictGlucoseList.isNotEmpty) {
-        _exercisePredictGlucoseList
-          ..clear()
-          ..addAll(exercisePredictGlucoseList);
-      }
+      await _fetchNormalPredict(careRelationId);
+      await _fetchExercisePredict(careRelationId, false);
     } catch (e) {
       throw CustomException(ExceptionMessage.internalServerError);
     } finally {
@@ -102,6 +84,41 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
       );
       _cachedChartWidth = null;
       setState(() => _isPredictLoading = false);
+    }
+  }
+
+  Future<int?> _readCareRelationId() async {
+    late int careRelationId;
+    try {
+      careRelationId = LocalRepository().read<int>(LocalRepositoryKey.lateCareRelationId);
+    } on CustomException catch (_) {
+      var result = await ref.read(careRelationControllerProvider.notifier).getAllCareRelations();
+      if (result == null || result.isEmpty) return null;
+      await LocalRepository().save<int>(LocalRepositoryKey.lateCareRelationId, result.first.id);
+      careRelationId = result.first.id;
+    }
+    return careRelationId;
+  }
+
+  Future<void> _fetchNormalPredict(int careRelationId) async {
+    var normalPredictGlucoseList = await ref
+        .read(glucoseHistoryControllerProvider.notifier)
+        .getPredictGlucose(careRelationId);
+    if (normalPredictGlucoseList != null && normalPredictGlucoseList.isNotEmpty) {
+      _normalPredictGlucoseList = [_lastGlucoseRecord, ...normalPredictGlucoseList];
+    }
+  }
+
+  Future<void> _fetchExercisePredict(int careRelationId, bool needSetState) async {
+    var met = ref.read(exerciseManagerProvider).met;
+    var exercisePredictGlucoseList = await ref
+        .read(glucoseHistoryControllerProvider.notifier)
+        .getPredictGlucoseWithExercise(careRelationId, met);
+    if (exercisePredictGlucoseList != null && exercisePredictGlucoseList.isNotEmpty) {
+      _exercisePredictGlucoseList = [_lastGlucoseRecord, ...exercisePredictGlucoseList];
+    }
+    if (needSetState) {
+      setState(() {});
     }
   }
 
@@ -124,6 +141,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
       lineType: TrackballLineType.vertical,
       tooltipDisplayMode: TrackballDisplayMode.none,
     );
+    _lastGlucoseRecord = PredictGlucoseResponse.fromGlucoseHistoryResponse(widget.records.last);
     _yAxis = GlucoseChartYAxis.calculate(records: widget.records);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -141,265 +159,43 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      physics: ClampingScrollPhysics(),
+    ref.listen(exerciseManagerProvider, (previous, next) async {
+      if (previous == next) return;
+      var careRelationId = await _readCareRelationId();
+      if (careRelationId == null) return;
+      _fetchExercisePredict(careRelationId, true);
+    });
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Text(
-            "혈당 (mg/dL)",
-            style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.mainColor, fontWeight: FontWeight.bold),
-          ),
-        ),
-        Container(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(children: [1.0, 2.0, 3.0, 6.0].map((number) => getIntervalButton(number)).toList()),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 40,
-                height: 400,
-                child: SfCartesianChart(
-                  margin: EdgeInsets.only(top: 10, bottom: 40),
-                  plotAreaBorderWidth: 0,
-                  plotAreaBackgroundColor: Colors.transparent,
-                  primaryXAxis: DateTimeAxis(isVisible: false, minimum: minDate, maximum: maxDate),
-                  primaryYAxis: NumericAxis(
-                    minimum: _yAxis.min.toDouble(),
-                    maximum: _yAxis.max.toDouble(),
-                    interval: _yAxis.interval.toDouble(),
-                    axisLine: const AxisLine(width: 0),
-                    majorTickLines: const MajorTickLines(size: 0),
-                    majorGridLines: const MajorGridLines(width: 0),
-                    labelStyle: TextStyle(fontSize: 12, color: AppColors.fontGray600Color),
-                  ),
-                  series: <CartesianSeries>[
-                    LineSeries<Map<String, dynamic>, DateTime>(
-                      dataSource: const [],
-                      xValueMapper: (data, _) => data['x'] as DateTime,
-                      yValueMapper: (data, _) => data['y'] as double,
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    SingleChildScrollView(
-                      controller: _controller,
-                      physics: ClampingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      child: SizedBox(
-                        width: chartWidth,
-                        height: 400,
-                        child: Stack(
-                          children: [
-                            SfCartesianChart(
-                              margin: EdgeInsets.symmetric(vertical: 10),
-                              primaryXAxis: DateTimeAxis(
-                                minimum: minDate,
-                                maximum: maxDate,
-                                interval: _interval,
-                                intervalType: DateTimeIntervalType.hours,
-                                labelAlignment: LabelAlignment.center,
-                                labelPosition: ChartDataLabelPosition.outside,
-                                labelIntersectAction: AxisLabelIntersectAction.hide,
-                                axisLabelFormatter: (AxisLabelRenderDetails details) {
-                                  var date = DateTime.fromMillisecondsSinceEpoch(details.value as int);
-                                  var key = getKey(date);
-                                  var isAlreadyShown = _labelShowSet.contains(key);
-
-                                  if (!isAlreadyShown) {
-                                    _labelShowSet.add(key);
-                                    var monthDayString = DateFormat('MM.dd').format(date);
-                                    return ChartAxisLabel(
-                                      monthDayString,
-                                      TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.fontGray800Color,
-                                        fontWeight: FontWeight.bold,
-                                        height: 20 / 12,
-                                      ),
-                                    );
-                                  }
-                                  return ChartAxisLabel(
-                                    "${date.hour < 12 ? "오전" : "오후"} ${date.hour > 12 ? date.hour - 12 : date.hour}시",
-                                    TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.fontGray800Color,
-                                      fontWeight: FontWeight.bold,
-                                      height: 20 / 12,
-                                    ),
-                                  );
-                                },
-                              ),
-                              primaryYAxis: NumericAxis(
-                                minimum: _yAxis.min.toDouble(),
-                                maximum: _yAxis.max.toDouble(),
-                                interval: _yAxis.interval.toDouble(),
-                                axisLine: const AxisLine(width: 0),
-                                labelStyle: const TextStyle(fontSize: 0),
-                                majorTickLines: const MajorTickLines(size: 0),
-                                plotBands: [
-                                  PlotBand(
-                                    start: 70,
-                                    end: 140,
-                                    color: AppColors.glucoseNormalBandColor.withValues(alpha: 0.4),
-                                  ),
-                                  PlotBand(
-                                    start: 140,
-                                    end: 180,
-                                    color: AppColors.glucoseWarningBandColor.withValues(alpha: 0.4),
-                                  ),
-                                  PlotBand(
-                                    start: 180,
-                                    end: _yAxis.max.toDouble(),
-                                    color: AppColors.glucoseDangerBandColor.withValues(alpha: 0.4),
-                                  ),
-                                  PlotBand(
-                                    start: _yAxis.min.toDouble(),
-                                    end: 70,
-                                    color: AppColors.glucoseDangerBandColor.withValues(alpha: 0.4),
-                                  ),
-                                ],
-                              ),
-                              tooltipBehavior: TooltipBehavior(enable: false),
-                              trackballBehavior: _isInPredictionZone ? _trackballHidden : _trackballNormal,
-                              onTrackballPositionChanging: (TrackballArgs args) {
-                                var info = args.chartPointInfo;
-                                if (info.seriesIndex != 0) {
-                                  if (!_isInPredictionZone) {
-                                    setState(() => _isInPredictionZone = true);
-                                    _tooltipNotifier.value = null;
-                                  }
-                                  return;
-                                }
-                                if (_isInPredictionZone) {
-                                  setState(() => _isInPredictionZone = false);
-                                }
-                                var idx = info.dataPointIndex;
-                                var xPosition = info.xPosition;
-                                if (_tooltipNotifier.value?.index == idx) return;
-
-                                _tooltipNotifier.value = (xPosition: xPosition!, index: idx!);
-                              },
-                              series: <CartesianSeries>[
-                                LineSeries<GlucoseHistoryResponse, DateTime>(
-                                  dataSource: widget.records,
-                                  xValueMapper: (dto, _) => dto.dateTime,
-                                  yValueMapper: (dto, _) => dto.sgv,
-                                  width: 3,
-                                  pointColorMapper: (dto, _) {
-                                    var sgv = dto.sgv;
-                                    if (sgv >= 180) {
-                                      return AppColors.glucoseDangerColor;
-                                    }
-                                    if (sgv >= 140) {
-                                      return AppColors.glucoseWarningColor;
-                                    }
-                                    if (sgv < 70) {
-                                      return AppColors.glucoseDangerColor;
-                                    }
-                                    return AppColors.glucoseNormalColor;
-                                  },
-                                  markerSettings: MarkerSettings(isVisible: false),
-                                ),
-                                LineSeries<PredictGlucoseResponse, DateTime>(
-                                  dataSource: _normalPredictGlucoseList,
-                                  xValueMapper: (dto, _) => dto.dateTime,
-                                  yValueMapper: (dto, _) => dto.mean,
-                                  width: 3,
-                                  color: AppColors.doNothingColor,
-                                  markerSettings: MarkerSettings(isVisible: false),
-                                  name: "휴식 평균",
-                                ),
-                                LineSeries<PredictGlucoseResponse, DateTime>(
-                                  dataSource: _exercisePredictGlucoseList,
-                                  xValueMapper: (dto, _) => dto.dateTime,
-                                  yValueMapper: (dto, _) => dto.mean,
-                                  width: 3,
-                                  color: AppColors.doExerciseColor,
-                                  markerSettings: MarkerSettings(isVisible: false),
-                                  name: "운동 평균",
-                                ),
-                              ],
-                            ),
-                            ValueListenableBuilder(
-                              valueListenable: _tooltipNotifier,
-                              builder: (context, value, _) {
-                                if (value == null) return const SizedBox.shrink();
-                                return GlucoseChartTooltip(
-                                  record: widget.records[value.index],
-                                  xPosition: value.xPosition,
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "예상 혈당",
-                            style: TextStyle(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              color: AppColors.mainColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(width: 30, height: 3, color: AppColors.doExerciseColor),
-                              SizedBox(width: 10),
-                              Text(
-                                "운동",
-                                style: TextStyle(fontSize: 12, height: 14 / 12, color: AppColors.mainColor),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(width: 30, height: 3, color: AppColors.doNothingColor),
-                              SizedBox(width: 10),
-                              Text(
-                                "휴식",
-                                style: TextStyle(fontSize: 12, height: 14 / 12, color: AppColors.mainColor),
-                              ),
-                            ],
-                          ),
-                          if (_isPredictLoading)
-                            Container(
-                              margin: const EdgeInsets.only(top: 10),
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.mainColor),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              ...([1.0, 2.0, 3.0, 6.0].map((number) => _getIntervalButton(number)).toList()),
+              Spacer(),
+              GestureDetector(
+                onTap: widget.isLoading ? null : widget.onRefresh, // 로딩중 탭 막기
+                child: widget.isLoading
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.mainColor),
+                      )
+                    : Icon(Icons.refresh, color: AppColors.mainColor),
               ),
             ],
           ),
         ),
+        _getChart(),
+        GlucoseExerciseContainer(),
+        SizedBox(height: 50),
       ],
     );
   }
 
-  Widget getIntervalButton(double value) {
+  Widget _getIntervalButton(double value) {
     var isSelected = _interval == value;
 
     return GestureDetector(
@@ -430,6 +226,246 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
             color: isSelected ? AppColors.whiteColor : AppColors.mainColor,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _getChart() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 40,
+            height: 400,
+            child: SfCartesianChart(
+              margin: EdgeInsets.only(top: 10, bottom: 40),
+              plotAreaBorderWidth: 0,
+              plotAreaBackgroundColor: Colors.transparent,
+              primaryXAxis: DateTimeAxis(isVisible: false, minimum: minDate, maximum: maxDate),
+              primaryYAxis: NumericAxis(
+                minimum: _yAxis.min.toDouble(),
+                maximum: _yAxis.max.toDouble(),
+                interval: _yAxis.interval.toDouble(),
+                axisLine: const AxisLine(width: 0),
+                majorTickLines: const MajorTickLines(size: 0),
+                majorGridLines: const MajorGridLines(width: 0),
+                labelStyle: TextStyle(fontSize: 12, color: AppColors.fontGray600Color),
+              ),
+              series: <CartesianSeries>[
+                LineSeries<Map<String, dynamic>, DateTime>(
+                  dataSource: const [],
+                  xValueMapper: (data, _) => data['x'] as DateTime,
+                  yValueMapper: (data, _) => data['y'] as double,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  controller: _controller,
+                  physics: ClampingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: chartWidth,
+                    height: 400,
+                    child: Stack(
+                      children: [
+                        SfCartesianChart(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          primaryXAxis: DateTimeAxis(
+                            minimum: minDate,
+                            maximum: maxDate,
+                            interval: _interval,
+                            intervalType: DateTimeIntervalType.hours,
+                            labelAlignment: LabelAlignment.center,
+                            labelPosition: ChartDataLabelPosition.outside,
+                            labelIntersectAction: AxisLabelIntersectAction.hide,
+                            axisLabelFormatter: (AxisLabelRenderDetails details) {
+                              var date = DateTime.fromMillisecondsSinceEpoch(details.value as int);
+                              var key = getKey(date);
+                              var isAlreadyShown = _labelShowSet.contains(key);
+
+                              if (!isAlreadyShown) {
+                                _labelShowSet.add(key);
+                                var monthDayString = DateFormat('MM.dd').format(date);
+                                return ChartAxisLabel(
+                                  monthDayString,
+                                  TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.fontGray800Color,
+                                    fontWeight: FontWeight.bold,
+                                    height: 20 / 12,
+                                  ),
+                                );
+                              }
+                              return ChartAxisLabel(
+                                "${date.hour < 12 ? "오전" : "오후"} ${date.hour > 12 ? date.hour - 12 : date.hour}시",
+                                TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.fontGray800Color,
+                                  fontWeight: FontWeight.bold,
+                                  height: 20 / 12,
+                                ),
+                              );
+                            },
+                          ),
+                          primaryYAxis: NumericAxis(
+                            minimum: _yAxis.min.toDouble(),
+                            maximum: _yAxis.max.toDouble(),
+                            interval: _yAxis.interval.toDouble(),
+                            axisLine: const AxisLine(width: 0),
+                            labelStyle: const TextStyle(fontSize: 0),
+                            majorTickLines: const MajorTickLines(size: 0),
+                            plotBands: [
+                              PlotBand(
+                                start: 70,
+                                end: 140,
+                                color: AppColors.glucoseNormalBandColor.withValues(alpha: 0.4),
+                              ),
+                              PlotBand(
+                                start: 140,
+                                end: 180,
+                                color: AppColors.glucoseWarningBandColor.withValues(alpha: 0.4),
+                              ),
+                              PlotBand(
+                                start: 180,
+                                end: _yAxis.max.toDouble(),
+                                color: AppColors.glucoseDangerBandColor.withValues(alpha: 0.4),
+                              ),
+                              PlotBand(
+                                start: _yAxis.min.toDouble(),
+                                end: 70,
+                                color: AppColors.glucoseDangerBandColor.withValues(alpha: 0.4),
+                              ),
+                            ],
+                          ),
+                          tooltipBehavior: TooltipBehavior(enable: false),
+                          trackballBehavior: _isInPredictionZone ? _trackballHidden : _trackballNormal,
+                          onTrackballPositionChanging: (TrackballArgs args) {
+                            var info = args.chartPointInfo;
+                            if (info.seriesIndex != 0) {
+                              if (!_isInPredictionZone) {
+                                setState(() => _isInPredictionZone = true);
+                                _tooltipNotifier.value = null;
+                              }
+                              return;
+                            }
+                            if (_isInPredictionZone) {
+                              setState(() => _isInPredictionZone = false);
+                            }
+                            var idx = info.dataPointIndex;
+                            var xPosition = info.xPosition;
+                            if (_tooltipNotifier.value?.index == idx) return;
+
+                            _tooltipNotifier.value = (xPosition: xPosition!, index: idx!);
+                          },
+                          series: <CartesianSeries>[
+                            LineSeries<GlucoseHistoryResponse, DateTime>(
+                              dataSource: widget.records,
+                              xValueMapper: (dto, _) => dto.dateTime,
+                              yValueMapper: (dto, _) => dto.sgv,
+                              width: 3,
+                              pointColorMapper: (dto, _) {
+                                var sgv = dto.sgv;
+                                if (sgv >= 180) {
+                                  return AppColors.glucoseDangerColor;
+                                }
+                                if (sgv >= 140) {
+                                  return AppColors.glucoseWarningColor;
+                                }
+                                if (sgv < 70) {
+                                  return AppColors.glucoseDangerColor;
+                                }
+                                return AppColors.glucoseNormalColor;
+                              },
+                              markerSettings: MarkerSettings(isVisible: false),
+                            ),
+                            LineSeries<PredictGlucoseResponse, DateTime>(
+                              dataSource: _normalPredictGlucoseList,
+                              xValueMapper: (dto, _) => dto.dateTime,
+                              yValueMapper: (dto, _) => dto.mean,
+                              width: 3,
+                              color: AppColors.doNothingColor,
+                              markerSettings: MarkerSettings(isVisible: false),
+                              name: "휴식 평균",
+                            ),
+                            LineSeries<PredictGlucoseResponse, DateTime>(
+                              dataSource: _exercisePredictGlucoseList,
+                              xValueMapper: (dto, _) => dto.dateTime,
+                              yValueMapper: (dto, _) => dto.mean,
+                              width: 3,
+                              color: AppColors.doExerciseColor,
+                              markerSettings: MarkerSettings(isVisible: false),
+                              name: "운동 평균",
+                            ),
+                          ],
+                        ),
+                        ValueListenableBuilder(
+                          valueListenable: _tooltipNotifier,
+                          builder: (context, value, _) {
+                            if (value == null) return const SizedBox.shrink();
+                            return GlucoseChartTooltip(record: widget.records[value.index], xPosition: value.xPosition);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        "예상 혈당",
+                        style: TextStyle(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: AppColors.mainColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(width: 30, height: 3, color: AppColors.doExerciseColor),
+                          SizedBox(width: 10),
+                          Text(
+                            "운동",
+                            style: TextStyle(fontSize: 12, height: 14 / 12, color: AppColors.mainColor),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(width: 30, height: 3, color: AppColors.doNothingColor),
+                          SizedBox(width: 10),
+                          Text(
+                            "휴식",
+                            style: TextStyle(fontSize: 12, height: 14 / 12, color: AppColors.mainColor),
+                          ),
+                        ],
+                      ),
+                      if (_isPredictLoading)
+                        Container(
+                          margin: const EdgeInsets.only(top: 10),
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.mainColor),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

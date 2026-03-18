@@ -44,8 +44,8 @@ class HealthConnector {
     var nowDate = DateTime.now();
     late DateTime startDate;
     try {
-      var lastSyncDateTime = LocalRepository().read<String>(LocalRepositoryKey.lastSyncDateTime);
-      startDate = DateTime.parse(lastSyncDateTime);
+      var lastSyncDateTime = LocalRepository().read<int>(LocalRepositoryKey.lastSyncDateTime);
+      startDate = DateTime.fromMillisecondsSinceEpoch(lastSyncDateTime);
     } catch (e) {
       startDate = nowDate.subtract(Duration(days: 90));
     }

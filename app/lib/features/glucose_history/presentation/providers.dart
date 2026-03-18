@@ -5,6 +5,12 @@ import 'package:app/features/glucose_history/presentation/controllers/glucose_hi
 import 'package:app/features/glucose_history/presentation/controllers/health_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/constants/my_exercise.dart';
+import 'controllers/exercise_manager.dart';
+
+// --- Exercise Manager Provider ---
+final exerciseManagerProvider = StateNotifierProvider<ExerciseManager, MyExercise>((ref) => ExerciseManager());
+
 // --- Controller Providers ---
 final glucoseHistoryControllerProvider = StateNotifierProvider<GlucoseHistoryController, BaseState>((ref) {
   var dio = ref.read(dioProvider);

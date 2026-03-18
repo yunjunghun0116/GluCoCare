@@ -19,29 +19,29 @@ class GlucoseScreen extends ConsumerStatefulWidget {
 }
 
 class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
+  bool _isLoading = false;
   int _tapIndex = 0;
   List<GlucoseHistoryResponse> _records = [];
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await setGlucoseHistories();
-
-      ref.listen<HealthState>(healthControllerProvider, (previous, next) {
-        if (next.lastSyncTime != null && next.lastSyncTime != previous?.lastSyncTime) {
-          setGlucoseHistories();
-        }
-      });
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => setGlucoseHistories());
   }
 
   Future<void> setGlucoseHistories() async {
-    var result = await ref
-        .read(glucoseHistoryControllerProvider.notifier)
-        .getAllGlucoseHistories(widget.careRelation.id);
-    if (result == null || result.isEmpty) return;
-    setState(() => _records = result);
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+    try {
+      var result = await ref
+          .read(glucoseHistoryControllerProvider.notifier)
+          .getAllGlucoseHistories(widget.careRelation.id);
+
+      if (result == null || result.isEmpty) return;
+      setState(() => _records = result);
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   Widget getScreen() {
@@ -61,7 +61,12 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
     }
     switch (_tapIndex) {
       case 0:
-        return GlucoseChart(records: _records);
+        return GlucoseChart(
+          key: ValueKey(_records.length),
+          records: _records,
+          onRefresh: setGlucoseHistories,
+          isLoading: _isLoading,
+        );
       case 1:
       default:
         return GlucoseStatisticalInformation(careGiver: widget.careRelation, records: _records);
@@ -70,6 +75,11 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<HealthState>(healthControllerProvider, (previous, next) {
+      if (next.lastSyncTime != null && next.lastSyncTime != previous?.lastSyncTime) {
+        setGlucoseHistories();
+      }
+    });
     return Column(
       children: [
         Row(
@@ -78,7 +88,7 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
             getTapButton(index: 1, title: "통계 정보 보기"),
           ],
         ),
-        Expanded(child: getScreen()),
+        getScreen(),
       ],
     );
   }

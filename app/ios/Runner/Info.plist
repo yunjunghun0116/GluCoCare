@@ -26,6 +26,31 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSHealthShareUsageDescription</key>
+	<string>애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>W애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneDelegateClassName</key>
+					<string>FlutterSceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
@@ -49,10 +74,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	
-	<key>NSHealthShareUsageDescription</key>
-    <string>애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
-    <key>NSHealthUpdateUsageDescription</key>
-    <string>W애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
 </dict>
 </plist>

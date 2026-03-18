@@ -36,6 +36,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Future<void> healthConnectorInitialize() async {
     var isPatient = await ref.read(patientControllerProvider.notifier).readIsPatient();
     if (!isPatient) return;
+    // 1. 최초 실행 시 예측 기능을 위한 데이터 전송 동의 dialog
+    // 2. 만약 그걸 안할경우 아무 기능도 동작 안하도록 하며 이게 true가 되기 전까지는 false일때도 계속 들어올 때마다 묻기
     await HealthConnector().initialize();
     ref.read(healthControllerProvider.notifier).startFetch();
   }
@@ -68,7 +70,18 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: "GluCoCare", showLeading: false),
+      appBar: CommonAppBar(
+        title: "GluCoCare",
+        centerTitle: true,
+        showLeading: false,
+        actions: [
+          GestureDetector(
+            onTap: () {},
+            child: Icon(Icons.info_outline_rounded, size: 24, color: AppColors.mainColor),
+          ),
+          SizedBox(width: 20),
+        ],
+      ),
       backgroundColor: AppColors.backgroundColor,
       body: _getScreen(),
       bottomNavigationBar: Container(

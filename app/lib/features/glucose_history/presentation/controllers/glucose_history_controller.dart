@@ -27,9 +27,9 @@ class GlucoseHistoryController extends BaseController<BaseState> {
     return null;
   }
 
-  Future<List<PredictGlucoseResponse>?> getPredictGlucoseWithExercise(int careRelationId) async {
+  Future<List<PredictGlucoseResponse>?> getPredictGlucoseWithExercise(int careRelationId, double met) async {
     var response = await getRequest(
-      "/api/glucose-histories/predict/exercise?careRelationId=$careRelationId&duration=30",
+      "/api/glucose-histories/predict/exercise?careRelationId=$careRelationId&met=$met&duration=30",
     );
     if (response.statusCode == 200) {
       var result = (response.data as List).map((data) => PredictGlucoseResponse.fromJson(data)).toList();

@@ -35,7 +35,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       var result = await ref.read(careRelationControllerProvider.notifier).getCareRelation(lateCareRelationId);
       if (result == null) throw CustomException(ExceptionMessage.badRequest);
       setState(() => careRelation = result);
-    } on CustomException catch (e) {
+    } on CustomException catch (_) {
       var result = await ref.read(careRelationControllerProvider.notifier).getAllCareRelations();
       if (result == null || result.isEmpty) return;
       await LocalRepository().save<int>(LocalRepositoryKey.lateCareRelationId, result.first.id);
@@ -45,41 +45,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () async {
-            var result = await Navigator.push<int?>(context, MaterialPageRoute(builder: (_) => CareGiverScreen()));
-            if (result == null) return;
-            if (careRelation?.id == result) return;
-            await careRelationsInitialize();
-          },
-          child: Container(
-            color: AppColors.mainColor,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Row(
-              children: [
-                Text(
-                  careRelation?.patientName ?? "함께 혈당을 관리할 사람을 선택해 주세요.",
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 20 / 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.whiteColor,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: () async {
+              var result = await Navigator.push<int?>(context, MaterialPageRoute(builder: (_) => CareGiverScreen()));
+              if (result == null) return;
+              if (careRelation?.id == result) return;
+              await careRelationsInitialize();
+            },
+            child: Container(
+              color: AppColors.mainColor,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Row(
+                children: [
+                  Text(
+                    careRelation?.patientName ?? "함께 혈당을 관리할 사람을 선택해 주세요.",
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 20 / 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.whiteColor,
+                    ),
                   ),
-                ),
-                SizedBox(width: 10),
-                Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.whiteColor),
-              ],
+                  SizedBox(width: 10),
+                  Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.whiteColor),
+                ],
+              ),
             ),
           ),
-        ),
-        if (careRelation != null)
-          Expanded(
-            child: GlucoseScreen(key: ValueKey(careRelation), careRelation: careRelation!),
-          ),
-      ],
+          if (careRelation != null) GlucoseScreen(key: ValueKey(careRelation), careRelation: careRelation!),
+        ],
+      ),
     );
   }
 }

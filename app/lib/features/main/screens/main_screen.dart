@@ -1,5 +1,6 @@
 import 'package:app/core/health/health_connector.dart';
 import 'package:app/features/glucose_history/presentation/providers.dart';
+import 'package:app/features/main/screens/service/service_screen.dart';
 import 'package:app/features/main/screens/setting_screen.dart';
 import 'package:app/features/member/presentation/providers.dart';
 import 'package:app/features/patient/presentation/providers.dart';
@@ -76,7 +77,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         showLeading: false,
         actions: [
           GestureDetector(
-            onTap: () {},
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ServiceScreen())),
             child: Icon(Icons.info_outline_rounded, size: 24, color: AppColors.mainColor),
           ),
           SizedBox(width: 20),

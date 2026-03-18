@@ -59,4 +59,7 @@ abstract final class AppColors {
 
   static const Color exerciseSelectedBackgroundColor = Color(0xFFE1F5EE);
   static const Color exerciseSelectedBorderColor = Color(0xFF1D9E75);
+
+  static const Color informationBackgroundColor = Color(0xFFFFF8E8);
+  static const Color informationBorderColor = Color(0xFFF5A623);
 }

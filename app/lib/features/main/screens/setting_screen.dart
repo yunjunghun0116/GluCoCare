@@ -1,11 +1,9 @@
-import 'package:app/core/data/repositories/local_repository.dart';
-import 'package:app/core/data/repositories/secure_repository.dart';
-import 'package:app/features/auth/presentation/screens/sign_in_screen.dart';
+import 'package:app/features/main/screens/service/connect_screen.dart';
 import 'package:app/features/main/screens/service/service_screen.dart';
 import 'package:app/features/member/presentation/providers.dart';
 import 'package:app/features/member/presentation/screens/member_screen.dart';
 import 'package:app/shared/constants/app_colors.dart';
-import 'package:app/shared/constants/local_repository_key.dart';
+import 'package:app/shared/utils/sign_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -36,15 +34,6 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
     setState(() => name = result);
   }
 
-  void logOut() async {
-    LocalRepository().delete(LocalRepositoryKey.accessToken);
-    LocalRepository().delete(LocalRepositoryKey.lateCareRelationId);
-    LocalRepository().delete(LocalRepositoryKey.lastSyncDateTime);
-    await SecureRepository().deleteRefreshToken();
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => SignInScreen()), (route) => false);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -67,7 +56,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
             ),
             Spacer(),
             GestureDetector(
-              onTap: logOut,
+              onTap: () => SignUtil.logout(context),
               child: Text(
                 "로그아웃",
                 style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray600Color),
@@ -97,6 +86,10 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
         SettingActionButton(
           title: "서비스 정보",
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ServiceScreen())),
+        ),
+        SettingActionButton(
+          title: "데이터 연동",
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ConnectScreen())),
         ),
       ],
     );

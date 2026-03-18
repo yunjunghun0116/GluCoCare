@@ -53,6 +53,14 @@ class HealthController extends BaseController<HealthState> {
     }
   }
 
+  Future<bool> isAvailable() async {
+    return await _healthConnector.isHealthConnectAvailable();
+  }
+
+  Future<bool> requestPermission() async {
+    return await _healthConnector.requestHealthConnectPermission();
+  }
+
   @override
   void dispose() {
     stopFetch();

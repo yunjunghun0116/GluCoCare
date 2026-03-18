@@ -16,6 +16,10 @@ class LocalRepository {
     _preferences = await SharedPreferences.getInstance();
   }
 
+  bool containsKey(String key) {
+    return _preferences.containsKey(key);
+  }
+
   void delete(String key) {
     if (!_preferences.containsKey(key)) return;
     _preferences.remove(key);

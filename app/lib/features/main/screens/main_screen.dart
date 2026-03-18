@@ -9,8 +9,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/data/repositories/local_repository.dart';
 import '../../../core/notification/notification_service.dart';
 import '../../../shared/constants/app_colors.dart';
+import '../../../shared/constants/local_repository_key.dart';
+import '../widgets/consent_dialog.dart';
 import 'home_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -37,8 +40,25 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Future<void> healthConnectorInitialize() async {
     var isPatient = await ref.read(patientControllerProvider.notifier).readIsPatient();
     if (!isPatient) return;
-    // 1. 최초 실행 시 예측 기능을 위한 데이터 전송 동의 dialog
-    // 2. 만약 그걸 안할경우 아무 기능도 동작 안하도록 하며 이게 true가 되기 전까지는 false일때도 계속 들어올 때마다 묻기
+    if (!mounted) return;
+    if (!LocalRepository().containsKey(LocalRepositoryKey.consentAgreed) ||
+        !LocalRepository().read<bool>(LocalRepositoryKey.consentAgreed)) {
+      var consentAgreed = await showDialog<bool?>(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => ConsentDialog(
+          onAgree: () {
+            LocalRepository().save(LocalRepositoryKey.consentAgreed, true);
+            Navigator.pop(context, true);
+          },
+          onDeny: () => Navigator.pop(context),
+        ),
+      );
+      if (consentAgreed == null || !consentAgreed) {
+        return;
+      }
+    }
+
     await HealthConnector().initialize();
     ref.read(healthControllerProvider.notifier).startFetch();
   }

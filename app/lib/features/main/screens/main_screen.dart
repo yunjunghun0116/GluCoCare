@@ -51,11 +51,11 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
         BackgroundHealthSyncManager.stop();
         break;
       case AppLifecycleState.paused:
-      case AppLifecycleState.inactive:
         // 백그라운드 진입 시 Timer 중지
         ref.read(healthControllerProvider.notifier).stopFetch();
         backgroundServiceStart();
         break;
+      case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
         ref.read(healthControllerProvider.notifier).stopFetch();
         break;
@@ -145,6 +145,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
       body: _getScreen(),
       bottomNavigationBar: Container(
         color: AppColors.backgroundColor,
+        padding: const EdgeInsets.only(top: 10),
         child: SafeArea(
           child: Container(
             color: AppColors.backgroundColor,

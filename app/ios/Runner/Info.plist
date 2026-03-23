@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.transistorsoft.fetch</string>
+		<string>com.pravera.flutter_foreground_task.refresh</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -14,8 +19,6 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>app</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -29,7 +32,11 @@
 	<key>NSHealthShareUsageDescription</key>
 	<string>애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
 	<key>NSHealthUpdateUsageDescription</key>
-	<string>W애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
+	<string>애플 건강 앱을 통해 사용자의 데이터를 동기화합니다</string>
+	<key>SMAuthorizedClients</key>
+	<array>
+		<string></string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -38,7 +38,7 @@ dependencies:
   health: ^13.2.0
   # URL 연결
   url_launcher: ^6.3.2
-  # 포그라운드 task
+  # Android Foreground Task
   flutter_foreground_task: ^9.2.1
 
 dev_dependencies:

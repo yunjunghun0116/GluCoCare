@@ -17,8 +17,15 @@ final class LocalUtil {
       duration: const Duration(seconds: 2),
     );
     Future.delayed(Duration.zero, () {
-      if (!context.mounted) return;
-      flushBar.show(context);
+      try {
+        if (!context.mounted) return;
+        var navigator = Navigator.maybeOf(context);
+        if (navigator == null) return;
+
+        flushBar.show(context);
+      } catch (_) {
+        // 에러메시지 무시 ignore
+      }
     });
   }
 }

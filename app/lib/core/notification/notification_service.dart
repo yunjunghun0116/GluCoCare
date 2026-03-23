@@ -37,6 +37,11 @@ class NotificationService {
     }
     if (Platform.isIOS) {
       await FirebaseMessaging.instance.requestPermission(alert: true, badge: true, sound: true);
+      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: false,
+        badge: false,
+        sound: false,
+      );
     }
   }
 }

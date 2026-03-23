@@ -49,8 +49,8 @@ public class GlucoseHistoryController {
     }
 
     @GetMapping("/predict/exercise")
-    public ResponseEntity<List<PredictGlucoseResponse>> predictExercise(@AuthenticationPrincipal Long memberId, @RequestParam Long careRelationId, @RequestParam Integer duration) {
-        var response = predictGlucoseWithExerciseUseCase.execute(memberId, careRelationId, duration);
+    public ResponseEntity<List<PredictGlucoseResponse>> predictExercise(@AuthenticationPrincipal Long memberId, @RequestParam Long careRelationId, @RequestParam Double met, @RequestParam Integer duration) {
+        var response = predictGlucoseWithExerciseUseCase.execute(memberId, careRelationId, met, duration);
         return ResponseEntity.ok(response);
     }
 }

@@ -62,7 +62,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private void setMemberAuthToken(HttpServletRequest request, Long memberId) {
         var member = memberRepository.findById(memberId)
                                      .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
-        var authorities = List.of(new SimpleGrantedAuthority(member.getMemberRole()
+        var authorities = List.of(new SimpleGrantedAuthority(member.getGrade()
                                                                    .name()));
         var authToken = new UsernamePasswordAuthenticationToken(member.getId(), member.getEmail(), authorities);
         var authDetails = new WebAuthenticationDetailsSource().buildDetails(request);

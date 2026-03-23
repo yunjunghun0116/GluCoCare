@@ -35,8 +35,8 @@ public class Member extends BaseEntity {
     private String accessCode = "";
     @NotNull
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "member_role")
-    private MemberRole memberRole = MemberRole.MEMBER;
+    @Column(name = "grade")
+    private MemberGrade grade = MemberGrade.NORMAL;
 
     protected Member() {
     }

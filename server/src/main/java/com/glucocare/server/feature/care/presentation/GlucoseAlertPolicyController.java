@@ -2,9 +2,11 @@ package com.glucocare.server.feature.care.presentation;
 
 import com.glucocare.server.feature.care.application.ReadGlucoseAlertPolicyUseCase;
 import com.glucocare.server.feature.care.application.UpdateGlucoseAlertPolicyHighRiskUseCase;
+import com.glucocare.server.feature.care.application.UpdateGlucoseAlertPolicyLowRiskUseCase;
 import com.glucocare.server.feature.care.application.UpdateGlucoseAlertPolicyVeryHighRiskUseCase;
 import com.glucocare.server.feature.care.dto.ReadGlucoseAlertPolicyResponse;
 import com.glucocare.server.feature.care.dto.UpdateGlucoseAlertPolicyHighRiskRequest;
+import com.glucocare.server.feature.care.dto.UpdateGlucoseAlertPolicyLowRiskRequest;
 import com.glucocare.server.feature.care.dto.UpdateGlucoseAlertPolicyVeryHighRiskRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class GlucoseAlertPolicyController {
 
     private final UpdateGlucoseAlertPolicyVeryHighRiskUseCase updateGlucoseAlertPolicyVeryHighRiskUseCase;
     private final UpdateGlucoseAlertPolicyHighRiskUseCase updateGlucoseAlertPolicyHighRiskUseCase;
+    private final UpdateGlucoseAlertPolicyLowRiskUseCase updateGlucoseAlertPolicyLowRiskUseCase;
     private final ReadGlucoseAlertPolicyUseCase readGlucoseAlertPolicyUseCase;
 
     @PostMapping("/{id}/high-risk")
@@ -37,6 +40,13 @@ public class GlucoseAlertPolicyController {
     @PostMapping("/{id}/very-high-risk")
     public ResponseEntity<Void> updateGlucoseAlertPolicyVeryHighRisk(@PathVariable Long id, @AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateGlucoseAlertPolicyVeryHighRiskRequest updateGlucoseAlertPolicyRequest) {
         updateGlucoseAlertPolicyVeryHighRiskUseCase.execute(id, memberId, updateGlucoseAlertPolicyRequest);
+        return ResponseEntity.ok()
+                             .build();
+    }
+
+    @PostMapping("/{id}/low-risk")
+    public ResponseEntity<Void> updateGlucoseAlertPolicyLowRisk(@PathVariable Long id, @AuthenticationPrincipal Long memberId, @Valid @RequestBody UpdateGlucoseAlertPolicyLowRiskRequest updateGlucoseAlertPolicyRequest) {
+        updateGlucoseAlertPolicyLowRiskUseCase.execute(id, memberId, updateGlucoseAlertPolicyRequest);
         return ResponseEntity.ok()
                              .build();
     }

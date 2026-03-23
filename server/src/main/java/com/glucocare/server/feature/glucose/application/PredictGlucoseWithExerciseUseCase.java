@@ -20,7 +20,7 @@ public class PredictGlucoseWithExerciseUseCase {
     private final CareRelationRepository careRelationRepository;
     private final PredictClient predictClient;
 
-    public List<PredictGlucoseResponse> execute(Long memberId, Long careRelationId, Integer duration) {
+    public List<PredictGlucoseResponse> execute(Long memberId, Long careRelationId, Double met, Integer duration) {
         var careRelation = careRelationRepository.findById(careRelationId)
                                                  .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
         careRelation.validateOwnership(memberId);
@@ -28,6 +28,6 @@ public class PredictGlucoseWithExerciseUseCase {
         if (recentGlucoseHistories.size() < 20) {
             throw new ApplicationException(ErrorMessage.NEED_MORE_GLUCOSE_HISTORIES);
         }
-        return predictClient.predictExerciseGlucose(recentGlucoseHistories, duration);
+        return predictClient.predictExerciseGlucose(recentGlucoseHistories, met, duration);
     }
 }

@@ -6,12 +6,12 @@ public enum GlucoseWarningType {
     HIGH_RISK,
     VERY_HIGH_RISK,
     NORMAL,
-    LOW_RISK,
-    VERY_LOW_RISK;
+    LOW_RISK;
 
     public static GlucoseWarningType from(Integer sgv, GlucoseAlertPolicy policy) {
         if (sgv >= policy.getVeryHighRiskValue()) return VERY_HIGH_RISK;
         if (sgv >= policy.getHighRiskValue()) return HIGH_RISK;
+        if (sgv < policy.getLowRiskValue()) return LOW_RISK;
         return NORMAL;
     }
 

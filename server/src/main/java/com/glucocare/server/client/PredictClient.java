@@ -61,12 +61,12 @@ public class PredictClient {
         return predictGlucoseList;
     }
 
-    public List<PredictGlucoseResponse> predictExerciseGlucose(List<GlucoseHistory> glucoseHistories, Integer duration) {
+    public List<PredictGlucoseResponse> predictExerciseGlucose(List<GlucoseHistory> glucoseHistories, Double met, Integer duration) {
         var points = glucoseHistories.stream()
                                      .map(g -> Map.of("dateTime", g.getDateTime(), "sgv", g.getSgv()))
                                      .toList();
 
-        var body = Map.of("points", points, "planned_duration_min", duration, "planned_mets", 4.0, "exercise_effect_scale", 1.0);
+        var body = Map.of("points", points, "planned_duration_min", duration, "planned_mets", met, "exercise_effect_scale", 1.0);
 
         var response = restClient.post()
                                  .uri(URI.create(PREDICT_SERVER_URL + "/predict/exercise"))

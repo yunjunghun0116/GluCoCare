@@ -27,6 +27,9 @@ public class GlucoseAlertPolicy extends BaseEntity {
     @NotNull
     @Column(name = "very_high_risk_value")
     private Integer veryHighRiskValue;
+    @NotNull
+    @Column(name = "low_risk_value")
+    private Integer lowRiskValue;
 
 
     protected GlucoseAlertPolicy() {
@@ -36,14 +39,18 @@ public class GlucoseAlertPolicy extends BaseEntity {
         this.careRelation = careRelation;
         this.highRiskValue = 140;
         this.veryHighRiskValue = 180;
+        this.lowRiskValue = 70;
     }
 
     public void updateHighRiskValue(Integer newHighRiskValue) {
         this.highRiskValue = newHighRiskValue;
     }
 
-
     public void updateVeryHighRiskValue(Integer newVeryHighRiskValue) {
         this.veryHighRiskValue = newVeryHighRiskValue;
+    }
+
+    public void updateLowRiskValue(Integer newLowRiskValue) {
+        this.lowRiskValue = newLowRiskValue;
     }
 }

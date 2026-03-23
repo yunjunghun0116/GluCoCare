@@ -12,8 +12,14 @@ class LocalRepository {
 
   LocalRepository._internal();
 
+  bool _initialized = false;
+
+  bool get initialized => _initialized;
+
   Future<void> initialize() async {
+    if (_initialized) return;
     _preferences = await SharedPreferences.getInstance();
+    _initialized = true;
   }
 
   bool containsKey(String key) {

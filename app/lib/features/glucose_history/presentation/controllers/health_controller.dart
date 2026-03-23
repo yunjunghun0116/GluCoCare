@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:app/core/data/repositories/local_repository.dart';
 import 'package:app/features/glucose_history/data/models/health_upload_request.dart';
@@ -26,8 +27,8 @@ class HealthController extends BaseController<HealthState> {
     : _healthConnector = healthConnector;
 
   Future<void> startFetch() async {
-    await _fetch();
     _timer?.cancel();
+    await Future.delayed(Duration(seconds: 10), () async => await _fetch());
     _timer = Timer.periodic(const Duration(minutes: 3), (_) => _fetch());
   }
 
@@ -53,8 +54,12 @@ class HealthController extends BaseController<HealthState> {
     }
   }
 
-  Future<bool> isAvailable() async {
-    return await _healthConnector.isHealthConnectAvailable();
+  Future<bool> isAuthorized() async {
+    if (Platform.isAndroid) {
+      return await _healthConnector.isAuthorized();
+    } else {
+      return await _healthConnector.requestHealthConnectPermission();
+    }
   }
 
   Future<bool> requestPermission() async {

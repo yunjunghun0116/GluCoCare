@@ -77,13 +77,15 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
     } catch (e) {
       throw CustomException(ExceptionMessage.internalServerError);
     } finally {
-      _yAxis = GlucoseChartYAxis.calculate(
-        records: widget.records,
-        normalPredictList: _normalPredictGlucoseList,
-        exercisePredictList: _exercisePredictGlucoseList,
-      );
-      _cachedChartWidth = null;
-      setState(() => _isPredictLoading = false);
+      if (mounted) {
+        _yAxis = GlucoseChartYAxis.calculate(
+          records: widget.records,
+          normalPredictList: _normalPredictGlucoseList,
+          exercisePredictList: _exercisePredictGlucoseList,
+        );
+        _cachedChartWidth = null;
+        setState(() => _isPredictLoading = false);
+      }
     }
   }
 
@@ -165,7 +167,6 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
       if (careRelationId == null) return;
       _fetchExercisePredict(careRelationId, true);
     });
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -383,6 +384,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                                 return AppColors.glucoseNormalColor;
                               },
                               markerSettings: MarkerSettings(isVisible: false),
+                              animationDuration: 0,
                             ),
                             LineSeries<PredictGlucoseResponse, DateTime>(
                               dataSource: _normalPredictGlucoseList,
@@ -392,6 +394,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                               color: AppColors.doNothingColor,
                               markerSettings: MarkerSettings(isVisible: false),
                               name: "휴식 평균",
+                              animationDuration: 0,
                             ),
                             LineSeries<PredictGlucoseResponse, DateTime>(
                               dataSource: _exercisePredictGlucoseList,
@@ -401,6 +404,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                               color: AppColors.doExerciseColor,
                               markerSettings: MarkerSettings(isVisible: false),
                               name: "운동 평균",
+                              animationDuration: 500,
                             ),
                           ],
                         ),

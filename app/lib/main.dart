@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:app/features/main/screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/background/background_health_sync_manager.dart';
 import 'core/exceptions/exception_handler.dart';
 import 'core/notification/notification_service.dart';
 
@@ -15,9 +17,11 @@ void main() {
     ExceptionHandler().handleException(details.exception, details.stack, rootStateKey.currentContext);
   };
   runZonedGuarded(() async {
+    FlutterForegroundTask.initCommunicationPort();
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp();
     await NotificationService().initialize();
+    await BackgroundHealthSyncManager.initialize();
     runApp(ProviderScope(child: const MainApp()));
   }, (error, stackTrace) => ExceptionHandler().handleException(error, stackTrace, rootStateKey.currentContext));
 }

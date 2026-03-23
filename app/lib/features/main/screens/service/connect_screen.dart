@@ -22,19 +22,19 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       appBar: CommonAppBar(title: "데이터 연동", onBack: () => Navigator.pop(context)),
       backgroundColor: AppColors.backgroundColor,
       body: FutureBuilder(
-        future: ref.read(healthControllerProvider.notifier).isAvailable(),
+        future: ref.read(healthControllerProvider.notifier).isAuthorized(),
         builder: (context, asyncSnapshot) {
           var isConnected = false;
           if (asyncSnapshot.data != null) {
             isConnected = asyncSnapshot.data!;
           }
+          if (Platform.isIOS) {
+            return Column(
+              children: [_connectButton(isConnected: isConnected, title: "건강", image: AppValues.appleHealthImage)],
+            );
+          }
           return Column(
-            children: [
-              if (Platform.isIOS)
-                _connectButton(isConnected: isConnected, title: "건강", image: AppValues.appleHealthImage)
-              else
-                _connectButton(isConnected: isConnected, title: "헬스커넥트", image: AppValues.healthConnectImage),
-            ],
+            children: [_connectButton(isConnected: isConnected, title: "헬스커넥트", image: AppValues.healthConnectImage)],
           );
         },
       ),

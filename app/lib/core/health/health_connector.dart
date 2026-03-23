@@ -17,7 +17,7 @@ class HealthConnector {
 
   Future<bool> initialize() async {
     try {
-      var isAvailable = await isHealthConnectAvailable();
+      var isAvailable = await _isHealthConnectAvailable();
       if (!isAvailable) return false;
 
       bool authorized = await health.requestAuthorization(
@@ -31,13 +31,20 @@ class HealthConnector {
     }
   }
 
-  Future<bool> isHealthConnectAvailable() async {
+  Future<bool> _isHealthConnectAvailable() async {
     var isAvailable = await health.isHealthConnectAvailable();
     if (!isAvailable) {
       await health.installHealthConnect();
       isAvailable = await health.isHealthConnectAvailable();
     }
     return isAvailable;
+  }
+
+  Future<bool> isAuthorized() async {
+    final permissions = [HealthDataAccess.READ];
+
+    final result = await health.hasPermissions(types, permissions: permissions);
+    return result ?? false;
   }
 
   Future<bool> requestHealthConnectPermission() async {

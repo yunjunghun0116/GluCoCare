@@ -1,3 +1,4 @@
+import 'package:app/core/background/background_health_sync_manager.dart';
 import 'package:app/core/health/health_connector.dart';
 import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/features/main/screens/service/service_screen.dart';
@@ -23,13 +24,50 @@ class MainScreen extends ConsumerStatefulWidget {
   ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends ConsumerState<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     initialize();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // 포그라운드 복귀 시 즉시 동기화
+        ref.read(healthControllerProvider.notifier).startFetch();
+        BackgroundHealthSyncManager.stop();
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+        // 백그라운드 진입 시 Timer 중지
+        ref.read(healthControllerProvider.notifier).stopFetch();
+        backgroundServiceStart();
+        break;
+      case AppLifecycleState.detached:
+        ref.read(healthControllerProvider.notifier).stopFetch();
+        break;
+      case AppLifecycleState.hidden:
+        break;
+    }
+  }
+
+  void backgroundServiceStart() async {
+    if (await ref.read(healthControllerProvider.notifier).isAuthorized()) {
+      BackgroundHealthSyncManager.start();
+    }
   }
 
   void initialize() async {

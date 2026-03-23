@@ -38,9 +38,13 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
           .getAllGlucoseHistories(widget.careRelation.id);
 
       if (result == null || result.isEmpty) return;
-      setState(() => _records = result);
+      if (mounted) {
+        setState(() => _records = result);
+      }
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

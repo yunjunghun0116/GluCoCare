@@ -31,15 +31,15 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
             ),
           ),
         ),
-        GridView.count(
-          shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
-          crossAxisCount: 4,
-          childAspectRatio: 2 / 3,
+        Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          children: MyExercise.values.map((exercise) => _exerciseCard(exercise)).toList(),
+          child: Center(
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: MyExercise.values.map((exercise) => _exerciseCard(exercise)).toList(),
+            ),
+          ),
         ),
       ],
     );
@@ -54,6 +54,7 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
       },
       behavior: HitTestBehavior.opaque,
       child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.exerciseSelectedBackgroundColor : AppColors.fontGray50Color,
           border: Border.all(color: isSelected ? AppColors.exerciseSelectedBorderColor : AppColors.fontGray100Color),
@@ -63,18 +64,24 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
           children: [
             Container(
               padding: const EdgeInsets.symmetric(vertical: 5),
-              width: 80,
-              height: 80,
+              width: 50,
+              height: 50,
               child: Image.asset(exercise.image, fit: BoxFit.contain),
             ),
             Text(
               exercise.name,
-              style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray600Color),
+              style: TextStyle(
+                fontSize: 14,
+                height: 20 / 14,
+                color: AppColors.fontGray600Color,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               "강도 ${exercise.met}",
               style: TextStyle(fontSize: 12, height: 16 / 12, color: AppColors.fontGray400Color),
             ),
+            SizedBox(height: 10),
           ],
         ),
       ),

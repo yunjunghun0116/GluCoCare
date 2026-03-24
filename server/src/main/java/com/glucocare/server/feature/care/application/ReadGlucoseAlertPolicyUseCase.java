@@ -29,7 +29,7 @@ public class ReadGlucoseAlertPolicyUseCase {
 
     private ReadGlucoseAlertPolicyResponse convertGlucoseAlertPolicyResponse(GlucoseAlertPolicy glucoseAlertPolicy) {
         var careRelation = glucoseAlertPolicy.getCareRelation();
-        return ReadGlucoseAlertPolicyResponse.of(glucoseAlertPolicy.getId(), careRelation.getId(), glucoseAlertPolicy.getHighRiskValue(), glucoseAlertPolicy.getVeryHighRiskValue());
+        return ReadGlucoseAlertPolicyResponse.of(glucoseAlertPolicy.getId(), careRelation.getId(), glucoseAlertPolicy.getHighRiskValue(), glucoseAlertPolicy.getVeryHighRiskValue(), glucoseAlertPolicy.getLowRiskValue());
     }
 
     private GlucoseAlertPolicy createGlucoseAlertPolicy(CareRelation careRelation) {

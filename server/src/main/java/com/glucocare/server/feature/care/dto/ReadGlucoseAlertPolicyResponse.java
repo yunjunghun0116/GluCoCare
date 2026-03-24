@@ -4,9 +4,10 @@ public record ReadGlucoseAlertPolicyResponse(
         Long id,
         Long careRelationId,
         Integer highRiskValue,
-        Integer veryHighRiskValue
+        Integer veryHighRiskValue,
+        Integer lowRiskValue
 ) {
-    public static ReadGlucoseAlertPolicyResponse of(Long id, Long careRelationId, Integer highRiskValue, Integer veryHighRiskValue) {
-        return new ReadGlucoseAlertPolicyResponse(id, careRelationId, highRiskValue, veryHighRiskValue);
+    public static ReadGlucoseAlertPolicyResponse of(Long id, Long careRelationId, Integer highRiskValue, Integer veryHighRiskValue, Integer lowRiskValue) {
+        return new ReadGlucoseAlertPolicyResponse(id, careRelationId, highRiskValue, veryHighRiskValue, lowRiskValue);
     }
 }

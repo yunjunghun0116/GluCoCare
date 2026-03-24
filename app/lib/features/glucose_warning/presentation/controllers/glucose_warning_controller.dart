@@ -37,4 +37,15 @@ class GlucoseWarningController extends BaseController<BaseState> {
     }
     return false;
   }
+
+  Future<bool> updateLowRisk(GlucoseAlertPolicyResponse glucoseAlertPolicy, int newValue) async {
+    var response = await postRequest(
+      "/api/glucose-alert-policies/${glucoseAlertPolicy.id}/low-risk",
+      data: {"lowRiskValue": newValue},
+    );
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
 }

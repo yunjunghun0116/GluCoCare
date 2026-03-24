@@ -37,6 +37,8 @@ class HealthController extends BaseController<HealthState> {
     _timer = null;
   }
 
+  Future<void> fetchOnce() async => await _fetch();
+
   Future<void> _fetch() async {
     var nowDate = DateTime.now();
     var data = await _healthConnector.fetchBloodGlucose();

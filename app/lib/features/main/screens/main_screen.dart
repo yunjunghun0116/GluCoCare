@@ -31,7 +31,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    initialize();
+    WidgetsBinding.instance.addPostFrameCallback((_) => initialize());
   }
 
   @override

@@ -80,7 +80,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
           },
         ),
         SettingActionButton(
-          title: "혈당 관리가 필요한가요?",
+          title: "내 혈당 관리하기",
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PatientScreen())),
         ),
         SettingActionButton(

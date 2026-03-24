@@ -3,8 +3,10 @@ import 'package:app/features/glucose_history/presentation/widgets/glucose_statis
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/health/health_connector.dart';
 import '../../../../shared/constants/app_colors.dart';
 import '../../../care/data/models/care_relation_response.dart';
+import '../../../patient/presentation/providers.dart';
 import '../../data/models/glucose_history_response.dart';
 import '../controllers/health_controller.dart';
 import '../providers.dart';
@@ -33,13 +35,17 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
     if (_isLoading) return;
     setState(() => _isLoading = true);
     try {
+      if (await ref.read(patientControllerProvider.notifier).readIsPatient()) {
+        await HealthConnector().initialize();
+        await ref.read(healthControllerProvider.notifier).fetchOnce();
+      }
+
       var result = await ref
           .read(glucoseHistoryControllerProvider.notifier)
           .getAllGlucoseHistories(widget.careRelation.id);
 
-      if (result == null || result.isEmpty) return;
       if (mounted) {
-        setState(() => _records = result);
+        setState(() => _records = result ?? []);
       }
     } finally {
       if (mounted) {
@@ -59,6 +65,17 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
               style: TextStyle(fontSize: 16, height: 20 / 16, color: AppColors.mainColor),
               textAlign: TextAlign.center,
             ),
+          ),
+          SizedBox(height: 20),
+          GestureDetector(
+            onTap: _isLoading ? null : setGlucoseHistories,
+            child: _isLoading
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.mainColor),
+                  )
+                : Icon(Icons.refresh, color: AppColors.mainColor),
           ),
         ],
       );

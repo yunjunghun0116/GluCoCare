@@ -9,8 +9,15 @@ class GlucoseValueSelectScreen extends StatefulWidget {
   final String title;
   final int minValue;
   final int maxValue;
+  final String unit;
 
-  const GlucoseValueSelectScreen({super.key, required this.title, required this.minValue, required this.maxValue});
+  const GlucoseValueSelectScreen({
+    super.key,
+    required this.title,
+    required this.minValue,
+    required this.maxValue,
+    required this.unit,
+  });
 
   @override
   State<GlucoseValueSelectScreen> createState() => _GlucoseValueSelectScreenState();
@@ -41,7 +48,7 @@ class _GlucoseValueSelectScreenState extends State<GlucoseValueSelectScreen> {
             child: Row(
               children: [
                 Text(
-                  "알림 혈당 값",
+                  "알림 기준 혈당 수치",
                   style: TextStyle(
                     fontSize: 16,
                     height: 20 / 16,
@@ -51,7 +58,7 @@ class _GlucoseValueSelectScreenState extends State<GlucoseValueSelectScreen> {
                 ),
                 Spacer(),
                 Text(
-                  "${widget.minValue} mg/dL 이상",
+                  "${widget.minValue} ${widget.unit}",
                   style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray400Color),
                 ),
               ],

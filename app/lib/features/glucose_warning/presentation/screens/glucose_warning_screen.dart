@@ -39,13 +39,34 @@ class _GlucoseWarningScreenState extends ConsumerState<GlucoseWarningScreen> {
       body: Column(
         children: [
           getGlucoseAlertContainer(
-            title: "혈당 고위험(1단계)",
+            title: "고혈당 매우 위험",
+            value: _glucoseAlertPolicy.veryHighRiskValue,
+            onTap: () async {
+              var result = await Navigator.push<int?>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      GlucoseValueSelectScreen(title: "고혈당 매우 위험", minValue: 160, maxValue: 200, unit: "mg/dL 이상"),
+                ),
+              );
+              if (result == null) return;
+              var success = await ref
+                  .read(glucoseWarningControllerProvider.notifier)
+                  .updateVeryHighRisk(widget.glucoseAlertPolicy, result);
+              if (success) {
+                setGlucoseAlertPolicy();
+              }
+            },
+          ),
+          getGlucoseAlertContainer(
+            title: "고혈당 위험",
             value: _glucoseAlertPolicy.highRiskValue,
             onTap: () async {
               var result = await Navigator.push<int?>(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => GlucoseValueSelectScreen(title: "혈당 고위험(1단계)", minValue: 100, maxValue: 180),
+                  builder: (_) =>
+                      GlucoseValueSelectScreen(title: "고혈당 위험", minValue: 120, maxValue: 160, unit: "mg/dL 이상"),
                 ),
               );
               if (result == null) return;
@@ -58,19 +79,20 @@ class _GlucoseWarningScreenState extends ConsumerState<GlucoseWarningScreen> {
             },
           ),
           getGlucoseAlertContainer(
-            title: "혈당 고위험(2단계)",
-            value: _glucoseAlertPolicy.veryHighRiskValue,
+            title: "저혈당 위험",
+            value: _glucoseAlertPolicy.lowRiskValue,
             onTap: () async {
               var result = await Navigator.push<int?>(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => GlucoseValueSelectScreen(title: "혈당 고위험(2단계)", minValue: 180, maxValue: 250),
+                  builder: (_) =>
+                      GlucoseValueSelectScreen(title: "저혈당 위험", minValue: 50, maxValue: 80, unit: "mg/dL 이하"),
                 ),
               );
               if (result == null) return;
               var success = await ref
                   .read(glucoseWarningControllerProvider.notifier)
-                  .updateVeryHighRisk(widget.glucoseAlertPolicy, result);
+                  .updateLowRisk(widget.glucoseAlertPolicy, result);
               if (success) {
                 setGlucoseAlertPolicy();
               }
@@ -90,7 +112,7 @@ class _GlucoseWarningScreenState extends ConsumerState<GlucoseWarningScreen> {
         child: Row(
           children: [
             Text(
-              "$title 수치 : ",
+              "$title 알림 설정 : ",
               style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray800Color),
             ),
             Text(

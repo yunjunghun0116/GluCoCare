@@ -21,7 +21,7 @@ import java.time.LocalDate;
         name = "member_daily_mission",
         uniqueConstraints = @UniqueConstraint(
                 name = "uk_member_daily_mission",
-                columnNames = {"member_id", "mission_id", "mission_date"}
+                columnNames = {"member_id", "mission_id", "date"}
         )
 )
 @Getter
@@ -39,8 +39,8 @@ public class MemberDailyMission extends BaseEntity {
     private Mission mission;
 
     @NotNull
-    @Column(name = "mission_date")
-    private LocalDate missionDate;
+    @Column(name = "date")
+    private LocalDate date;
 
     @NotNull
     @Column(name = "is_completed")
@@ -53,10 +53,10 @@ public class MemberDailyMission extends BaseEntity {
     protected MemberDailyMission() {
     }
 
-    public MemberDailyMission(Member member, Mission mission, LocalDate missionDate) {
+    public MemberDailyMission(Member member, Mission mission, LocalDate date) {
         this.member = member;
         this.mission = mission;
-        this.missionDate = missionDate;
+        this.date = date;
     }
 
     public void complete() {

@@ -39,5 +39,4 @@ public class PatientController {
         return ResponseEntity.ok()
                              .build();
     }
-
 }

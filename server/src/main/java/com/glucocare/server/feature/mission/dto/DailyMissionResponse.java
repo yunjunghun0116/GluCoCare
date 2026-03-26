@@ -15,7 +15,7 @@ public record DailyMissionResponse(
         Boolean canComplete,
         Boolean isCompleted,
         Boolean isFailed,
-        Integer rewardPoint,
+        Long rewardPoint,
         LocalDate missionDate
 ) {
     public static DailyMissionResponse from(MemberDailyMission daily, Boolean canComplete, Double currentValue) {

@@ -8,6 +8,8 @@ import com.glucocare.server.feature.auth.dto.AuthResponse;
 import com.glucocare.server.feature.auth.dto.RegisterRequest;
 import com.glucocare.server.feature.member.domain.Member;
 import com.glucocare.server.feature.member.domain.MemberRepository;
+import com.glucocare.server.feature.point.domain.PointWallet;
+import com.glucocare.server.feature.point.domain.PointWalletRepository;
 import com.glucocare.server.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,11 +28,13 @@ public class RegisterUseCase {
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenRepository authTokenRepository;
+    private final PointWalletRepository pointWalletRepository;
 
     public AuthResponse execute(RegisterRequest request) {
         var member = saveMemberWithRequest(request);
         var accessCode = generateAccessCode(member);
         member.updateAccessCode(accessCode);
+        generatePointWallet(member);
         return saveRefreshToken(member);
     }
 
@@ -69,5 +73,10 @@ public class RegisterUseCase {
         } catch (Exception e) {
             throw new ApplicationException(ErrorMessage.GENERATE_ACCESS_CODE_ERROR);
         }
+    }
+
+    private void generatePointWallet(Member member) {
+        var pointWallet = new PointWallet(member);
+        pointWalletRepository.save(pointWallet);
     }
 }

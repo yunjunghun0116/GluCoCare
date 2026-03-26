@@ -6,8 +6,14 @@ import com.glucocare.server.feature.glucose.domain.GlucoseHistory;
 import com.glucocare.server.feature.glucose.domain.GlucoseHistoryRepository;
 import com.glucocare.server.feature.member.domain.Member;
 import com.glucocare.server.feature.member.domain.MemberRepository;
+import com.glucocare.server.feature.mission.domain.MemberDailyMission;
 import com.glucocare.server.feature.mission.domain.MemberDailyMissionRepository;
 import com.glucocare.server.feature.mission.domain.MissionValidator;
+import com.glucocare.server.feature.point.domain.PointHistory;
+import com.glucocare.server.feature.point.domain.PointHistoryRepository;
+import com.glucocare.server.feature.point.domain.PointTransactionType;
+import com.glucocare.server.feature.point.domain.PointWallet;
+import com.glucocare.server.feature.point.domain.PointWalletRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +32,8 @@ public class CompleteDailyMissionUseCase {
     private final MemberRepository memberRepository;
     private final MemberDailyMissionRepository memberDailyMissionRepository;
     private final GlucoseHistoryRepository glucoseHistoryRepository;
+    private final PointWalletRepository pointWalletRepository;
+    private final PointHistoryRepository pointHistoryRepository;
     private final MissionValidator missionValidator;
 
     public void execute(Long id, Long memberId) {
@@ -38,6 +46,9 @@ public class CompleteDailyMissionUseCase {
         var records = getTodayRecords(member, today);
         if (missionValidator.validate(dailyMission, records)) {
             dailyMission.complete();
+            var pointWallet = pointWalletRepository.findByMember(member)
+                                                   .orElseThrow(() -> new ApplicationException(ErrorMessage.NOT_FOUND));
+            earnPoint(member, pointWallet, dailyMission);
         }
     }
 
@@ -50,5 +61,21 @@ public class CompleteDailyMissionUseCase {
                       .toInstant()
                       .toEpochMilli();
         return glucoseHistoryRepository.findByPatientAndDateTimeBetweenOrderByDateTimeAsc(member, start, end);
+    }
+
+    private void earnPoint(Member member, PointWallet pointWallet, MemberDailyMission dailyMission) {
+        var amount = dailyMission.getMission()
+                                 .getRewardPoint();
+        var mission = dailyMission.getMission();
+        var balanceAfter = pointWallet.getBalance() + dailyMission.getMission()
+                                                                  .getRewardPoint();
+        var pointHistory = new PointHistory(member,
+                                            PointTransactionType.EARN,
+                                            amount,
+                                            balanceAfter,
+                                            mission.getMissionType()
+                                                   .getRewardMessage());
+        pointWallet.earn(amount);
+        pointHistoryRepository.save(pointHistory);
     }
 }

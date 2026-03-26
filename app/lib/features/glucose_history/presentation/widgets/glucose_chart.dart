@@ -1,4 +1,3 @@
-import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/features/care/presentation/providers.dart';
 import 'package:app/features/glucose_history/data/models/glucose_history_response.dart';
 import 'package:app/features/glucose_history/data/models/predict_glucose_response.dart';
@@ -74,8 +73,6 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
     try {
       await _fetchNormalPredict(careRelationId);
       await _fetchExercisePredict(careRelationId, false);
-    } catch (e) {
-      throw CustomException(ExceptionMessage.internalServerError);
     } finally {
       if (mounted) {
         _yAxis = GlucoseChartYAxis.calculate(
@@ -239,7 +236,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
         children: [
           SizedBox(
             width: 40,
-            height: 400,
+            height: 300,
             child: SfCartesianChart(
               margin: EdgeInsets.only(top: 10, bottom: 40),
               plotAreaBorderWidth: 0,
@@ -272,7 +269,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
                   scrollDirection: Axis.horizontal,
                   child: SizedBox(
                     width: chartWidth,
-                    height: 400,
+                    height: 300,
                     child: Stack(
                       children: [
                         SfCartesianChart(

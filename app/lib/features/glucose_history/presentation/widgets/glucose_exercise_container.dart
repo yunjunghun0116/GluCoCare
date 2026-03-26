@@ -64,8 +64,8 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
           children: [
             Container(
               padding: const EdgeInsets.symmetric(vertical: 5),
-              width: 50,
-              height: 50,
+              width: 30,
+              height: 30,
               child: Image.asset(exercise.image, fit: BoxFit.contain),
             ),
             Text(
@@ -79,7 +79,7 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
             ),
             Text(
               "강도 ${exercise.met}",
-              style: TextStyle(fontSize: 12, height: 16 / 12, color: AppColors.fontGray400Color),
+              style: TextStyle(fontSize: 10, height: 14 / 10, color: AppColors.fontGray400Color),
             ),
             SizedBox(height: 10),
           ],

@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class ReadTodayDailyMissionUseCase {
 
     private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");

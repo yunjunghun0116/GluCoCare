@@ -62,4 +62,19 @@ abstract final class AppColors {
 
   static const Color informationBackgroundColor = Color(0xFFFFF8E8);
   static const Color informationBorderColor = Color(0xFFF5A623);
+
+  // 미션 완료 (초록)
+  static const Color missionCompletedBackgroundColor = Color(0xFFF0F9F4);
+  static const Color missionCompletedBorderColor = Color(0xFFAAD9BE);
+  static const Color missionCompletedTextColor = Color(0xFF3DAB7A);
+
+  // 미션 완료하기 (파랑)
+  static const Color missionActiveBackgroundColor = Color(0xFFECF3FF);
+  static const Color missionActiveBorderColor = Color(0xFF89B8FF);
+  static const Color missionActiveTextColor = Color(0xFF3888FF);
+
+  // 달성 조건 부족 (회색)
+  static const Color missionDisabledBackgroundColor = Color(0xFFF1F3F4);
+  static const Color missionDisabledBorderColor = Color(0xFFCED4DA);
+  static const Color missionDisabledTextColor = Color(0xFFADB5BD);
 }

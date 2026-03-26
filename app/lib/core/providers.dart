@@ -9,8 +9,8 @@ final dioProvider = Provider<Dio>((ref) {
   var dio = Dio(
     BaseOptions(
       baseUrl: AppValues.serverBaseUrl,
-      connectTimeout: Duration(seconds: 5),
-      receiveTimeout: Duration(seconds: 5),
+      connectTimeout: Duration(seconds: 30),
+      receiveTimeout: Duration(seconds: 30),
       headers: {'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true'},
     ),
   );

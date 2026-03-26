@@ -28,7 +28,7 @@ public class Mission extends BaseEntity {
     private Double threshold;
     @NotNull
     @Column(name = "reward_point")
-    private Integer rewardPoint;
+    private Long rewardPoint;
     @NotNull
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -37,7 +37,7 @@ public class Mission extends BaseEntity {
     protected Mission() {
     }
 
-    public Mission(String title, String description, MissionType missionType, Double threshold, Integer rewardPoint) {
+    public Mission(String title, String description, MissionType missionType, Double threshold, Long rewardPoint) {
         this.title = title;
         this.description = description;
         this.missionType = missionType;
@@ -45,7 +45,7 @@ public class Mission extends BaseEntity {
         this.rewardPoint = rewardPoint;
     }
 
-    public void update(String title, String description, Double threshold, Integer rewardPoint, Boolean isActive) {
+    public void update(String title, String description, Double threshold, Long rewardPoint, Boolean isActive) {
         this.title = title;
         this.description = description;
         this.threshold = threshold;

@@ -16,6 +16,9 @@ public enum ErrorMessage {
     BAD_REQUEST(400, "잘못된 요청입니다."),
     INTERNAL_SERVER_ERROR(500, "서버 내부의 문제로 인해 요청을 처리할 수 없습니다."),
     NEED_MORE_GLUCOSE_HISTORIES(400, "예측에 필요한 혈당 개수가 부족합니다. 잠시 후에 다시 수행해 주세요."),
+    INVALID_BALANCE_IN_WALLET(400, "포인트 잔액이 부족합니다."),
+    AMOUNT_MUST_BE_POSITIVE(400, "포인트는 항상 0과 같거나, 0보다 커야합니다."),
+    BALANCE_IN_WALLET_MUST_BE_POSITIVE(400, "보유 포인트는 항상 0과 같거나, 0보다 커야합니다."),
     GENERATE_ACCESS_CODE_ERROR(400, "고유 코드를 만드는 과정에서 에러가 발생했습니다. 잠시 후 다시 시도해 주세요.");
 
     private final int code;

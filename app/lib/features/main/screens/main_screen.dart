@@ -4,6 +4,7 @@ import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/features/main/screens/service/service_screen.dart';
 import 'package:app/features/main/screens/setting_screen.dart';
 import 'package:app/features/member/presentation/providers.dart';
+import 'package:app/features/mission/presentation/screens/mission_screen.dart';
 import 'package:app/features/patient/presentation/providers.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -134,6 +135,11 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
         centerTitle: true,
         showLeading: false,
         actions: [
+          GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MissionScreen())),
+            child: Icon(Icons.dashboard_outlined, size: 24, color: AppColors.mainColor),
+          ),
+          SizedBox(width: 20),
           GestureDetector(
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ServiceScreen())),
             child: Icon(Icons.info_outline_rounded, size: 24, color: AppColors.mainColor),

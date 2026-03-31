@@ -38,7 +38,7 @@ class _PointContainerState extends ConsumerState<PointContainer> {
     return Row(
       children: [
         Text(
-          "보유 포인트: $_point",
+          "나의 보유 포인트: $_point",
           style: TextStyle(fontSize: 12, height: 20 / 12, color: AppColors.fontGray200Color),
         ),
         SizedBox(width: 6),

@@ -137,7 +137,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
         actions: [
           GestureDetector(
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MissionScreen())),
-            child: Icon(Icons.dashboard_outlined, size: 24, color: AppColors.mainColor),
+            child: Icon(Icons.task_outlined, size: 24, color: AppColors.mainColor),
           ),
           SizedBox(width: 20),
           GestureDetector(

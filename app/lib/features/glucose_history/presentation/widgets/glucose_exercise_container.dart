@@ -63,9 +63,9 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              width: 30,
-              height: 30,
+              margin: const EdgeInsets.symmetric(vertical: 5),
+              width: 40,
+              height: 40,
               child: Image.asset(exercise.image, fit: BoxFit.contain),
             ),
             Text(

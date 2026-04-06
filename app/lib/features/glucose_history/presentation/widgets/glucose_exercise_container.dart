@@ -1,6 +1,7 @@
 import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/shared/constants/my_exercise.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/constants/app_colors.dart';
@@ -50,10 +51,13 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
     return GestureDetector(
       onTap: () {
         if (isSelected) return;
+        HapticFeedback.lightImpact();
         setState(() => ref.read(exerciseManagerProvider.notifier).update(exercise));
       },
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.exerciseSelectedBackgroundColor : AppColors.fontGray50Color,

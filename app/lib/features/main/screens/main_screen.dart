@@ -9,6 +9,7 @@ import 'package:app/features/patient/presentation/providers.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/data/repositories/local_repository.dart';
@@ -27,6 +28,8 @@ class MainScreen extends ConsumerStatefulWidget {
 
 class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
+
+  final _screens = [HomeScreen(), MissionScreen(), SettingScreen()];
 
   @override
   void initState() {
@@ -113,20 +116,6 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
     });
   }
 
-  Widget _getScreen() {
-    Widget screen;
-    switch (_currentIndex) {
-      case 0:
-        screen = HomeScreen();
-        break;
-      case 1:
-      default:
-        screen = SettingScreen();
-        break;
-    }
-    return SafeArea(child: screen);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,20 +124,14 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
         centerTitle: true,
         showLeading: false,
         actions: [
-          GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MissionScreen())),
-            child: Icon(Icons.task_outlined, size: 24, color: AppColors.mainColor),
+          IconButton(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ServiceScreen())),
+            icon: Icon(Icons.info_outline_rounded, size: 24, color: AppColors.mainColor),
           ),
-          SizedBox(width: 20),
-          GestureDetector(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ServiceScreen())),
-            child: Icon(Icons.info_outline_rounded, size: 24, color: AppColors.mainColor),
-          ),
-          SizedBox(width: 20),
         ],
       ),
       backgroundColor: AppColors.backgroundColor,
-      body: _getScreen(),
+      body: SafeArea(child: _screens[_currentIndex]),
       bottomNavigationBar: Container(
         color: AppColors.backgroundColor,
         padding: const EdgeInsets.only(top: 10),
@@ -164,14 +147,18 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
                   inactiveIcon: Icons.home_outlined,
                   index: 0,
                   title: '홈',
-                  onTap: () => setState(() => _currentIndex = 0),
+                ),
+                _getBottomNavigationBarItem(
+                  activeIcon: Icons.flag,
+                  inactiveIcon: Icons.flag_outlined,
+                  index: 1,
+                  title: '미션',
                 ),
                 _getBottomNavigationBarItem(
                   activeIcon: Icons.settings,
                   inactiveIcon: Icons.settings_outlined,
-                  index: 1,
+                  index: 2,
                   title: '설정',
-                  onTap: () => setState(() => _currentIndex = 1),
                 ),
               ],
             ),
@@ -186,25 +173,32 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
     required IconData inactiveIcon,
     required int index,
     required String title,
-    required Function() onTap,
   }) {
+    var isSelected = _currentIndex == index;
     return Expanded(
       child: GestureDetector(
-        onTap: onTap,
+        onTap: () {
+          HapticFeedback.lightImpact();
+          setState(() => _currentIndex = index);
+        },
         behavior: HitTestBehavior.opaque,
-        child: Container(
-          color: AppColors.backgroundColor,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(_currentIndex == index ? activeIcon : inactiveIcon),
-              SizedBox(height: 10),
-              Text(
-                title,
-                style: TextStyle(fontSize: 12, height: 20 / 12, color: AppColors.fontGray600Color),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(isSelected ? activeIcon : inactiveIcon, size: 24),
+            SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                height: 20 / 14,
+                color: AppColors.fontGray600Color,
+                fontWeight: FontWeight.bold,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

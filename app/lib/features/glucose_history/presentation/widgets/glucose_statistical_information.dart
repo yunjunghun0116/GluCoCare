@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../care/data/models/care_relation_response.dart';
+import '../../../main/widgets/setting_action_button.dart';
 
 class GlucoseStatisticalInformation extends ConsumerStatefulWidget {
   final CareRelationResponse careGiver;
@@ -64,13 +65,15 @@ class _GlucoseStatisticalInformationState extends ConsumerState<GlucoseStatistic
             style: TextStyle(fontSize: 16, height: 20 / 16, color: AppColors.mainColor, fontWeight: FontWeight.bold),
           ),
         ),
-        Container(width: double.infinity, height: 1, color: AppColors.fontGray400Color),
-        getActiveButton(
+        Container(width: double.infinity, height: 1, color: AppColors.fontGray200Color),
+        SettingActionButton(
           title: "직접 측정 혈당 추가하기",
+          fontSize: 14,
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GlucoseUploadScreen())),
         ),
-        getActiveButton(
+        SettingActionButton(
           title: "혈당 위험 구간 알림 설정하기",
+          fontSize: 14,
           onTap: () async {
             var glucoseAlertPolicy = await ref
                 .read(glucoseWarningControllerProvider.notifier)
@@ -86,39 +89,6 @@ class _GlucoseStatisticalInformationState extends ConsumerState<GlucoseStatistic
           },
         ),
       ],
-    );
-  }
-
-  Widget getActiveButton({required String title, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        width: double.infinity,
-        height: 50,
-        decoration: BoxDecoration(
-          color: AppColors.backgroundColor,
-          border: Border(bottom: BorderSide(color: AppColors.fontGray400Color)),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  height: 20 / 14,
-                  color: AppColors.fontGray800Color,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(width: 20),
-            Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.fontGray800Color),
-          ],
-        ),
-      ),
     );
   }
 }

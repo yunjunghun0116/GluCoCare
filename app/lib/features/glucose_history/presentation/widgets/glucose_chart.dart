@@ -5,6 +5,7 @@ import 'package:app/features/glucose_history/presentation/providers.dart';
 import 'package:app/features/glucose_history/presentation/widgets/glucose_chart_y_axis.dart';
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -12,6 +13,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../../../core/data/repositories/local_repository.dart';
 import '../../../../core/exceptions/custom_exception.dart';
 import '../../../../shared/constants/local_repository_key.dart';
+import '../../../../shared/widgets/common_loading_indicator.dart';
 import 'glucose_chart_tooltip.dart';
 import 'glucose_exercise_container.dart';
 
@@ -174,14 +176,13 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
               ...([1.0, 2.0, 3.0, 6.0].map((number) => _getIntervalButton(number)).toList()),
               Spacer(),
               GestureDetector(
-                onTap: widget.isLoading ? null : widget.onRefresh, // 로딩중 탭 막기
-                child: widget.isLoading
-                    ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.mainColor),
-                      )
-                    : Icon(Icons.refresh, color: AppColors.mainColor),
+                onTap: widget.isLoading
+                    ? null
+                    : () {
+                        HapticFeedback.lightImpact();
+                        widget.onRefresh();
+                      }, // 로딩중 탭 막기
+                child: widget.isLoading ? CommonLoadingIndicator() : Icon(Icons.refresh, color: AppColors.mainColor),
               ),
             ],
           ),
@@ -198,6 +199,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
     return GestureDetector(
       onTap: () {
+        HapticFeedback.lightImpact();
         setState(() {
           _labelShowSet.clear();
           _cachedChartWidth = null;

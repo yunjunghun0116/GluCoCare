@@ -2,7 +2,7 @@ name: app
 description: "GluCoCare"
 publish_to: 'none'
 
-version: 1.1.4+22
+version: 1.1.5+24
 
 environment:
   sdk: ^3.8.1
@@ -26,6 +26,9 @@ dependencies:
   # 차트 그리기
   fl_chart: ^1.0.0
   syncfusion_flutter_charts: ^30.1.42
+  # 언어 적용
+  flutter_localizations: # flutter gen-l10n
+    sdk: flutter
   intl: ^0.20.2
   # 파이어베이스
   firebase_core: ^4.0.0
@@ -58,3 +61,4 @@ flutter:
     - assets/logo/
     - assets/exercise/
     - assets/health/
+    - assets/icon/

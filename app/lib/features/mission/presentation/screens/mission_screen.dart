@@ -2,7 +2,8 @@ import 'package:app/features/mission/data/models/daily_mission_response.dart';
 import 'package:app/features/mission/data/models/mission_type.dart';
 import 'package:app/features/mission/presentation/providers.dart';
 import 'package:app/features/mission/presentation/widgets/mission_button.dart';
-import 'package:app/features/mission/presentation/widgets/point_container.dart';
+import 'package:app/features/mission/presentation/widgets/mission_status.dart';
+import 'package:app/features/point/presentation/widgets/point_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -61,17 +62,12 @@ class _MissionScreenState extends ConsumerState<MissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: "오늘의 미션", onBack: () => Navigator.pop(context), actions: [PointContainer()]),
       backgroundColor: AppColors.backgroundColor,
       body: ListView(
+        physics: ClampingScrollPhysics(),
         children: [
-          Container(
-            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-            child: Text(
-              "오늘의 미션은 나 뿐만 아니라 \n내 가족을 통해서도 완료를 할 수 있습니다.\n가족과 함께 혈당 관리를 해보아요.",
-              style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.mainColor, fontWeight: FontWeight.bold),
-            ),
-          ),
+          MissionStatus(completedCount: 2, totalCount: 5),
+          SizedBox(height: 10),
           ..._missions.map(
             (mission) => Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -129,6 +125,7 @@ class _MissionScreenState extends ConsumerState<MissionScreen> {
               ),
             ),
           ),
+          SizedBox(height: 50),
         ],
       ),
     );

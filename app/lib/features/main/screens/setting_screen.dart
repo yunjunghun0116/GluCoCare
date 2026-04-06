@@ -4,6 +4,7 @@ import 'package:app/features/member/presentation/providers.dart';
 import 'package:app/features/member/presentation/screens/member_screen.dart';
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:app/shared/utils/sign_util.dart';
+import 'package:app/shared/widgets/common_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -55,13 +56,7 @@ class _SettingScreenState extends ConsumerState<SettingScreen> {
               ),
             ),
             Spacer(),
-            GestureDetector(
-              onTap: () => SignUtil.logout(context),
-              child: Text(
-                "로그아웃",
-                style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray600Color),
-              ),
-            ),
+            CommonTextButton(text: "로그아웃", onTap: () => SignUtil.logout(context)),
             SizedBox(width: 20),
           ],
         ),

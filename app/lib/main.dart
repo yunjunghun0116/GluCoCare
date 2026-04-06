@@ -4,7 +4,9 @@ import 'package:app/features/main/screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/background/background_health_sync_manager.dart';
 import 'core/exceptions/exception_handler.dart';
@@ -22,6 +24,7 @@ void main() {
     await Firebase.initializeApp();
     await NotificationService().initialize();
     await BackgroundHealthSyncManager.initialize();
+    await initializeDateFormatting('ko');
     runApp(ProviderScope(child: const MainApp()));
   }, (error, stackTrace) => ExceptionHandler().handleException(error, stackTrace, rootStateKey.currentContext));
 }
@@ -35,6 +38,13 @@ class MainApp extends StatelessWidget {
       title: "글루코케어",
       debugShowCheckedModeBanner: false,
       navigatorKey: rootStateKey,
+      locale: Locale('ko'),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [Locale('ko', 'KR')],
       builder: (context, child) {
         if (child == null) return Container();
         return MediaQuery(

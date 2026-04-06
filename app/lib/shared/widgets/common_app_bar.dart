@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constants/app_colors.dart';
 
@@ -26,6 +27,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               onTap:
                   onBack ??
                   () {
+                    HapticFeedback.lightImpact();
                     if (Navigator.canPop(context)) {
                       Navigator.pop(context);
                     }

@@ -5,6 +5,7 @@ import 'package:app/features/glucose_warning/presentation/screens/glucose_value_
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GlucoseWarningScreen extends ConsumerStatefulWidget {
@@ -105,7 +106,10 @@ class _GlucoseWarningScreenState extends ConsumerState<GlucoseWarningScreen> {
 
   Widget getGlucoseAlertContainer({required String title, required int value, required VoidCallback onTap}) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

@@ -1,5 +1,3 @@
-import 'package:app/core/exceptions/custom_exception.dart';
-import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/shared/constants/app_values.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -13,9 +11,7 @@ class ServiceScreen extends StatelessWidget {
 
   Future<void> _launchUrl(String url) async {
     var uri = Uri.parse(url);
-    if (!await launchUrl(uri)) {
-      throw CustomException(ExceptionMessage.internalServerError);
-    }
+    await launchUrl(uri);
   }
 
   @override

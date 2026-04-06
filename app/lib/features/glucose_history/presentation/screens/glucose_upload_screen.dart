@@ -41,13 +41,6 @@ class _GlucoseUploadScreenState extends ConsumerState<GlucoseUploadScreen> {
         body: Column(
           children: [
             SizedBox(height: 20),
-            Center(
-              child: Text(
-                "직접 측정한 혈당 수치를 기록해 주세요.",
-                style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray600Color),
-              ),
-            ),
-            SizedBox(height: 20),
             Row(
               children: [
                 SizedBox(width: 80, child: Text("날짜", textAlign: TextAlign.center)),

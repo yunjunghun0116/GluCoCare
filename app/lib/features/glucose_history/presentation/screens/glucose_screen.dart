@@ -1,6 +1,7 @@
 import 'package:app/features/glucose_history/presentation/widgets/glucose_chart.dart';
 import 'package:app/features/glucose_history/presentation/widgets/glucose_statistical_information.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/health/health_connector.dart';
@@ -68,7 +69,12 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
           ),
           SizedBox(height: 20),
           GestureDetector(
-            onTap: _isLoading ? null : setGlucoseHistories,
+            onTap: _isLoading
+                ? null
+                : () {
+                    HapticFeedback.lightImpact();
+                    setGlucoseHistories();
+                  },
             child: _isLoading
                 ? SizedBox(
                     width: 24,
@@ -118,7 +124,10 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
     var isSelected = _tapIndex == index;
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _tapIndex = index),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          setState(() => _tapIndex = index);
+        },
         behavior: HitTestBehavior.opaque,
         child: Container(
           height: 50,

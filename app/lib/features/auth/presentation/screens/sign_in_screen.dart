@@ -3,6 +3,7 @@ import 'package:app/core/exceptions/exception_message.dart';
 import 'package:app/features/auth/data/models/login_request.dart';
 import 'package:app/features/auth/presentation/providers.dart';
 import 'package:app/shared/widgets/common_check_box.dart';
+import 'package:app/shared/widgets/common_text_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -103,17 +104,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               SizedBox(height: 20),
               CommonButton(value: true, onTap: loginWithEmailAndPassword, title: "로그인"),
               SizedBox(height: 20),
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
+              CommonTextButton(
+                text: "회원가입",
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpScreen())),
-                child: Container(
-                  alignment: Alignment.center,
-                  width: 120,
-                  child: Text(
-                    '회원가입',
-                    style: TextStyle(fontSize: 14, color: AppColors.fontGray500Color, height: 20 / 14),
-                  ),
-                ),
               ),
             ],
           ),

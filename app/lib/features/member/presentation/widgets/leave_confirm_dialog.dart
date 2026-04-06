@@ -1,4 +1,6 @@
+import 'package:app/shared/widgets/common_text_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../shared/constants/app_colors.dart';
 
@@ -17,7 +19,7 @@ class _LeaveConfirmDialogState extends State<LeaveConfirmDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         height: 200,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,15 +42,34 @@ class _LeaveConfirmDialogState extends State<LeaveConfirmDialog> {
                 ),
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => Navigator.pop(context, false),
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    Navigator.pop(context, false);
+                  },
                   child: SizedBox(width: 20, child: Icon(Icons.close, size: 24)),
                 ),
               ],
             ),
-
+            SizedBox(height: 10),
+            Center(
+              child: Text(
+                "탈퇴 시 혈당 기록과 미션 달성 내역,\n포인트가 모두 삭제되며 복구할 수 없어요.",
+                style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray400Color),
+                textAlign: TextAlign.center,
+              ),
+            ),
             Spacer(),
-            getButton(title: "네", color: AppColors.fontGray400Color, onTap: () => Navigator.pop(context, true)),
-            getButton(title: "아니오", color: AppColors.fontGray800Color, onTap: () => Navigator.pop(context, false)),
+            Center(
+              child: CommonTextButton(text: "네", onTap: () => Navigator.pop(context, true)),
+            ),
+            Center(
+              child: CommonTextButton(
+                text: "아니오",
+                onTap: () => Navigator.pop(context, false),
+                color: AppColors.mainColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),

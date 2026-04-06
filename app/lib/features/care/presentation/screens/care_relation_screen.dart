@@ -4,10 +4,12 @@ import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
 import 'package:app/shared/widgets/common_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/care_relation_response.dart';
 import '../providers.dart';
+import '../widgets/care_relation_button.dart';
 import 'create_care_relation_screen.dart';
 
 class CareGiverScreen extends ConsumerStatefulWidget {
@@ -62,62 +64,20 @@ class _CareGiverScreenState extends ConsumerState<CareGiverScreen> {
             title: "등록하기",
           ),
           SizedBox(height: 20),
-          Container(width: double.infinity, height: 1, color: AppColors.mainColor),
-          Padding(
+          Container(
+            width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            color: AppColors.mainColor,
             child: Text(
-              "등록된 사람들 목록",
-              style: TextStyle(fontSize: 16, height: 20 / 16, fontWeight: FontWeight.bold, color: AppColors.mainColor),
+              "등록된 사람들",
+              style: TextStyle(fontSize: 16, height: 20 / 16, fontWeight: FontWeight.bold, color: AppColors.whiteColor),
             ),
           ),
-          Container(width: double.infinity, height: 1, color: AppColors.mainColor),
-          ..._careRelations.map((careGiver) => getCareGiverCard(careGiver)),
+          ..._careRelations.map(
+            (careRelation) =>
+                CareRelationButton(careRelation: careRelation, onTap: () => selectCareReceiver(careRelation)),
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget getCareGiverCard(CareRelationResponse careRelation) {
-    return GestureDetector(
-      onTap: () => selectCareReceiver(careRelation),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          border: Border(bottom: BorderSide(color: AppColors.mainColor)),
-          color: AppColors.backgroundColor,
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "등록된 사람 정보",
-                    style: TextStyle(
-                      fontSize: 14,
-                      height: 20 / 14,
-                      color: AppColors.subColor3,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    "이름 : ${careRelation.patientName} (ID : ${careRelation.patientId})",
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 20 / 16,
-                      color: AppColors.subColor2,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                ],
-              ),
-            ),
-            Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.mainColor),
-          ],
-        ),
       ),
     );
   }

@@ -3,6 +3,8 @@ import 'package:app/features/member/presentation/providers.dart';
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:app/shared/utils/local_util.dart';
 import 'package:app/shared/widgets/common_app_bar.dart';
+import 'package:app/shared/widgets/common_small_button.dart';
+import 'package:app/shared/widgets/common_text_button.dart';
 import 'package:app/shared/widgets/common_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,36 +59,13 @@ class _MemberScreenState extends ConsumerState<MemberScreen> {
               Expanded(
                 child: CommonTextField(controller: _nameController, hintText: "닉네임을 입력해 주세요."),
               ),
-              GestureDetector(
-                onTap: () => updateName(),
-                child: Container(
-                  width: 80,
-                  height: 52,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: AppColors.mainColor, borderRadius: BorderRadius.circular(15)),
-                  child: Text(
-                    "변경",
-                    style: TextStyle(
-                      fontSize: 16,
-                      height: 20 / 16,
-                      color: AppColors.whiteColor,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
+              CommonSmallButton(title: "변경", onTap: updateName),
               SizedBox(width: 20),
             ],
           ),
           Spacer(),
           Center(
-            child: GestureDetector(
-              onTap: () => deleteMember(),
-              child: Text(
-                "회원탈퇴",
-                style: TextStyle(fontSize: 14, height: 20 / 14, color: AppColors.fontGray800Color),
-              ),
-            ),
+            child: CommonTextButton(text: "회원탈퇴", onTap: () => deleteMember()),
           ),
           SizedBox(height: 100),
         ],

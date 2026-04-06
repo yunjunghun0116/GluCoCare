@@ -1,5 +1,6 @@
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CommonCheckBox extends StatefulWidget {
   final bool value;
@@ -16,7 +17,10 @@ class _CommonCheckBoxState extends State<CommonCheckBox> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => widget.onTap(!widget.value),
+      onTap: () {
+        HapticFeedback.lightImpact();
+        widget.onTap(!widget.value);
+      },
       child: Container(
         alignment: Alignment.center,
         width: widget.size,

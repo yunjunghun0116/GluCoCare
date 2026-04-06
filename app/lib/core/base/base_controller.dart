@@ -11,7 +11,7 @@ abstract class BaseController<S extends BaseState> extends StateNotifier<S> {
 
   Future<Response> getRequest(String url, {Map<String, dynamic>? queryParameters, Map<String, String>? headers}) async {
     try {
-      if (state.isLoading) throw CustomException(ExceptionMessage.progressing);
+      await _validateIsLoading();
       state = state.copyWith(isLoading: true) as S;
 
       var response = await _dio.get(
@@ -27,7 +27,7 @@ abstract class BaseController<S extends BaseState> extends StateNotifier<S> {
 
   Future<Response> postRequest(String url, {dynamic data, Map<String, String>? headers}) async {
     try {
-      if (state.isLoading) throw CustomException(ExceptionMessage.progressing);
+      await _validateIsLoading();
       state = state.copyWith(isLoading: true) as S;
 
       var response = await _dio.post(
@@ -43,7 +43,7 @@ abstract class BaseController<S extends BaseState> extends StateNotifier<S> {
 
   Future<Response> putRequest(String url, {dynamic data, Map<String, String>? headers}) async {
     try {
-      if (state.isLoading) throw CustomException(ExceptionMessage.progressing);
+      await _validateIsLoading();
       state = state.copyWith(isLoading: true) as S;
 
       var response = await _dio.put(
@@ -59,7 +59,7 @@ abstract class BaseController<S extends BaseState> extends StateNotifier<S> {
 
   Future<Response> patchRequest(String url, {dynamic data, Map<String, String>? headers}) async {
     try {
-      if (state.isLoading) throw CustomException(ExceptionMessage.progressing);
+      await _validateIsLoading();
       state = state.copyWith(isLoading: true) as S;
 
       var response = await _dio.patch(
@@ -75,7 +75,7 @@ abstract class BaseController<S extends BaseState> extends StateNotifier<S> {
 
   Future<Response> deleteRequest(String url, {Map<String, String>? headers}) async {
     try {
-      if (state.isLoading) throw CustomException(ExceptionMessage.progressing);
+      await _validateIsLoading();
       state = state.copyWith(isLoading: true) as S;
 
       var response = await _dio.delete(url, options: Options(headers: headers));
@@ -83,6 +83,14 @@ abstract class BaseController<S extends BaseState> extends StateNotifier<S> {
     } finally {
       state = state.copyWith(isLoading: false) as S;
     }
+  }
+
+  Future<void> _validateIsLoading() async {
+    for (var attempt = 0; attempt < 3; attempt++) {
+      if (!state.isLoading) return;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+    throw CustomException(ExceptionMessage.progressing);
   }
 }
 

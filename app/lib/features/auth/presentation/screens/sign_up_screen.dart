@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/exceptions/custom_exception.dart';
@@ -69,6 +70,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           leading: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
+              HapticFeedback.lightImpact();
               if (_pageIndex > 0) {
                 setState(() => _pageIndex--);
                 return;

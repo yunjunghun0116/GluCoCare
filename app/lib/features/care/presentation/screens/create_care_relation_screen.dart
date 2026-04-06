@@ -55,7 +55,7 @@ class _CreateCareGiverScreenState extends ConsumerState<CreateCareGiverScreen> {
               ),
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           Row(
             children: [
               SizedBox(width: 80, child: Text("이름", textAlign: TextAlign.center)),

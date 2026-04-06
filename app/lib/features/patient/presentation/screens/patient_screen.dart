@@ -34,6 +34,7 @@ class _PatientScreenState extends ConsumerState<PatientScreen> {
     super.initState();
     _copyRecognizer = TapGestureRecognizer()
       ..onTap = () {
+        HapticFeedback.lightImpact();
         var url = getDexcomServerUrl();
         Clipboard.setData(ClipboardData(text: url));
         if (!mounted) return;

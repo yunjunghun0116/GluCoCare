@@ -68,7 +68,7 @@ class _GlucoseValueSelectScreenState extends State<GlucoseValueSelectScreen> {
             width: double.infinity,
             height: 150,
             child: CupertinoPicker(
-              itemExtent: 50,
+              itemExtent: 40,
               onSelectedItemChanged: (item) {
                 _selectedValue = (widget.minValue + item * 5);
               },

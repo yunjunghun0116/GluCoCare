@@ -4,6 +4,7 @@ import 'package:app/features/glucose_history/presentation/screens/glucose_screen
 import 'package:app/shared/constants/app_colors.dart';
 import 'package:app/shared/constants/local_repository_key.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/data/repositories/local_repository.dart';
@@ -51,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           GestureDetector(
             onTap: () async {
+              HapticFeedback.lightImpact();
               var result = await Navigator.push<int?>(context, MaterialPageRoute(builder: (_) => CareGiverScreen()));
               if (result == null) return;
               if (careRelation?.id == result) return;

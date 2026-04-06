@@ -61,7 +61,6 @@ public class MemberDailyMission extends BaseEntity {
 
     public void complete() {
         if (isFailed) return;
-        if (isCompleted) return;
         this.isCompleted = true;
     }
 

@@ -15,6 +15,7 @@ import com.glucocare.server.feature.point.domain.PointTransactionType;
 import com.glucocare.server.feature.point.domain.PointWallet;
 import com.glucocare.server.feature.point.domain.PointWalletRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional

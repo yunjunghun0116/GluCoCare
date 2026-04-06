@@ -40,3 +40,6 @@ out/
 src/main/resources/application.yml
 src/main/resources/serviceAccountKey.json
 
+.DS_Store
+**/.DS_Store
+

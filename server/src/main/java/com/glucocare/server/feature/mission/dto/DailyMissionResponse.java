@@ -18,23 +18,19 @@ public record DailyMissionResponse(
         Long rewardPoint,
         LocalDate missionDate
 ) {
-    public static DailyMissionResponse from(MemberDailyMission daily, Boolean canComplete, Double currentValue) {
-        return new DailyMissionResponse(daily.getMission()
-                                             .getId(),
-                                        daily.getMission()
-                                             .getTitle(),
-                                        daily.getMission()
-                                             .getDescription(),
-                                        daily.getMission()
-                                             .getMissionType(),
-                                        daily.getMission()
-                                             .getThreshold(),
+    public static DailyMissionResponse from(MemberDailyMission dailyMission, Boolean canComplete, Double currentValue) {
+        var mission = dailyMission.getMission();
+        return new DailyMissionResponse(dailyMission.getId(),
+                                        mission.getTitle(),
+                                        mission.getDescription(),
+                                        mission.getMissionType(),
+                                        mission.getThreshold(),
                                         currentValue,
                                         canComplete,
-                                        daily.getIsCompleted(),
-                                        daily.getIsFailed(),
-                                        daily.getMission()
-                                             .getRewardPoint(),
-                                        daily.getDate());
+                                        dailyMission.getIsCompleted(),
+                                        dailyMission.getIsFailed(),
+                                        dailyMission.getMission()
+                                                    .getRewardPoint(),
+                                        dailyMission.getDate());
     }
 }

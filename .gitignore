@@ -1,2 +1,4 @@
 server/src/main/resources/serviceAccountKey.json
 server/src/main/resources/application.yml
+.DS_Store
+**/.DS_Store

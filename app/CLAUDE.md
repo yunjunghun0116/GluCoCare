@@ -61,7 +61,7 @@ lib/
 | **주요 CTA 버튼** | `Material + InkWell` | 저장, 확인, 등록 같은 주요 액션 |
 | **텍스트 링크** | `TextButton` | 로그아웃, 회원가입, 다이얼로그 버튼 |
 | **리스트 아이템** | `Material + InkWell` | 선택 가능한 카드, 설정 항목 |
-| **컨텐츠 영역 아이콘** | `GestureDetector + 햅틱` | 새로고침, 복사 등 인라인 아이콘 |
+| **컨텐츠 영역 아이콘** | `GestureDetector` | 새로고침, 복사 등 인라인 아이콘 |
 | **선택형 카드** | `GestureDetector + AnimatedContainer` | 배경색이 바뀌는 선택 UI (운동 선택) |
 | **전체 화면 제스처** | `GestureDetector` | 키보드 닫기 등 화면 전체 터치 |
 
@@ -118,61 +118,37 @@ Material 리플 효과가 어울리는가?
 
 #### 기본 원칙
 
-> **"사용자가 의도적으로 탭한 모든 버튼과 상태 변경 UI에만 햅틱을 추가한다"**
+> **"햅틱은 미션 완료 순간에만 사용한다. 나머지 버튼은 애니메이션으로만 피드백을 제공한다."**
 
-#### ✅ 햅틱을 넣어야 하는 경우
+햅틱은 신호(signal)다. 남발하면 노이즈가 되어 정작 중요한 순간의 의미가 희석된다.  
+GlucoCare에서 햅틱을 느낄 수 있는 유일한 순간은 미션 완료이며, 이를 통해 사용자는 해당 진동이 특별한 달성 순간임을 명확히 학습한다.
 
-| 상황            | 햅틱 종류              | 예시                       |
-|---------------|--------------------|--------------------------|
-| 일반 버튼 탭       | `lightImpact()`    | 저장, 확인, 취소 버튼            |
-| 상태 변경 (선택/토글) | `selectionClick()` | 탭 전환, 리스트 선택, 간격 선택      |
-| 체크박스/스위치      | `lightImpact()`    | 자동 로그인 체크                |
-| 뒤로가기/닫기       | `lightImpact()`    | AppBar leading, 다이얼로그 닫기 |
-| 파괴적 액션        | `mediumImpact()`   | 삭제, 회원탈퇴                 |
-| 복사/공유         | `lightImpact()`    | URL 복사, 공유하기             |
+#### ✅ 햅틱을 넣는 경우
 
-#### ❌ 햅틱을 넣으면 안 되는 경우
+| 상황 | 햅틱 종류           | 예시 |
+|------|-----------------|------|
+| 미션 완료 | `lightImpact()` | MissionButton 완료 탭 |
 
-| 상황                | 이유                |
-|-------------------|-------------------|
-| TextField 입력      | 매 글자마다 진동 → 피로감   |
-| 스크롤 이벤트           | 연속적 진동 → 불쾌감      |
-| 자동 새로고침/로딩        | 사용자가 의도하지 않은 진동   |
-| 차트 터치 (정보 확인)     | 읽기 전용 UI → 액션 아님  |
-| 드래그/슬라이더 조작       | 연속 진동 → 배터리 소모    |
-| 짧은 시간 내 연타 가능한 버튼 | +/- 버튼 등 → 과도한 진동 |
+#### ❌ 햅틱을 넣지 않는 경우 (전부)
 
-#### 판단 기준
-
-```
-사용자가 버튼을 눌렀을 때
-"내가 지금 뭔가 했구나"라고 느껴야 하는가?
-
-→ YES: 햅틱 추가 ✅
-→ NO: 햅틱 불필요 ❌
-```
+| 상황 | 피드백 방식 |
+|------|-----------|
+| 일반 CTA 버튼 (저장, 확인 등) | AnimatedScale + 색상 변화 |
+| 뒤로가기/닫기 | 없음 |
+| 상태 변경 (선택/토글) | AnimatedContainer 색상 변화 |
+| 체크박스/스위치 | 없음 |
+| 파괴적 액션 (삭제 등) | 없음 |
+| TextField, 스크롤, 차트 등 | 없음 |
 
 #### 코드 작성
 
 ```dart
 import 'package:flutter/services.dart';
 
-// 일반 버튼
+// ✅ 미션 완료 시에만 사용
 onTap: () {
-  HapticFeedback.lightImpact();
-  submitForm();
-}
-
-// 선택/토글
-onTap: () {
-  HapticFeedback.selectionClick();
-  setState(() => _selectedIndex = index);
-}
-
-// 파괴적 액션
-onTap: () {
-  HapticFeedback.mediumImpact();
-  deleteMember();
+  HapticFeedback.heavyImpact();
+  completeMission();
 }
 ```
 
@@ -211,7 +187,6 @@ void _handlePop() {
   if (_isPopping) return;  // 중복 방지
   if (!Navigator.canPop(context)) return;
   _isPopping = true;
-  HapticFeedback.lightImpact();
   Navigator.pop(context);
 }
 ```

@@ -63,12 +63,7 @@ class _PointContainerState extends ConsumerState<PointContainer> {
           ),
           Spacer(),
           GestureDetector(
-            onTap: _isLoading
-                ? null
-                : () {
-                    HapticFeedback.lightImpact();
-                    setPoint();
-                  },
+            onTap: _isLoading ? null : setPoint,
             child: Container(
               width: 32,
               height: 32,

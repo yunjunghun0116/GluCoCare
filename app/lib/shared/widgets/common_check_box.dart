@@ -17,10 +17,7 @@ class _CommonCheckBoxState extends State<CommonCheckBox> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        widget.onTap(!widget.value);
-      },
+      onTap: () => widget.onTap(!widget.value),
       child: Container(
         alignment: Alignment.center,
         width: widget.size,

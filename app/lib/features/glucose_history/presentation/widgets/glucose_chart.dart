@@ -176,12 +176,7 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
               ...([1.0, 2.0, 3.0, 6.0].map((number) => _getIntervalButton(number)).toList()),
               Spacer(),
               GestureDetector(
-                onTap: widget.isLoading
-                    ? null
-                    : () {
-                        HapticFeedback.lightImpact();
-                        widget.onRefresh();
-                      }, // 로딩중 탭 막기
+                onTap: widget.isLoading ? null : widget.onRefresh, // 로딩중 탭 막기
                 child: widget.isLoading ? CommonLoadingIndicator() : Icon(Icons.refresh, color: AppColors.mainColor),
               ),
             ],
@@ -199,7 +194,6 @@ class _GlucoseChartState extends ConsumerState<GlucoseChart> {
 
     return GestureDetector(
       onTap: () {
-        HapticFeedback.lightImpact();
         setState(() {
           _labelShowSet.clear();
           _cachedChartWidth = null;

@@ -52,7 +52,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           GestureDetector(
             onTap: () async {
-              HapticFeedback.lightImpact();
               var result = await Navigator.push<int?>(context, MaterialPageRoute(builder: (_) => CareGiverScreen()));
               if (result == null) return;
               if (careRelation?.id == result) return;

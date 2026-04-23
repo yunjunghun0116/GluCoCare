@@ -27,7 +27,6 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
               onTap:
                   onBack ??
                   () {
-                    HapticFeedback.lightImpact();
                     if (Navigator.canPop(context)) {
                       Navigator.pop(context);
                     }

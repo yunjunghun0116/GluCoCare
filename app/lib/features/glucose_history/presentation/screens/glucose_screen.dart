@@ -69,12 +69,7 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
           ),
           SizedBox(height: 20),
           GestureDetector(
-            onTap: _isLoading
-                ? null
-                : () {
-                    HapticFeedback.lightImpact();
-                    setGlucoseHistories();
-                  },
+            onTap: _isLoading ? null : setGlucoseHistories,
             child: _isLoading
                 ? SizedBox(
                     width: 24,
@@ -124,10 +119,7 @@ class _GlucoseScreenState extends ConsumerState<GlucoseScreen> {
     var isSelected = _tapIndex == index;
     return Expanded(
       child: GestureDetector(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          setState(() => _tapIndex = index);
-        },
+        onTap: () => setState(() => _tapIndex = index),
         behavior: HitTestBehavior.opaque,
         child: Container(
           height: 50,

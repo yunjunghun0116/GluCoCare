@@ -2,7 +2,7 @@ name: app
 description: "GluCoCare"
 publish_to: 'none'
 
-version: 1.1.5+24
+version: 1.1.5+26
 
 environment:
   sdk: ^3.8.1
@@ -43,6 +43,8 @@ dependencies:
   url_launcher: ^6.3.2
   # Android Foreground Task
   flutter_foreground_task: ^9.2.1
+  # 홈화면 Floating 버튼
+  flutter_speed_dial: ^7.0.0
 
 dev_dependencies:
   flutter_test:

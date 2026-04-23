@@ -33,12 +33,7 @@ class CommonSmallButton extends StatelessWidget {
         ),
         child: InkWell(
           borderRadius: BorderRadius.circular(15),
-          onTap: enabled
-              ? () {
-                  HapticFeedback.lightImpact();
-                  onTap();
-                }
-              : null,
+          onTap: enabled ? onTap : null,
           child: Center(
             child: Text(
               title,

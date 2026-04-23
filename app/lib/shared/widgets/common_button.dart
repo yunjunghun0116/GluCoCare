@@ -73,12 +73,7 @@ class _CommonButtonState extends State<CommonButton> {
               onTapDown: _handleTapDown,
               onTapUp: _handleTapUp,
               onTapCancel: _handleTapCancel,
-              onTap: widget.value
-                  ? () {
-                      HapticFeedback.lightImpact();
-                      widget.onTap();
-                    }
-                  : null,
+              onTap: widget.value ? widget.onTap : null,
               child: SizedBox(
                 width: double.infinity,
                 height: 50,

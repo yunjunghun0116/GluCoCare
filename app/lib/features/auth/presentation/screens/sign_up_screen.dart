@@ -70,7 +70,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           leading: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () {
-              HapticFeedback.lightImpact();
               if (_pageIndex > 0) {
                 setState(() => _pageIndex--);
                 return;

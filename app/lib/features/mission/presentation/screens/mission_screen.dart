@@ -66,7 +66,10 @@ class _MissionScreenState extends ConsumerState<MissionScreen> {
       body: ListView(
         physics: ClampingScrollPhysics(),
         children: [
-          MissionStatus(completedCount: 2, totalCount: 5),
+          MissionStatus(
+            completedCount: _missions.where((mission) => mission.isCompleted).length,
+            totalCount: _missions.length,
+          ),
           SizedBox(height: 10),
           ..._missions.map(
             (mission) => Container(

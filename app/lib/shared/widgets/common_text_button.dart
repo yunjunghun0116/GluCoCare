@@ -29,10 +29,7 @@ class _CommonTextButtonState extends State<CommonTextButton> {
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
-      onTap: () {
-        HapticFeedback.lightImpact();
-        widget.onTap();
-      },
+      onTap: widget.onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedOpacity(
         opacity: _isPressed ? 0.5 : 1.0,

@@ -11,6 +11,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 import '../../../core/data/repositories/local_repository.dart';
 import '../../../core/notification/notification_service.dart';
@@ -165,6 +166,44 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
           ),
         ),
       ),
+      floatingActionButton: _currentIndex == 0
+          ? SpeedDial(
+              icon: Icons.add,
+              activeIcon: Icons.close,
+              backgroundColor: AppColors.mainColor,
+              foregroundColor: AppColors.whiteColor,
+              overlayColor: Colors.black,
+              overlayOpacity: 0.4,
+              spacing: 12,
+              children: [
+                SpeedDialChild(
+                  child: const Icon(Icons.medication_outlined),
+                  backgroundColor: AppColors.mainColor,
+                  foregroundColor: AppColors.whiteColor,
+                  label: '인슐린 기록',
+                  labelStyle: const TextStyle(fontSize: 12),
+                  labelBackgroundColor: Colors.transparent,
+                  onTap: () {},
+                ),
+                SpeedDialChild(
+                  child: const Icon(Icons.directions_run_outlined),
+                  backgroundColor: AppColors.mainColor,
+                  foregroundColor: AppColors.whiteColor,
+                  label: '운동 기록',
+                  labelStyle: const TextStyle(fontSize: 14),
+                  onTap: () {},
+                ),
+                SpeedDialChild(
+                  child: const Icon(Icons.restaurant_outlined),
+                  backgroundColor: AppColors.mainColor,
+                  foregroundColor: AppColors.whiteColor,
+                  label: '식사 기록',
+                  labelStyle: const TextStyle(fontSize: 14),
+                  onTap: () {},
+                ),
+              ],
+            )
+          : null,
     );
   }
 
@@ -177,10 +216,7 @@ class _MainScreenState extends ConsumerState<MainScreen> with WidgetsBindingObse
     var isSelected = _currentIndex == index;
     return Expanded(
       child: GestureDetector(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          setState(() => _currentIndex = index);
-        },
+        onTap: () => setState(() => _currentIndex = index),
         behavior: HitTestBehavior.opaque,
         child: Column(
           mainAxisSize: MainAxisSize.min,

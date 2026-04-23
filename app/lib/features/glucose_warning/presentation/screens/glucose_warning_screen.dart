@@ -106,10 +106,7 @@ class _GlucoseWarningScreenState extends ConsumerState<GlucoseWarningScreen> {
 
   Widget getGlucoseAlertContainer({required String title, required int value, required VoidCallback onTap}) {
     return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        onTap();
-      },
+      onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

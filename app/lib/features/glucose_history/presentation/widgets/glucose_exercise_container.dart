@@ -51,7 +51,6 @@ class _GlucoseExerciseContainerState extends ConsumerState<GlucoseExerciseContai
     return GestureDetector(
       onTap: () {
         if (isSelected) return;
-        HapticFeedback.lightImpact();
         setState(() => ref.read(exerciseManagerProvider.notifier).update(exercise));
       },
       behavior: HitTestBehavior.opaque,

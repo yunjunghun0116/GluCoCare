@@ -42,10 +42,7 @@ class _LeaveConfirmDialogState extends State<LeaveConfirmDialog> {
                 ),
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    Navigator.pop(context, false);
-                  },
+                  onTap: () => Navigator.pop(context, false),
                   child: SizedBox(width: 20, child: Icon(Icons.close, size: 24)),
                 ),
               ],
